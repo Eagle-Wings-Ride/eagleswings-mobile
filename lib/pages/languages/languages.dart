@@ -4,7 +4,7 @@ import '../../functions/function.dart';
 import '../../styles/styles.dart';
 import '../../translations/translations.dart';
 import '../../widgets/widgets.dart';
-import '../auth/login.dart';
+import '../../presentation/screens/auth/login.dart';
 
 class Languages extends StatefulWidget {
   const Languages({Key? key}) : super(key: key);

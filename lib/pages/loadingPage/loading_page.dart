@@ -1,15 +1,22 @@
 import 'dart:async';
 
+import 'package:eaglerides/pages/auth/register.dart';
+import 'package:eaglerides/navigation_page.dart';
+import 'package:eaglerides/presentation/screens/home/home.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../core/network_checker/network_checker_controller.dart';
 import '../../functions/function.dart';
+import '../../presentation/controller/auth/auth_controller.dart';
 import '../../styles/styles.dart';
 import '../languages/languages.dart';
-import '../auth/login.dart';
+import '../../presentation/screens/auth/login.dart';
 import '../noInternet/no_internet.dart';
 import '../onTripPage/booking_confirmation.dart';
 import '../onTripPage/invoice.dart';
 import '../onTripPage/map_page.dart';
 import '../onboarding/onboarding_page.dart';
+import '../../injection_container.dart' as di;
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({super.key});
@@ -19,63 +26,79 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage> {
+  final AuthController _authController = Get.put(di.sl<AuthController>());
+  final NetWorkStatusChecker _netWorkStatusChecker =
+      Get.put(di.sl<NetWorkStatusChecker>());
   String dot = '.';
   var demopage = TextEditingController();
 
   @override
   void initState() {
-    getLanguageDone();
+    _netWorkStatusChecker.updateConnectionStatus();
+    _authController.checkIsSignIn();
+    Timer(const Duration(seconds: 3), () async {
+      if (_authController.isSignIn.value) {
+        // if (await _authController.checkUserStatus()) {
+        //   Get.off(() => const NavigationPage());
+        // } else {
+        //   Get.off(() => const Register());
+        // }
+        Get.off(() => const HomePage());
+      } else {
+        Get.off(() => const Login());
+      }
+    });
 
     super.initState();
   }
 
 //get language json and data saved in local (bearer token , choosen language) and find users current status
-  getLanguageDone() async {
-    await getDetailsOfDevice();
-    if (internet == true) {
-      var val = await getLocalData();
+  // getLanguageDone() async {
+  //   await getDetailsOfDevice();
+  //   if (internet == true) {
+  //     var val = await getLocalData();
 
-      if (val == '3') {
-        if (userRequestData.isNotEmpty &&
-            userRequestData['is_completed'] == 1) {
-          //invoice page of ride
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const Invoice()),
-              (route) => false);
-        } else if (userRequestData.isNotEmpty &&
-            userRequestData['is_completed'] != 1) {
-          //searching ride page
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const BookingConfirmation()),
-              (route) => false);
-          mqttForUser();
-        } else {
-          //home page
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const Maps()),
-              (route) => false);
-        }
-      } else if (val == '2') {
-        Future.delayed(const Duration(seconds: 2), () {
-          //login page
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => const Login()));
-        });
-      } else {
-        Future.delayed(const Duration(seconds: 2), () {
-          //choose language page
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const OnboardingPage()));
-        });
-      }
-    } else {
-      setState(() {});
-    }
-  }
+  //     if (val == '3') {
+  //       if (userRequestData.isNotEmpty &&
+  //           userRequestData['is_completed'] == 1) {
+  //         //invoice page of ride
+  //         Navigator.pushAndRemoveUntil(
+  //             context,
+  //             MaterialPageRoute(builder: (context) => const Invoice()),
+  //             (route) => false);
+  //       } else if (userRequestData.isNotEmpty &&
+  //           userRequestData['is_completed'] != 1) {
+  //         //searching ride page
+  //         Navigator.pushAndRemoveUntil(
+  //             context,
+  //             MaterialPageRoute(
+  //                 builder: (context) => const BookingConfirmation()),
+  //             (route) => false);
+  //         mqttForUser();
+  //       } else {
+  //         //home page
+  //         Navigator.pushAndRemoveUntil(
+  //             context,
+  //             MaterialPageRoute(builder: (context) => const NavigationPage()),
+  //             (route) => false);
+  //       }
+  //     } else if (val == '2') {
+  //       Future.delayed(const Duration(seconds: 2), () {
+  //         //login page
+  //         Navigator.pushReplacement(
+  //             context, MaterialPageRoute(builder: (context) => const Login()));
+  //       });
+  //     } else {
+  //       Future.delayed(const Duration(seconds: 2), () {
+  //         //choose language page
+  //         Navigator.pushReplacement(context,
+  //             MaterialPageRoute(builder: (context) => const OnboardingPage()));
+  //       });
+  //     }
+  //   } else {
+  //     setState(() {});
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +139,7 @@ class _LoadingPageState extends State<LoadingPage> {
                       onTap: () {
                         setState(() {
                           internetTrue();
-                          getLanguageDone();
+                          // getLanguageDone();
                         });
                       },
                     ))

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'package:uuid/uuid.dart';
-import 'package:firebase_database/firebase_database.dart';
+// import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +10,7 @@ import 'package:location/location.dart';
 import 'dart:ui' as ui;
 import '../../functions/function.dart';
 import '../../functions/geohash.dart';
+import '../../functions/location_service.dart';
 import '../../styles/styles.dart';
 import 'package:geolocator/geolocator.dart' as geolocs;
 import 'package:permission_handler/permission_handler.dart' as perm;
@@ -17,7 +18,7 @@ import 'package:permission_handler/permission_handler.dart' as perm;
 import '../../translations/translations.dart';
 import '../../widgets/widgets.dart';
 import '../loadingPage/loading.dart';
-import '../auth/login.dart';
+import '../../presentation/screens/auth/login.dart';
 import '../noInternet/no_internet.dart';
 import 'booking_confirmation.dart';
 import 'drop_location_select.dart';
@@ -46,6 +47,7 @@ bool cancelRequestByUser = false;
 bool logout = false;
 
 class _MapsState extends State<Maps> with WidgetsBindingObserver {
+  late LocationService locationService;
   LatLng _centerLocation = const LatLng(41.4219057, -102.0840772);
 
   dynamic _sessionToken;
@@ -74,6 +76,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    locationService = LocationService();
     WidgetsBinding.instance!.addObserver(this);
 
     getLocs();
@@ -104,68 +107,79 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
 
 //get location permission and location details
   getLocs() async {
-    serviceEnabled = await location.serviceEnabled();
-    polyline.clear();
+    try {
+      print('getting');
+      serviceEnabled = await location.serviceEnabled();
+      polyline.clear();
 
-    permission = await location.hasPermission();
-
-    if (permission == PermissionStatus.denied ||
-        permission == PermissionStatus.deniedForever ||
-        serviceEnabled == false) {
-      gettingPerm++;
-      if (gettingPerm >= 2) {
+      permission = await location.hasPermission();
+      print(permission);
+      if (permission == PermissionStatus.denied ||
+          permission == PermissionStatus.deniedForever ||
+          serviceEnabled == false) {
+        print('permission');
+        gettingPerm++;
+        if (gettingPerm >= 2) {
+          setState(() {
+            _locationDenied = true;
+          });
+        }
         setState(() {
-          _locationDenied = true;
+          state = '2';
+          _loading = false;
         });
+      } else if (permission == PermissionStatus.granted ||
+          permission == PermissionStatus.grantedLimited) {
+        var locs = await geolocs.Geolocator.getLastKnownPosition();
+        print(locs);
+        if (locs != null) {
+          print(LatLng(double.parse(locs.latitude.toString()),
+              double.parse(locs.longitude.toString())));
+          setState(() {
+            center = LatLng(double.parse(locs.latitude.toString()),
+                double.parse(locs.longitude.toString()));
+            _centerLocation = LatLng(double.parse(locs.latitude.toString()),
+                double.parse(locs.longitude.toString()));
+            currentLocation = LatLng(double.parse(locs.latitude.toString()),
+                double.parse(locs.longitude.toString()));
+          });
+        } else {
+          var loc = await geolocs.Geolocator.getCurrentPosition(
+              desiredAccuracy: geolocs.LocationAccuracy.low);
+          setState(() {
+            center = LatLng(double.parse(loc.latitude.toString()),
+                double.parse(loc.longitude.toString()));
+            _centerLocation = LatLng(double.parse(loc.latitude.toString()),
+                double.parse(loc.longitude.toString()));
+            currentLocation = LatLng(double.parse(loc.latitude.toString()),
+                double.parse(loc.longitude.toString()));
+          });
+        }
+        BitmapDescriptor.fromAssetImage(
+                const ImageConfiguration(devicePixelRatio: 5),
+                'assets/images/userloc.png')
+            .then((value) {
+          setState(() {
+            userLocationIcon = value;
+          });
+        });
+
+        final Uint8List markerIcon =
+            await getBytesFromAsset('assets/images/top-taxi.png', 40);
+        pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
+
+        setState(() {
+          state = '3';
+          _loading = false;
+        });
+        if (timerLocation == null) {
+          getCurrentLocation();
+        }
       }
-      setState(() {
-        state = '2';
-        _loading = false;
-      });
-    } else if (permission == PermissionStatus.granted ||
-        permission == PermissionStatus.grantedLimited) {
-      var locs = await geolocs.Geolocator.getLastKnownPosition();
-      if (locs != null) {
-        setState(() {
-          center = LatLng(double.parse(locs.latitude.toString()),
-              double.parse(locs.longitude.toString()));
-          _centerLocation = LatLng(double.parse(locs.latitude.toString()),
-              double.parse(locs.longitude.toString()));
-          currentLocation = LatLng(double.parse(locs.latitude.toString()),
-              double.parse(locs.longitude.toString()));
-        });
-      } else {
-        var loc = await geolocs.Geolocator.getCurrentPosition(
-            desiredAccuracy: geolocs.LocationAccuracy.low);
-        setState(() {
-          center = LatLng(double.parse(loc.latitude.toString()),
-              double.parse(loc.longitude.toString()));
-          _centerLocation = LatLng(double.parse(loc.latitude.toString()),
-              double.parse(loc.longitude.toString()));
-          currentLocation = LatLng(double.parse(loc.latitude.toString()),
-              double.parse(loc.longitude.toString()));
-        });
-      }
-      BitmapDescriptor.fromAssetImage(
-              const ImageConfiguration(devicePixelRatio: 5),
-              'assets/images/userloc.png')
-          .then((value) {
-        setState(() {
-          userLocationIcon = value;
-        });
-      });
-
-      final Uint8List markerIcon =
-          await getBytesFromAsset('assets/images/top-taxi.png', 40);
-      pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
-
-      setState(() {
-        state = '3';
-        _loading = false;
-      });
-      if (timerLocation == null) {
-        getCurrentLocation();
-      }
+    } catch (e) {
+      print('Error getting location: $e');
+      state = '2';
+      _loading = false;
     }
   }
 
@@ -185,11 +199,11 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
     var lower = geo.encode(lowerLon, lowerLat);
     var higher = geo.encode(greaterLon, greaterLat);
 
-    var fdb = FirebaseDatabase.instance
-        .ref('drivers')
-        .orderByChild('g')
-        .startAt(lower)
-        .endAt(higher);
+    // var fdb = FirebaseDatabase.instance
+    //     .ref('drivers')
+    //     .orderByChild('g')
+    //     .startAt(lower)
+    //     .endAt(higher);
 
     var media = MediaQuery.of(context).size;
     return WillPopScope(
@@ -263,8 +277,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              languages[choosenLanguage]
-                                                  ['text_enable_location'],
+                                              'Enable Location',
                                               style: GoogleFonts.roboto(
                                                   fontSize:
                                                       media.width * sixteen,
@@ -281,8 +294,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                   getLocs();
                                                 },
                                                 child: Text(
-                                                  languages[choosenLanguage]
-                                                      ['text_ok'],
+                                                  'text_ok',
                                                   style: GoogleFonts.roboto(
                                                       fontWeight:
                                                           FontWeight.bold,
@@ -318,8 +330,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                 height: media.width * 0.05,
                                               ),
                                               Text(
-                                                languages[choosenLanguage]
-                                                    ['text_trustedtaxi'],
+                                                'Trusted Taxi',
                                                 style: GoogleFonts.roboto(
                                                     fontSize:
                                                         media.width * eighteen,
@@ -330,16 +341,14 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                 height: media.width * 0.025,
                                               ),
                                               Text(
-                                                languages[choosenLanguage]
-                                                    ['text_allowpermission1'],
+                                                'Allow Permission',
                                                 style: GoogleFonts.roboto(
                                                   fontSize:
                                                       media.width * fourteen,
                                                 ),
                                               ),
                                               Text(
-                                                languages[choosenLanguage]
-                                                    ['text_allowpermission2'],
+                                                'Allow permission',
                                                 style: GoogleFonts.roboto(
                                                   fontSize:
                                                       media.width * fourteen,
@@ -369,10 +378,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                     SizedBox(
                                                       width: media.width * 0.7,
                                                       child: Text(
-                                                        languages[
-                                                                choosenLanguage]
-                                                            [
-                                                            'text_loc_permission_user'],
+                                                        'Permission User',
                                                         style:
                                                             GoogleFonts.roboto(
                                                                 fontSize: media
@@ -387,32 +393,33 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                 ),
                                               ),
                                               Container(
-                                                  padding: EdgeInsets.all(
-                                                      media.width * 0.05),
-                                                  child: Button(
-                                                      onTap: () async {
-                                                        if (serviceEnabled ==
-                                                            false) {
-                                                          await location
-                                                              .requestService();
-                                                        }
-                                                        if (permission ==
-                                                                PermissionStatus
-                                                                    .denied ||
-                                                            permission ==
-                                                                PermissionStatus
-                                                                    .deniedForever) {
-                                                          await location
-                                                              .requestPermission();
-                                                        }
-                                                        setState(() {
-                                                          _loading = true;
-                                                        });
-                                                        getLocs();
-                                                      },
-                                                      text: languages[
-                                                              choosenLanguage]
-                                                          ['text_allow']))
+                                                padding: EdgeInsets.all(
+                                                    media.width * 0.05),
+                                                child: Button(
+                                                    onTap: () async {
+                                                      print(serviceEnabled);
+                                                      if (serviceEnabled ==
+                                                          false) {
+                                                        print('requesting');
+                                                        await location
+                                                            .requestService();
+                                                      }
+                                                      if (permission ==
+                                                              PermissionStatus
+                                                                  .denied ||
+                                                          permission ==
+                                                              PermissionStatus
+                                                                  .deniedForever) {
+                                                        await location
+                                                            .requestPermission();
+                                                      }
+                                                      setState(() {
+                                                        _loading = true;
+                                                      });
+                                                      getLocs();
+                                                    },
+                                                    text: 'Allow'),
+                                              ),
                                             ],
                                           ),
                                         )
@@ -421,152 +428,123 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                               alignment: Alignment.center,
                                               children: [
                                                 SizedBox(
-                                                    height: media.height * 1,
-                                                    width: media.width * 1,
-                                                    child: StreamBuilder<
-                                                            DatabaseEvent>(
-                                                        stream: fdb.onValue,
-                                                        builder: (context,
-                                                            AsyncSnapshot<
-                                                                    DatabaseEvent>
-                                                                event) {
-                                                          if (event.hasData) {
-                                                            myMarkers.removeWhere(
-                                                                (element) => element
-                                                                    .markerId
-                                                                    .toString()
-                                                                    .contains(
-                                                                        'car'));
-                                                            List driverData =
-                                                                [];
-                                                            event.data!.snapshot
-                                                                .children
-                                                                // ignore: avoid_function_literals_in_foreach_calls
-                                                                .forEach(
-                                                                    (element) {
-                                                              driverData.add(
-                                                                  element
-                                                                      .value);
-                                                            });
-                                                            // ignore: avoid_function_literals_in_foreach_calls
-                                                            driverData.forEach(
-                                                                (element) {
-                                                              if (element['is_active'] ==
-                                                                      1 &&
-                                                                  element['is_available'] ==
-                                                                      true) {
-                                                                DateTime dt = DateTime
-                                                                    .fromMillisecondsSinceEpoch(
-                                                                        element[
-                                                                            'updated_at']);
+                                                  height: media.height * 1,
+                                                  width: media.width * 1,
+                                                  child: StreamBuilder<LatLng>(
+                                                    stream: locationService
+                                                        .locationStream,
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting) {
+                                                        return Center(
+                                                            child:
+                                                                CircularProgressIndicator());
+                                                      } else if (snapshot
+                                                          .hasError) {
+                                                        return Center(
+                                                            child: Text(
+                                                                'Error: ${snapshot.error}'));
+                                                      } else if (snapshot
+                                                          .hasData) {
+                                                        LatLng location =
+                                                            snapshot.data!;
 
-                                                                if (DateTime.now()
-                                                                        .difference(
-                                                                            dt)
-                                                                        .inMinutes <=
-                                                                    2) {
-                                                                  myMarkers.add(
-                                                                      Marker(
-                                                                    markerId: MarkerId('car' +
-                                                                        element['id']
-                                                                            .toString()),
-                                                                    rotation: double.parse(
-                                                                        element['bearing']
-                                                                            .toString()),
-                                                                    position: LatLng(
-                                                                        element['l']
-                                                                            [0],
-                                                                        element['l']
-                                                                            [
-                                                                            1]),
-                                                                    icon:
-                                                                        pinLocationIcon,
-                                                                  ));
-                                                                }
-                                                              }
-                                                            });
-                                                          }
-                                                          return GoogleMap(
-                                                            onMapCreated:
-                                                                _onMapCreated,
-                                                            compassEnabled:
-                                                                false,
-                                                            initialCameraPosition:
-                                                                CameraPosition(
-                                                              target: center,
-                                                              zoom: 14.0,
-                                                            ),
-                                                            onCameraMove:
-                                                                (CameraPosition
-                                                                    position) {
-                                                              _centerLocation =
-                                                                  position
-                                                                      .target;
-                                                            },
-                                                            onCameraIdle:
-                                                                () async {
-                                                              if (_bottom ==
-                                                                      0 &&
-                                                                  _pickaddress ==
-                                                                      false) {
-                                                                var val = await geoCoding(
-                                                                    _centerLocation
-                                                                        .latitude,
-                                                                    _centerLocation
-                                                                        .longitude);
-                                                                setState(() {
-                                                                  if (addressList
-                                                                      .where((element) =>
-                                                                          element
-                                                                              .id ==
-                                                                          'pickup')
-                                                                      .isNotEmpty) {
-                                                                    var add = addressList.firstWhere((element) =>
+                                                        // Update the center position with new data
+                                                        center = location;
+                                                        return GoogleMap(
+                                                          onMapCreated:
+                                                              _onMapCreated,
+                                                          compassEnabled: false,
+                                                          initialCameraPosition:
+                                                              CameraPosition(
+                                                            target: center,
+                                                            zoom: 14.0,
+                                                          ),
+                                                          onCameraMove:
+                                                              (CameraPosition
+                                                                  position) {
+                                                            _centerLocation =
+                                                                position.target;
+                                                          },
+                                                          onCameraIdle:
+                                                              () async {
+                                                            if (_bottom == 0 &&
+                                                                _pickaddress ==
+                                                                    false) {
+                                                              var val = await geoCoding(
+                                                                  _centerLocation
+                                                                      .latitude,
+                                                                  _centerLocation
+                                                                      .longitude);
+                                                              print('val');
+                                                              print(val);
+                                                              setState(() {
+                                                                if (addressList
+                                                                    .where((element) =>
                                                                         element
                                                                             .id ==
-                                                                        'pickup');
-                                                                    add.address =
-                                                                        val;
-                                                                    add.latlng = LatLng(
-                                                                        _centerLocation
-                                                                            .latitude,
-                                                                        _centerLocation
-                                                                            .longitude);
-                                                                  } else {
-                                                                    addressList.add(AddressList(
-                                                                        id:
-                                                                            'pickup',
-                                                                        address:
-                                                                            val,
-                                                                        latlng: LatLng(
-                                                                            _centerLocation.latitude,
-                                                                            _centerLocation.longitude)));
-                                                                  }
-                                                                });
-                                                              } else if (_pickaddress ==
-                                                                  true) {
-                                                                setState(() {
-                                                                  _pickaddress =
-                                                                      false;
-                                                                });
-                                                              }
-                                                            },
-                                                            minMaxZoomPreference:
-                                                                const MinMaxZoomPreference(
-                                                                    8.0, 20.0),
-                                                            myLocationButtonEnabled:
-                                                                false,
-                                                            markers:
-                                                                Set<Marker>.from(
-                                                                    myMarkers),
-                                                            buildingsEnabled:
-                                                                false,
-                                                            zoomControlsEnabled:
-                                                                false,
-                                                            myLocationEnabled:
-                                                                true,
-                                                          );
-                                                        })),
+                                                                        'pickup')
+                                                                    .isNotEmpty) {
+                                                                  var add = addressList.firstWhere(
+                                                                      (element) =>
+                                                                          element
+                                                                              .id ==
+                                                                          'pickup');
+                                                                  add.address =
+                                                                      val;
+                                                                  add.latlng = LatLng(
+                                                                      _centerLocation
+                                                                          .latitude,
+                                                                      _centerLocation
+                                                                          .longitude);
+                                                                } else {
+                                                                  addressList.add(AddressList(
+                                                                      id:
+                                                                          'pickup',
+                                                                      address:
+                                                                          val,
+                                                                      latlng: LatLng(
+                                                                          _centerLocation
+                                                                              .latitude,
+                                                                          _centerLocation
+                                                                              .longitude)));
+                                                                }
+                                                              });
+                                                            } else if (_pickaddress ==
+                                                                true) {
+                                                              setState(() {
+                                                                _pickaddress =
+                                                                    false;
+                                                              });
+                                                            }
+                                                          },
+                                                          minMaxZoomPreference:
+                                                              const MinMaxZoomPreference(
+                                                                  8.0, 20.0),
+                                                          myLocationButtonEnabled:
+                                                              false,
+                                                          markers:
+                                                              Set<Marker>.from(
+                                                                  myMarkers),
+                                                          buildingsEnabled:
+                                                              false,
+                                                          zoomControlsEnabled:
+                                                              false,
+                                                          myLocationEnabled:
+                                                              true,
+                                                        );
+                                                      } else {
+                                                        // Handle the case where snapshot has no data
+                                                        return Center(
+                                                            child: Text(
+                                                                'No location data'));
+                                                      }
+                                                    },
+                                                  ),
+                                                ),
                                                 Positioned(
                                                     top: 0,
                                                     child: Container(
@@ -747,7 +725,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                               autofocus: true,
                                                                               decoration: InputDecoration(
                                                                                 contentPadding: (languageDirection == 'rtl') ? EdgeInsets.only(bottom: media.width * 0.035) : EdgeInsets.only(bottom: media.width * 0.047),
-                                                                                hintText: languages[choosenLanguage]['text_4lettersforautofill'],
+                                                                                hintText: 'lettersforautofill',
                                                                                 hintStyle: GoogleFonts.roboto(fontSize: media.width * twelve, color: hintColor),
                                                                                 border: InputBorder.none,
                                                                               ),
@@ -1073,7 +1051,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                           ? Expanded(
                                                                               child: TextField(
                                                                                   autofocus: true,
-                                                                                  decoration: InputDecoration(contentPadding: (languageDirection == 'rtl') ? EdgeInsets.only(bottom: media.width * 0.035) : EdgeInsets.only(bottom: media.width * 0.047), border: InputBorder.none, hintText: languages[choosenLanguage]['text_4lettersforautofill'], hintStyle: GoogleFonts.roboto(fontSize: media.width * twelve, color: hintColor)),
+                                                                                  decoration: InputDecoration(contentPadding: (languageDirection == 'rtl') ? EdgeInsets.only(bottom: media.width * 0.035) : EdgeInsets.only(bottom: media.width * 0.047), border: InputBorder.none, hintText: 'text_4lettersforautofill', hintStyle: GoogleFonts.roboto(fontSize: media.width * twelve, color: hintColor)),
                                                                                   maxLines: 1,
                                                                                   onChanged: (val) {
                                                                                     if (val.length >= 4) {
@@ -1087,7 +1065,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                             )
                                                                           : Expanded(
                                                                               child: Text(
-                                                                              languages[choosenLanguage]['text_4lettersforautofill'],
+                                                                              'text_4lettersforautofill',
                                                                               style: GoogleFonts.roboto(fontSize: media.width * twelve, color: hintColor),
                                                                             )),
                                                                     ],
@@ -1215,7 +1193,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                                       SizedBox(
                                                                                         width: media.width * 0.9,
                                                                                         child: Text(
-                                                                                          languages[choosenLanguage][(_pickaddress == true) ? 'text_pick_suggestion' : 'text_drop_suggestion'],
+                                                                                          'Pick Suggesstion',
                                                                                           style: GoogleFonts.roboto(
                                                                                             fontSize: media.width * sixteen,
                                                                                             color: textColor,
@@ -1353,7 +1331,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                                           width: media.width * 0.025,
                                                                                         ),
                                                                                         Text(
-                                                                                          languages[choosenLanguage]['text_chooseonmap'],
+                                                                                          'Chosen map',
                                                                                           style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: buttonColor),
                                                                                         ),
                                                                                       ],
@@ -1423,8 +1401,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                       child: Column(
                                         children: [
                                           Text(
-                                            languages[choosenLanguage]
-                                                ['text_saveaddressas'],
+                                            'Saved Address',
                                             style: GoogleFonts.roboto(
                                                 fontSize: media.width * sixteen,
                                                 color: textColor,
@@ -1497,9 +1474,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                         width:
                                                             media.width * 0.01,
                                                       ),
-                                                      Text(languages[
-                                                              choosenLanguage]
-                                                          ['text_home'])
+                                                      Text('Home')
                                                     ],
                                                   ),
                                                 ),
@@ -1555,9 +1530,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                         width:
                                                             media.width * 0.01,
                                                       ),
-                                                      Text(languages[
-                                                              choosenLanguage]
-                                                          ['text_work'])
+                                                      Text('Text Work')
                                                     ],
                                                   ),
                                                 ),
@@ -1613,9 +1586,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                         width:
                                                             media.width * 0.01,
                                                       ),
-                                                      Text(languages[
-                                                              choosenLanguage]
-                                                          ['text_others'])
+                                                      Text('Text Others')
                                                     ],
                                                   ),
                                                 ),
@@ -1637,12 +1608,10 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                     decoration: InputDecoration(
                                                         border:
                                                             InputBorder.none,
-                                                        hintText: languages[
-                                                                choosenLanguage]
-                                                            [
-                                                            'text_enterfavname'],
-                                                        hintStyle: GoogleFonts
-                                                            .roboto(
+                                                        hintText:
+                                                            'Enter Fav Name',
+                                                        hintStyle:
+                                                            GoogleFonts.roboto(
                                                                 fontSize: media
                                                                         .width *
                                                                     twelve,
@@ -1708,8 +1677,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                   });
                                                 }
                                               },
-                                              text: languages[choosenLanguage]
-                                                  ['text_confirm'])
+                                              text: 'Confirm')
                                         ],
                                       ),
                                     )
@@ -1740,8 +1708,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                       child: Column(
                                         children: [
                                           Text(
-                                            languages[choosenLanguage]
-                                                ['text_drivercancelled'],
+                                            'Driver Cancelled',
                                             style: GoogleFonts.roboto(
                                                 fontSize:
                                                     media.width * fourteen,
@@ -1759,8 +1726,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                   userRequestData = {};
                                                 });
                                               },
-                                              text: languages[choosenLanguage]
-                                                  ['text_ok'])
+                                              text: 'Okay')
                                         ],
                                       ),
                                     )
@@ -1791,8 +1757,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                       child: Column(
                                         children: [
                                           Text(
-                                            languages[choosenLanguage]
-                                                ['text_cancelsuccess'],
+                                            'Cancel Success',
                                             style: GoogleFonts.roboto(
                                                 fontSize:
                                                     media.width * fourteen,
@@ -1809,8 +1774,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                   userRequestData = {};
                                                 });
                                               },
-                                              text: languages[choosenLanguage]
-                                                  ['text_ok'])
+                                              text: 'Okay')
                                         ],
                                       ),
                                     )
@@ -1864,8 +1828,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                       child: Column(
                                         children: [
                                           Text(
-                                            languages[choosenLanguage]
-                                                ['text_confirmlogout'],
+                                            'text_confirmlogout',
                                             textAlign: TextAlign.center,
                                             style: GoogleFonts.roboto(
                                                 fontSize: media.width * sixteen,
@@ -1902,8 +1865,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                   _loading = false;
                                                 });
                                               },
-                                              text: languages[choosenLanguage]
-                                                  ['text_confirm'])
+                                              text: 'text_confirm')
                                         ],
                                       ),
                                     )
@@ -1938,8 +1900,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                         SizedBox(
                                             width: media.width * 0.8,
                                             child: Text(
-                                              languages[choosenLanguage]
-                                                  ['text_open_loc_settings'],
+                                              'text_open_loc_settings',
                                               style: GoogleFonts.roboto(
                                                   fontSize:
                                                       media.width * sixteen,
@@ -1956,8 +1917,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                   await perm.openAppSettings();
                                                 },
                                                 child: Text(
-                                                  languages[choosenLanguage]
-                                                      ['text_open_settings'],
+                                                  'text_open_settings',
                                                   style: GoogleFonts.roboto(
                                                       fontSize:
                                                           media.width * sixteen,
@@ -1975,8 +1935,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                   getLocs();
                                                 },
                                                 child: Text(
-                                                  languages[choosenLanguage]
-                                                      ['text_done'],
+                                                  'text_done',
                                                   style: GoogleFonts.roboto(
                                                       fontSize:
                                                           media.width * sixteen,

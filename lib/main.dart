@@ -1,25 +1,34 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // import 'package:rcdit_user/functions/functions.dart';
 // import 'package:rcdit_user/functions/notifications.dart';
 // import 'pages/loadingPage/loadingpage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'constants/component_constants.dart';
+import 'core/network_checker/network_checker_controller.dart';
 import 'functions/function.dart';
 import 'pages/loadingPage/loading_page.dart';
+import 'injection_container.dart' as di;
 // import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  await Hive.initFlutter();
+  await Hive.openBox('authBox');
+  await di.init();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown
+  ]); // lock orientation
 
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
-
-  checkInternetConnection();
+  // checkInternetConnection();
+  // Initialize the network status checker globally
+  // Get.put(NetWorkStatusChecker(), permanent: true);
 
   // initMessaging();
   runApp(const MyApp());
@@ -28,8 +37,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
-
   @override
   Widget build(BuildContext context) {
     platform = Theme.of(context).platform;
@@ -37,9 +44,7 @@ class MyApp extends StatelessWidget {
     setStatusBar();
     return GestureDetector(
       onTap: () {
-        //remove keyboard on touching anywhere on the screen.
         FocusScopeNode currentFocus = FocusScope.of(context);
-
         if (!currentFocus.hasPrimaryFocus) {
           currentFocus.unfocus();
           FocusManager.instance.primaryFocus?.unfocus();
@@ -48,7 +53,7 @@ class MyApp extends StatelessWidget {
       child: MediaQuery(
         data: MediaQuery.of(context)
             .copyWith(textScaler: const TextScaler.linear(1)),
-        child: MaterialApp(
+        child: GetMaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'EaglesRides',
           theme: ThemeData(),

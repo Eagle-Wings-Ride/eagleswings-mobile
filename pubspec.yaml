@@ -39,6 +39,22 @@ dependencies:
   firebase_database: ^10.5.7
   flutter_screenutil: ^5.9.3
   intl_phone_field: ^3.2.0
+  iconsax: ^0.0.8
+  get_it: ^7.7.0
+  equatable: ^2.0.5
+  dartz:
+  uuid: ^4.4.2
+  flutter_polyline_points: ^2.1.0
+  lottie: ^3.1.2
+  rating_dialog: ^2.0.4
+  get: ^4.6.6
+  hive: ^2.2.3
+  hive_generator: ^2.0.1
+  hive_flutter: ^1.1.0
+  build_runner: ^2.4.9
+  font_awesome_flutter: ^10.7.0
+  geocoding: ^3.0.0
+  flutter_phone_direct_caller: ^2.1.1
 
 dev_dependencies:
   flutter_test:

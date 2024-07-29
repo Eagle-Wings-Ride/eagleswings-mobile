@@ -36,7 +36,7 @@ bool internet = true;
 String url = 'base url ';
 String mqttUrl = 'mqtt url';
 int mqttPort = 1883;
-String mapkey = 'map key';
+String mapkey = 'AIzaSyBY1bi0lfZ6rqeY2SYh4uuCR6773YMpdjI';
 
 //check internet connection
 
@@ -81,6 +81,8 @@ getCurrentLocation() {
   timerLocation = Timer.periodic(const Duration(seconds: 5), (timer) async {
     var loc = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.medium);
+    print('loc');
+    print(loc);
 
     currentLocation = LatLng(loc.latitude, loc.longitude);
   });
@@ -185,7 +187,6 @@ List languagesCode = [
 
 List countries = [];
 getCountryCode() async {
-  print('printing');
   dynamic result;
   try {
     final response = await http.get(Uri.parse('${url}api/v1/countries'));
@@ -645,6 +646,7 @@ var pickupAddress = '';
 var dropAddress = '';
 
 geoCoding(double lat, double lng) async {
+  print('geocoding');
   dynamic result;
   try {
     var response = await http.get(Uri.parse(
