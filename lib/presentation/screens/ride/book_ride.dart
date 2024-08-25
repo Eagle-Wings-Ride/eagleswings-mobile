@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../styles/styles.dart';
+import '../../../widgets/custom_text_field_widget.dart';
+import '../../controller/ride/ride_controller.dart';
+import '../../../injection_container.dart' as di;
 
 class BookRide extends StatefulWidget {
   const BookRide({super.key});
@@ -12,6 +16,17 @@ class BookRide extends StatefulWidget {
 }
 
 class _BookRideState extends State<BookRide> {
+  final TextEditingController sourceController = TextEditingController();
+  final TextEditingController destinationController = TextEditingController();
+  final RideController _uberMapController = Get.put(di.sl<RideController>());
+
+  @override
+  void dispose() {
+    sourceController.dispose();
+    destinationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,74 +117,23 @@ class _BookRideState extends State<BookRide> {
                                 SizedBox(
                                   height: 3.h,
                                 ),
-                                TextFormField(
-                                  // autovalidateMode: autoValidateMode,
-                                  // onTap: onTap,
-                                  autofocus: true,
-                                  enableSuggestions: true,
-                                  keyboardType: TextInputType.text,
+                                CustomTextField(
+                                  onChanged: (val) {
+                                    _uberMapController.getPredictions(
+                                        val, 'source');
+                                  },
+                                  controller: sourceController
+                                    ..text = _uberMapController
+                                        .sourcePlaceName.value,
                                   obscureText: false,
-                                  cursorHeight: 12,
-                                  // controller: controller,
-                                  cursorColor:
-                                      Theme.of(context).colorScheme.primary,
-
-                                  enableInteractiveSelection: false,
-                                  style: GoogleFonts.lato(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      fontSize: 14),
-
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: const Color(0xffF7F6F6),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                      borderSide: const BorderSide(
-                                        color: Color(0xff616161),
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                      borderSide: BorderSide(
-                                          color: textColor, width: 1),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                      borderSide: const BorderSide(
-                                        color: Color(0xff616161),
-                                      ),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                      borderSide: const BorderSide(
-                                          color: Colors.red, width: 1),
-                                    ),
-                                    hintText: 'Please enter pick up',
-                                    errorStyle: GoogleFonts.lato(
-                                      color: Colors.red,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    hintStyle: GoogleFonts.lato(
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    // errorText: errorText,
-                                    suffixIcon: const Icon(
-                                      Icons.my_location_outlined,
-                                      size: 16,
-                                    ),
-
-                                    suffixIconColor: const Color(0xff616161),
-
-                                    contentPadding: EdgeInsets.all(12.sp),
+                                  filled: true,
+                                  keyboardType: TextInputType.text,
+                                  hintText: 'Please enter pick up',
+                                  readOnly: false,
+                                  suffixIcon: const Icon(
+                                    Icons.my_location_outlined,
+                                    size: 16,
                                   ),
-                                  maxLines: 1,
-
-                                  // validator: validator,
-                                  //  onChanged: onChanged,
                                 ),
                               ],
                             ),
@@ -195,79 +159,290 @@ class _BookRideState extends State<BookRide> {
                                 SizedBox(
                                   height: 3.h,
                                 ),
-                                TextFormField(
-                                  // autovalidateMode: autoValidateMode,
-                                  // onTap: onTap,
-                                  autofocus: true,
-                                  enableSuggestions: true,
-                                  keyboardType: TextInputType.text,
+                                CustomTextField(
+                                  onChanged: (val) {
+                                    _uberMapController.getPredictions(
+                                        val, 'destination');
+                                  },
+                                  controller: destinationController
+                                    ..text = _uberMapController
+                                        .destinationPlaceName.value,
                                   obscureText: false,
-                                  cursorHeight: 12,
-                                  // controller: controller,
-                                  cursorColor:
-                                      Theme.of(context).colorScheme.primary,
-
-                                  enableInteractiveSelection: false,
-                                  style: GoogleFonts.lato(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      fontSize: 14),
-
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: const Color(0xffF7F6F6),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                      borderSide: const BorderSide(
-                                        color: Color(0xff616161),
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                      borderSide: BorderSide(
-                                          color: textColor, width: 1),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                      borderSide: const BorderSide(
-                                        color: Color(0xff616161),
-                                      ),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                      borderSide: const BorderSide(
-                                          color: Colors.red, width: 1),
-                                    ),
-                                    hintText: 'Please enter drop off',
-                                    errorStyle: GoogleFonts.lato(
-                                      color: Colors.red,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    hintStyle: GoogleFonts.lato(
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    // errorText: errorText,
-                                    suffixIcon: const Icon(
-                                      Icons.my_location_outlined,
-                                      size: 16,
-                                    ),
-
-                                    suffixIconColor: const Color(0xff616161),
-
-                                    contentPadding: EdgeInsets.all(12.sp),
+                                  filled: true,
+                                  keyboardType: TextInputType.text,
+                                  hintText: 'Please enter drop off',
+                                  readOnly: false,
+                                  suffixIcon: const Icon(
+                                    Icons.my_location_outlined,
+                                    size: 16,
                                   ),
-                                  maxLines: 1,
-
-                                  // validator: validator,
-                                  //  onChanged: onChanged,
                                 ),
                               ],
                             ),
                           ],
                         ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 45.h,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Booking Details',
+                            style: GoogleFonts.dmSans(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8.h,
+                                  vertical: 5.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: const Color.fromRGBO(19, 59, 183, .14),
+                                ),
+                                child: Text(
+                                  'For you',
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 10,
+                                    color: const Color(0xff133BB7),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 15.w,
+                              ),
+                              Text(
+                                'For others',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 20.h,
+                      ),
+                      Text(
+                        'Ride Type',
+                        style: GoogleFonts.dmSans(
+                          color: textColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10.h,
+                      ),
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8.h,
+                                  vertical: 5.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: const Color.fromRGBO(19, 59, 183, .14),
+                                ),
+                                child: Text(
+                                  'Freelance Driver',
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 10,
+                                    color: const Color(0xff133BB7),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 15.w,
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8.h,
+                                  vertical: 5.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: const Color.fromRGBO(255, 85, 0, .14),
+                                ),
+                                child: Text(
+                                  'In-house Driver',
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 10,
+                                    color: const Color(0xffFF5500),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20.h,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8.h,
+                                  vertical: 5.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: const Color.fromRGBO(19, 59, 183, .14),
+                                ),
+                                child: Text(
+                                  'One way trip',
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 10,
+                                    color: const Color(0xffFF5500),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 15.w,
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8.h,
+                                  vertical: 5.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: const Color.fromRGBO(19, 59, 183, .14),
+                                ),
+                                child: Text(
+                                  'Return trip',
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 10,
+                                    color: const Color(0xffFF5500),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 20.h,
+                      ),
+                      Text(
+                        'Schedule',
+                        style: GoogleFonts.dmSans(
+                          color: textColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10.h,
+                      ),
+                      Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                              bottom: 10.h,
+                            ),
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8.h,
+                                    vertical: 5.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color:
+                                        const Color.fromRGBO(19, 59, 183, .14),
+                                  ),
+                                  child: Text(
+                                    'One Day',
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: 10,
+                                      color: const Color(0xff133BB7),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 20.w,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8.h,
+                                    vertical: 5.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color:
+                                        const Color.fromRGBO(19, 59, 183, .14),
+                                  ),
+                                  child: Text(
+                                    'One Week',
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: 10,
+                                      color: const Color(0xff133BB7),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 20.w,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8.h,
+                                    vertical: 5.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color:
+                                        const Color.fromRGBO(19, 59, 183, .14),
+                                  ),
+                                  child: Text(
+                                    'One Month',
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: 10,
+                                      color: const Color(0xff133BB7),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 20.w,
+                                ),
+                                Text(
+                                  'Enter Manually',
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 10,
+                                    color: const Color(0xff133BB7),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

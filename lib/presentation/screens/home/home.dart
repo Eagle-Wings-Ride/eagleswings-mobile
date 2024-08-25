@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                             //     defaultCameraPosition: _defaultLocation,
                             //   ),
                             // );
-                            Get.to(BookRide());
+                            Get.to(const BookRide());
                           },
                           child: quickButtons('book_rides', 'Book rides')),
                       quickButtons('track_rides', 'Track rides'),
@@ -108,6 +108,15 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(
                     height: 13.h,
                   ),
+                  // Text(
+                  //   'You have no current rides',
+                  //   style: GoogleFonts.dmSans(
+                  //     fontSize: 12,
+                  //     fontWeight: FontWeight.w500,
+                  //     color: textColor,
+                  //   ),
+                  // ),
+
                   Container(
                     padding:
                         EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
@@ -290,6 +299,7 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
+
                   SizedBox(
                     height: 20.h,
                   ),

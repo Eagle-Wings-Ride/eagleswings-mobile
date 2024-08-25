@@ -16,7 +16,8 @@ class Button extends StatefulWidget {
   dynamic width;
 
   Button(
-      {required this.onTap,
+      {super.key,
+      required this.onTap,
       required this.text,
       this.color,
       this.borcolor,
