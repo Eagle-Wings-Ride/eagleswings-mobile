@@ -39,7 +39,9 @@ class _BookRideState extends State<BookRide> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            SizedBox(height: 20.h,),
+                            SizedBox(
+                              height: 20.h,
+                            ),
                             Container(
                               padding: EdgeInsets.all(10.sp),
                               decoration: BoxDecoration(
