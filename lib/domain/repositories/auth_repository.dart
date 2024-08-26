@@ -1,5 +1,3 @@
-import 'package:dartz/dartz.dart';
-import 'package:eaglerides/domain/entities/app_error.dart';
 
 abstract class EagleRidesAuthRepository {
   Future<bool> eagleRidesAuthIsSignIn();

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import '../../config/map_api_key.dart';

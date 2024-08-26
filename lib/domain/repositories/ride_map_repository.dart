@@ -1,7 +1,6 @@
 import '../../data/models/generate_trip_model.dart';
 import '../../data/models/ride_charges_model.dart';
 import '../../data/models/vehicle_details_model.dart';
-import '../entities/get_drivers_entity.dart';
 import '../entities/map_prediction_entity.dart';
 import '../entities/ride_map_direction_entity.dart';
 

@@ -1,7 +1,3 @@
-import 'package:dartz/dartz.dart';
-
-import '../entities/app_error.dart';
-import '../entities/login_request_params.dart';
 import '../repositories/auth_repository.dart';
 
 class EagleRidesLoginUserUseCase {

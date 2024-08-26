@@ -1,11 +1,8 @@
-import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../core/api_client.dart';
-import '../models/response_model.dart';
 import 'auth_remote_data_source.dart';
 
 class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
@@ -27,7 +24,7 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
 
   @override
   Future<String> loginUser(String email, String password) async {
-    final uri = 'https://your-backend-url.com/api/login';
+    const uri = 'https://your-backend-url.com/api/login';
     final response = await _client.post(
       uri,
       params: {'email': email, 'password': password},

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:eaglerides/data/models/location_model.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 

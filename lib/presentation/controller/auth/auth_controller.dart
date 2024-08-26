@@ -1,5 +1,4 @@
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_check_user_usecase.dart';
-import 'package:eaglerides/domain/usecases/eagle_rides_auth_get_userid_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_is_signed_in_usecase.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';

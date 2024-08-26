@@ -1,4 +1,3 @@
-import 'package:eaglerides/data/models/response_model.dart';
 
 abstract class EagleRidesAuthDataSource {
   Future<bool> eagleridesAuthIsSignIn();

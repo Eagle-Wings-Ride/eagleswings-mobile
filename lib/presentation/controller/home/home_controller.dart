@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:location/location.dart';
 
-import '../../../data/models/location_model.dart';
 import '../../../domain/usecases/get_address_use_case.dart';
 import '../../../domain/usecases/get_user_current_location_usecase.dart';
 

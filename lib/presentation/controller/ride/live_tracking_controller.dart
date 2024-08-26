@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:eaglerides/domain/entities/ride_map_direction_entity.dart';
@@ -96,7 +95,7 @@ class LiveTrackingController extends GetxController {
       //   isLoading.value = false;
       // });
       addMarkers(
-          BitmapDescriptor.fromBytes(await getBytesFromAsset(
+          BitmapDescriptor.bytes(await getBytesFromAsset(
               vehicleTypeName.value == "cars"
                   ? 'assets/car.png'
                   : vehicleTypeName.value == "bikes"
@@ -121,9 +120,9 @@ class LiveTrackingController extends GetxController {
     List<PointLatLng> result = polylinePoints
         .decodePolyline(uberMapDirectionData[0].enCodedPoints.toString());
     polylineCoordinates.clear();
-    result.forEach((PointLatLng point) {
+    for (var point in result) {
       polylineCoordinates.value.add(LatLng(point.latitude, point.longitude));
-    });
+    }
     final GoogleMapController _controller = await controller.future;
     CameraPosition liveLoc = CameraPosition(
       target: LatLng(liveLocLatitude.value, liveLocLongitude.value),
