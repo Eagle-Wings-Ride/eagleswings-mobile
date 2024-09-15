@@ -1,5 +1,3 @@
-
-
 import '../datasource/auth_remote_data_source.dart';
 import '../../domain/repositories/auth_repository.dart';
 
@@ -16,6 +14,11 @@ class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
   @override
   Future<String> loginUser(String email, String password) async {
     return await eagleRidesAuthDataSource.loginUser(email, password);
+  }
+
+  @override
+  Future<String> register(Map<String, dynamic> requestBody) async {
+    return await eagleRidesAuthDataSource.register(requestBody);
   }
 
   // @override

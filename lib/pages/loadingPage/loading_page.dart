@@ -1,21 +1,14 @@
 import 'dart:async';
 
-import 'package:eaglerides/pages/auth/register.dart';
 import 'package:eaglerides/navigation_page.dart';
-import 'package:eaglerides/presentation/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/network_checker/network_checker_controller.dart';
 import '../../functions/function.dart';
 import '../../presentation/controller/auth/auth_controller.dart';
 import '../../styles/styles.dart';
-import '../languages/languages.dart';
 import '../../presentation/screens/auth/login.dart';
 import '../noInternet/no_internet.dart';
-import '../onTripPage/booking_confirmation.dart';
-import '../onTripPage/invoice.dart';
-import '../onTripPage/map_page.dart';
-import '../onboarding/onboarding_page.dart';
 import '../../injection_container.dart' as di;
 
 class LoadingPage extends StatefulWidget {
@@ -43,7 +36,7 @@ class _LoadingPageState extends State<LoadingPage> {
         // } else {
         //   Get.off(() => const Register());
         // }
-        Get.off(() => const HomePage());
+        Get.off(() => const Login());
       } else {
         Get.off(() => const Login());
       }

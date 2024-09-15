@@ -4,11 +4,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../functions/function.dart';
+import '../../presentation/controller/auth/auth_controller.dart';
 import '../../widgets/widgets.dart';
 import '../loadingPage/loading.dart';
 import '../noInternet/no_internet.dart';
@@ -26,10 +28,11 @@ class _RegisterState extends State<Register> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final signUpFormKey = GlobalKey<FormState>();
+
   // bool enableSignIn = false;
   bool obscureText = true;
 
-  bool terms = true; //terms and conditions true or false
+  bool terms = false; //terms and conditions true or false
   bool _isLoading = true;
 
   @override
@@ -60,22 +63,56 @@ class _RegisterState extends State<Register> {
     super.dispose();
   }
 
+  // validateLast(lastValue) {
+  //   if (lastValue.isEmpty) {
+  //     return 'last name cannot be empty';
+  //   }
+
+  //   return null;
+  // }
+
   @override
   Widget build(BuildContext context) {
+    validateFullName(fullName) {
+      if (fullName == null || fullName.isEmpty) {
+        return 'full name cannot be empty';
+      }
+      return null;
+    }
+
+    //Validator
+    validateMail(emailValue) {
+      if (emailValue == null || emailValue.isEmpty) {
+        return 'Please enter an email address.';
+      }
+      if (!RegExp(r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$')
+          .hasMatch(emailValue)) {
+        return 'Please enter a valid email address.';
+      }
+
+      return null;
+    }
+
+    validatePhone(phoneValue) {
+      if (phoneValue.toString().isEmpty) {
+        return 'phone cannot be empty';
+      }
+      if (phoneValue.toString().length < 11) {
+        return 'phone is invalid';
+      }
+      if (int.tryParse(phoneValue.toString()) == null) {
+        return 'enter valid number';
+      }
+      return null;
+    }
+
+    validateAddress(address) {
+      if (address == null || address.isEmpty) {
+        return 'Please enter a valid adress';
+      }
+    }
+
     return Scaffold(
-      // appBar: AppBar(
-      //   centerTitle: true,
-      //   backgroundColor: page,
-      //   elevation: 0,
-      //   automaticallyImplyLeading: false,
-      //   title: Padding(
-      //     padding: EdgeInsets.only(top: 30.h),
-      //     child: Image.asset(
-      //       'assets/images/app_name.png',
-      //       height: 21.5.h,
-      //     ),
-      //   ),
-      // ),
       body: SafeArea(
         child: Stack(
           children: [
@@ -158,7 +195,7 @@ class _RegisterState extends State<Register> {
                                 autoValidateMode:
                                     AutovalidateMode.onUserInteraction,
                                 maxLines: 1,
-                                // validator: validateFirst,
+                                validator: validateFullName,
                               ),
                               SizedBox(
                                 height: 20.h,
@@ -174,7 +211,7 @@ class _RegisterState extends State<Register> {
                                 autoValidateMode:
                                     AutovalidateMode.onUserInteraction,
                                 maxLines: 1,
-                                // validator: validateFirst,
+                                validator: validateMail,
                               ),
                               SizedBox(
                                 height: 20.h,
@@ -245,12 +282,13 @@ class _RegisterState extends State<Register> {
                                       contentPadding: EdgeInsets.all(14.sp),
                                     ),
                                     onChanged: (phone) {
-                                      // debugPrint(phone.completeNumber);
+                                      debugPrint(phone.completeNumber);
                                     },
                                     onCountryChanged: (country) {
                                       debugPrint(
                                           'Country changed to: ${country.name}');
                                     },
+                                    validator: validatePhone,
                                   ),
                                 ],
                               ),
@@ -272,7 +310,7 @@ class _RegisterState extends State<Register> {
                                 autoValidateMode:
                                     AutovalidateMode.onUserInteraction,
                                 maxLines: 1,
-                                // validator: validateFirst,
+                                validator: validateAddress,
                               ),
                               SizedBox(
                                 height: 20.h,
@@ -332,11 +370,7 @@ class _RegisterState extends State<Register> {
                                       GestureDetector(
                                         onTap: () {
                                           setState(() {
-                                            if (terms == true) {
-                                              terms = false;
-                                            } else {
-                                              terms = true;
-                                            }
+                                            terms = !terms;
                                           });
                                         },
                                         child: Container(
@@ -346,12 +380,12 @@ class _RegisterState extends State<Register> {
                                               border: Border.all(
                                                   color: greyColor, width: 2),
                                               shape: BoxShape.circle,
-                                              color: (terms == true)
+                                              color: terms == false
                                                   ? page
                                                   : buttonColor),
                                           child: Icon(
                                             Icons.done,
-                                            color: (terms == true)
+                                            color: terms == false
                                                 ? buttonColor
                                                 : Colors.white,
                                             size: 10,
@@ -419,13 +453,39 @@ class _RegisterState extends State<Register> {
                                     ),
                                   ),
                                   onPressed: () {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SetPasswordPage(),
-                                      ),
-                                    );
+                                    FocusScope.of(context).unfocus();
+                                    if (signUpFormKey.currentState!
+                                        .validate()) {
+                                      if (terms == true) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                SetPasswordPage(
+                                              fullName:
+                                                  _fullNameController.text,
+                                              email: _emailController.text,
+                                              phoneNumber:
+                                                  _phoneNumberController.text,
+                                              address: _addressController.text,
+                                            ),
+                                          ),
+                                        );
+                                      } else {
+                                        Get.snackbar('Error!',
+                                            'You have to agree to the terms of service');
+                                      }
+                                    } else {
+                                      Get.snackbar('Error!',
+                                          'Please fill the form properly');
+                                    }
+                                    // _authController.register({
+                                    //   'fullName': _fullNameController.text,
+                                    //   'email': _emailController.text,
+                                    //   'phoneNumber':
+                                    //       _phoneNumberController.text,
+                                    //   'address': _addressController.text
+                                    // });
                                   },
                                   child: Text(
                                     'Continue',

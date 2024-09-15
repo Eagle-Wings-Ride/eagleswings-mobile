@@ -9,12 +9,14 @@ import 'package:eaglerides/domain/usecases/generate_rental_charges_usecase.dart'
 import 'package:eaglerides/domain/usecases/generate_trip_usecase.dart';
 import 'package:eaglerides/domain/usecases/get_address_use_case.dart';
 import 'package:eaglerides/domain/usecases/login_user.dart';
+import 'package:eaglerides/domain/usecases/register.dart';
 import 'package:eaglerides/domain/usecases/ride_map_prediction_usecase.dart';
 import 'package:eaglerides/domain/usecases/trip_payment_usecase.dart';
 import 'package:eaglerides/domain/usecases/vwhicle_detail_usecase.dart';
 import 'package:eaglerides/presentation/controller/home/home_controller.dart';
 import 'package:eaglerides/presentation/controller/ride/live_tracking_controller.dart';
 import 'package:eaglerides/presentation/controller/ride/ride_controller.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart';
 import 'package:eaglerides/core/network_checker/network_checker_controller.dart';
 import 'package:eaglerides/data/datasource/auth_remote_data_source.dart';
@@ -38,7 +40,21 @@ final sl = GetIt.instance;
 Future<void> init() async {
   sl.registerLazySingleton<Client>(() => Client());
 
-  sl.registerLazySingleton<ApiClient>(() => ApiClient(sl()));
+  // sl.registerLazySingleton<ApiClient>(() => ApiClient(sl()));
+
+  // // Register ApiClient with optional token if available
+  // sl.registerLazySingleton<ApiClient>(() {
+  //   final token =
+  //       _getTokenFromHive(); // Implement this function to get the token
+  //   return ApiClient(Client(), token);
+  // });
+
+  // Register ApiClient with optional token
+  sl.registerLazySingleton<ApiClient>(() {
+    final token =
+        _getTokenFromHive(); // Implement this function to get the token
+    return ApiClient(sl<Client>(), token);
+  });
   //network getx
   sl.registerFactory<NetWorkStatusChecker>(
     () => NetWorkStatusChecker(),
@@ -83,6 +99,7 @@ Future<void> init() async {
       eagleRidesAuthIsSignInUseCase: sl.call(),
       eagleRidesLoginUserUseCase: sl.call(),
       eagleRidesAuthCheckUserUseCase: sl.call(),
+      eagleRidesRegisterUseCase: sl.call(),
       // eagleRidesAuthGetUserUidUseCase: sl.call(),
       // uberAuthOtpVerificationUseCase: sl.call(),
       // uberAuthCheckUserStatusUseCase: sl.call(),
@@ -100,6 +117,11 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<EagleRidesLoginUserUseCase>(
     () => EagleRidesLoginUserUseCase(
+      eagleRidesAuthRepository: sl.call(),
+    ),
+  );
+  sl.registerLazySingleton<EagleRidesRegisterUseCase>(
+    () => EagleRidesRegisterUseCase(
       eagleRidesAuthRepository: sl.call(),
     ),
   );
@@ -193,4 +215,10 @@ Future<void> init() async {
     ),
   );
   // sl.registerLazySingleton(() => http.Client());
+}
+
+String? _getTokenFromHive() {
+  // Function to retrieve the token from Hive
+  final box = Hive.box('authBox');
+  return box.get('auth_token');
 }

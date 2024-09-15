@@ -15,4 +15,5 @@ abstract class EagleRidesAuthDataSource {
   Future<String> eagleridesAddProfileImg(String riderId);
 
   Future<String> loginUser(String email, String password);
+  Future<String> register(Map<String, dynamic> requestBody);
 }

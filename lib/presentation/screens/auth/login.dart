@@ -138,27 +138,27 @@ class _LoginState extends State<Login> {
                                         ),
                                       ),
                                       onPressed: () {
-                                        // FocusScope.of(context).unfocus();
-                                        // if (_emailController.text.isNotEmpty &&
-                                        //     _passwordController
-                                        //         .text.isNotEmpty &&
-                                        //     GetUtils.isEmail(
-                                        //         _emailController.text)) {
-                                        //   _authController.loginUser(
-                                        //     _emailController.text,
-                                        //     _passwordController.text,
-                                        //   );
-                                        // } else {
-                                        //   Get.snackbar(
-                                        //       "error", "invalid values!");
-                                        // }
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const NavigationPage(),
-                                            ),
-                                            (route) => false);
+                                        FocusScope.of(context).unfocus();
+                                        if (_emailController.text.isNotEmpty &&
+                                            _passwordController
+                                                .text.isNotEmpty &&
+                                            GetUtils.isEmail(
+                                                _emailController.text)) {
+                                          _authController.loginUser(
+                                            _emailController.text,
+                                            _passwordController.text,
+                                          );
+                                        } else {
+                                          Get.snackbar(
+                                              "error", "invalid values!");
+                                        }
+                                        // Navigator.pushAndRemoveUntil(
+                                        //     context,
+                                        //     MaterialPageRoute(
+                                        //       builder: (context) =>
+                                        //           const NavigationPage(),
+                                        //     ),
+                                        //     (route) => false);
                                       },
                                       child: Text(
                                         'Login',

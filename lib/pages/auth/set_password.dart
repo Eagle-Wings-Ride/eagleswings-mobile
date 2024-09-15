@@ -4,14 +4,23 @@ import 'package:eaglerides/presentation/screens/auth/login.dart';
 import 'package:eaglerides/styles/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../presentation/controller/auth/auth_controller.dart';
 import '../../widgets/widgets.dart';
 import '../loadingPage/loading.dart';
 import '../noInternet/no_internet.dart';
 
 class SetPasswordPage extends StatefulWidget {
-  const SetPasswordPage({super.key});
+  const SetPasswordPage({
+    super.key,
+    required this.email,
+    required this.phoneNumber,
+    required this.fullName,
+    required this.address,
+  });
+  final String email, phoneNumber, fullName, address;
 
   @override
   State<SetPasswordPage> createState() => _SetPasswordPageState();
@@ -22,6 +31,7 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final setPasswordFormKey = GlobalKey<FormState>();
+  final AuthController _authController = Get.find();
 
   @override
   void dispose() {
@@ -32,6 +42,28 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    validatePass(passValue) {
+      RegExp uppercaseRegex = RegExp(r'[A-Z]');
+      RegExp lowercaseRegex = RegExp(r'[a-z]');
+      RegExp digitsRegex = RegExp(r'[0-9]');
+      RegExp specialCharRegex = RegExp(r'[#\$%&*?@]');
+      if (passValue == null || passValue.isEmpty) {
+        return 'Input a valid password';
+      } else if (passValue.length < 8) {
+        return "Password must be at least 8 characters long.";
+      } else if (!uppercaseRegex.hasMatch(passValue)) {
+        return "Password must contain at least one uppercase letter.";
+      } else if (!lowercaseRegex.hasMatch(passValue)) {
+        return "Password must contain at least one lowercase letter.";
+      } else if (!digitsRegex.hasMatch(passValue)) {
+        return "Password must contain at least one number.";
+      } else if (!specialCharRegex.hasMatch(passValue)) {
+        return "Password must contain at least one special character (%&*?@).";
+      } else {
+        return null;
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -105,13 +137,12 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                                     obscureText: true,
                                     filled: false,
                                     readOnly: false,
-
                                     labelText: 'Enter Password',
                                     hintText: '********',
                                     autoValidateMode:
                                         AutovalidateMode.onUserInteraction,
                                     maxLines: 1,
-                                    // validator: validateFirst,
+                                    validator: validatePass,
                                   ),
                                   SizedBox(
                                     height: 20.h,
@@ -128,6 +159,16 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                                     autoValidateMode:
                                         AutovalidateMode.onUserInteraction,
                                     maxLines: 1,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please confirm your password';
+                                      }
+                                      if (value != _passwordController.text) {
+                                        return 'Passwords do not match';
+                                      }
+
+                                      return null;
+                                    },
                                     // validator: validateFirst,
                                   ),
                                   SizedBox(
@@ -150,12 +191,23 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                                         ),
                                       ),
                                       onPressed: () {
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => const Login(),
-                                          ),
-                                        );
+                                        // Navigator.pushReplacement(
+                                        //   context,
+                                        //   MaterialPageRoute(
+                                        //     builder: (context) => const Login(),
+                                        //   ),
+                                        // );
+                                        if (setPasswordFormKey.currentState!
+                                            .validate()) {
+                                          _authController.register({
+                                            'fullname': widget.fullName,
+                                            'email': widget.email,
+                                            'password':
+                                                _passwordController.text,
+                                            'phone_number': widget.phoneNumber,
+                                            'address': widget.address,
+                                          });
+                                        }
                                       },
                                       child: Text(
                                         'Create Account',

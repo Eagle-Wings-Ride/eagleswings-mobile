@@ -1,4 +1,7 @@
+import 'dart:convert';
 
+import 'package:eaglerides/data/models/register_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -24,18 +27,49 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
 
   @override
   Future<String> loginUser(String email, String password) async {
-    const uri = 'https://your-backend-url.com/api/login';
-    final response = await _client.post(
-      uri,
-      params: {'email': email, 'password': password},
-      // headers: {'Content-Type': 'application/json'},
-    );
-    if (response['token'] != null) {
-      var box = await Hive.openBox('authBox');
-      await box.put('auth_token', response['token']);
-      return response['token'];
-    } else {
-      throw Exception('Failed to login');
+    const uri = '/users/login';
+    try {
+      final response = await _client.post(
+        uri,
+        params: {'email': email, 'password': password},
+        // headers: {'Content-Type': 'application/json'},  // Ensure content-type is correct
+      );
+      // Convert response to string if it's not already
+      debugPrint("Raw response: $response");
+
+      if (response['token'] != null) {
+        var box = await Hive.openBox('authBox');
+        await box.put('auth_token', response['token']);
+        debugPrint("Token saved: ${response['token']}");
+        return response['token'];
+      } else {
+        throw Exception('Failed to login: No token found');
+      }
+    } catch (e) {
+      debugPrint("Error: $e");
+      rethrow;
+      // throw Exception('Failed to login: $e');
+    }
+  }
+
+  @override
+  Future<String> register(Map<String, dynamic> requestBody) async {
+    const uri = '/users/register';
+    try {
+      final response = await _client.post(uri, params: requestBody);
+
+      debugPrint('Response Body: $response');
+      // Assume the response is a map, not a string
+      if (response is Map<String, dynamic>) {
+        print('error here');
+        debugPrint(response['message']);
+        return response['message'];
+      } else {
+        return 'Unexpected response format';
+      }
+    } catch (e) {
+      debugPrint('Exception: $e');
+      rethrow;
     }
   }
 
@@ -89,9 +123,9 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
 
   @override
   Future<bool> eagleridesAuthCheckUserStatus(String userId) async {
-     final response = await _client.get('/checkUserStatus', params: {'userId': userId});
+    final response =
+        await _client.get('/checkUserStatus', params: {'userId': userId});
     return response['status'] == 'active'; // Adjust based on your API response
- 
   }
 
   @override
