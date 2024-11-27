@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NoInterNetWidget extends StatelessWidget {
-  const NoInterNetWidget({Key? key}) : super(key: key);
+  const NoInterNetWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

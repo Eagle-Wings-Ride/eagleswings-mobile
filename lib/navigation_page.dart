@@ -1,12 +1,12 @@
 import 'package:eaglerides/pages/onTripPage/booking_confirmation.dart';
-import 'package:eaglerides/pages/onTripPage/invoice.dart';
-import 'package:eaglerides/pages/onTripPage/map_page.dart';
+// import 'package:eaglerides/pages/onTripPage/invoice.dart';
+// import 'package:eaglerides/pages/onTripPage/map_page.dart';
 import 'package:eaglerides/presentation/screens/home/home.dart';
-import 'package:eaglerides/presentation/screens/ride/map_with_source_destination_field.dart';
+// import 'package:eaglerides/presentation/screens/ride/map_with_source_destination_field.dart';
 import 'package:eaglerides/styles/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 
 class NavigationPage extends StatefulWidget {
@@ -17,10 +17,10 @@ class NavigationPage extends StatefulWidget {
 }
 
 class _NavigationPageState extends State<NavigationPage> {
-  static const CameraPosition _defaultLocation = CameraPosition(
-    target: LatLng(23.030357, 72.517845),
-    zoom: 14.4746,
-  );
+  // static const CameraPosition _defaultLocation = CameraPosition(
+  //   target: LatLng(23.030357, 72.517845),
+  //   zoom: 14.4746,
+  // );
   var currentIndex = 0;
   @override
   Widget build(BuildContext context) {

@@ -32,7 +32,7 @@ import 'data/datasource/user_current_location_data_source_impl.dart';
 import 'data/repositories/user_current_location_repository_impl.dart';
 import 'domain/repositories/user_current_location_repository.dart';
 import 'domain/usecases/get_user_current_location_usecase.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'presentation/controller/auth/auth_controller.dart';
 
 final sl = GetIt.instance;

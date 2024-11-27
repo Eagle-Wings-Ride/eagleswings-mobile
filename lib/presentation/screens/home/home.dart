@@ -1,16 +1,16 @@
 import 'package:eaglerides/presentation/screens/ride/book_ride.dart';
-import 'package:flutter/cupertino.dart';
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+// import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../injection_container.dart' as di;
 import '../../../styles/styles.dart';
 import '../../controller/home/home_controller.dart';
-import '../ride/map_with_source_destination_field.dart';
+// import '../ride/map_with_source_destination_field.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,10 +25,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final HomeController _homeController = Get.put(di.sl<HomeController>());
   // String address = '';
-  static const CameraPosition _defaultLocation = CameraPosition(
-    target: LatLng(23.030357, 72.517845),
-    zoom: 14.4746,
-  );
+  // static const CameraPosition _defaultLocation = CameraPosition(
+  //   target: LatLng(23.030357, 72.517845),
+  //   zoom: 14.4746,
+  // );
 
   @override
   void initState() {
