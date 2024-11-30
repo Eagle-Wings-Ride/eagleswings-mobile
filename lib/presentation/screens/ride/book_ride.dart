@@ -34,8 +34,12 @@ class _BookRideState extends State<BookRide> {
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: Text(
-          'Book a Ride',
+          'Book a ride',
           style: GoogleFonts.dmSans(fontSize: 25, fontWeight: FontWeight.bold),
+        ),
+        leading: const Icon(
+          Icons.arrow_back_ios,
+          color: Colors.black,
         ),
       ),
       body: SafeArea(
@@ -200,39 +204,39 @@ class _BookRideState extends State<BookRide> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Row(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 8.h,
-                                  vertical: 5.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: const Color.fromRGBO(19, 59, 183, .14),
-                                ),
-                                child: Text(
-                                  'For you',
-                                  style: GoogleFonts.dmSans(
-                                    fontSize: 10,
-                                    color: const Color(0xff133BB7),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 15.w,
-                              ),
-                              Text(
-                                'For others',
-                                style: GoogleFonts.dmSans(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: textColor,
-                                ),
-                              ),
-                            ],
-                          ),
+                          // Row(
+                          //   children: [
+                          //     Container(
+                          //       padding: EdgeInsets.symmetric(
+                          //         horizontal: 8.h,
+                          //         vertical: 5.h,
+                          //       ),
+                          //       decoration: BoxDecoration(
+                          //         borderRadius: BorderRadius.circular(15),
+                          //         color: const Color.fromRGBO(19, 59, 183, .14),
+                          //       ),
+                          //       child: Text(
+                          //         'For you',
+                          //         style: GoogleFonts.dmSans(
+                          //           fontSize: 10,
+                          //           color: const Color(0xff133BB7),
+                          //           fontWeight: FontWeight.bold,
+                          //         ),
+                          //       ),
+                          //     ),
+                          //     SizedBox(
+                          //       width: 15.w,
+                          //     ),
+                          //     Text(
+                          //       'For others',
+                          //       style: GoogleFonts.dmSans(
+                          //         fontSize: 10,
+                          //         fontWeight: FontWeight.bold,
+                          //         color: textColor,
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
                         ],
                       ),
                       SizedBox(
@@ -376,29 +380,7 @@ class _BookRideState extends State<BookRide> {
                                         const Color.fromRGBO(19, 59, 183, .14),
                                   ),
                                   child: Text(
-                                    'One Day',
-                                    style: GoogleFonts.dmSans(
-                                      fontSize: 10,
-                                      color: const Color(0xff133BB7),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 20.w,
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8.h,
-                                    vertical: 5.h,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15),
-                                    color:
-                                        const Color.fromRGBO(19, 59, 183, .14),
-                                  ),
-                                  child: Text(
-                                    'One Week',
+                                    'Two Weeks',
                                     style: GoogleFonts.dmSans(
                                       fontSize: 10,
                                       color: const Color(0xff133BB7),
@@ -440,6 +422,46 @@ class _BookRideState extends State<BookRide> {
                                   ),
                                 ),
                               ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20.h,
+                  ),
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Start Date:',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(),
+                          Flexible(
+                            child: CustomTextField(
+                              onChanged: (val) {
+                                _uberMapController.getPredictions(
+                                    val, 'source');
+                              },
+                              controller: sourceController
+                                ..text =
+                                    _uberMapController.sourcePlaceName.value,
+                              obscureText: false,
+                              filled: true,
+                              keyboardType: TextInputType.text,
+                              hintText: 'Please enter pick up',
+                              readOnly: false,
+                              suffixIcon: const Icon(
+                                Icons.my_location_outlined,
+                                size: 16,
+                              ),
                             ),
                           ),
                         ],

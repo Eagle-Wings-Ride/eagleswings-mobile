@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_database/firebase_database.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
@@ -54,26 +54,26 @@ checkInternetConnection() {
   });
 }
 
-getDetailsOfDevice() async {
-  var connectivityResult = await (Connectivity().checkConnectivity());
-  if (connectivityResult == ConnectivityResult.none) {
-    internet = false;
-  } else {
-    internet = true;
-  }
-  try {
-    rootBundle.loadString('assets/map_style_black.json').then((value) {
-      mapStyle = value;
-    });
-    var token = await FirebaseMessaging.instance.getToken();
-    fcm = token;
-    pref = await SharedPreferences.getInstance();
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
-  }
-}
+// getDetailsOfDevice() async {
+//   var connectivityResult = await (Connectivity().checkConnectivity());
+//   if (connectivityResult == ConnectivityResult.none) {
+//     internet = false;
+//   } else {
+//     internet = true;
+//   }
+//   try {
+//     rootBundle.loadString('assets/map_style_black.json').then((value) {
+//       mapStyle = value;
+//     });
+//     var token = await FirebaseMessaging.instance.getToken();
+//     fcm = token;
+//     pref = await SharedPreferences.getInstance();
+//   } catch (e) {
+//     if (e is SocketException) {
+//       internet = false;
+//     }
+//   }
+// }
 
 dynamic timerLocation;
 //get current location
@@ -223,32 +223,32 @@ int? resendTokenId;
 bool phoneAuthCheck = false;
 dynamic credentials;
 
-phoneAuth(String phone) async {
-  try {
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: phone,
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        credentials = credential;
-        valueNotifierHome.incrementNotifier();
-      },
-      forceResendingToken: resendTokenId,
-      verificationFailed: (FirebaseAuthException e) {
-        if (e.code == 'invalid-phone-number') {
-          debugPrint('The provided phone number is not valid.');
-        }
-      },
-      codeSent: (String verificationId, int? resendToken) async {
-        verId = verificationId;
-        resendTokenId = resendToken;
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {},
-    );
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
-  }
-}
+// phoneAuth(String phone) async {
+//   try {
+//     await FirebaseAuth.instance.verifyPhoneNumber(
+//       phoneNumber: phone,
+//       verificationCompleted: (PhoneAuthCredential credential) async {
+//         credentials = credential;
+//         valueNotifierHome.incrementNotifier();
+//       },
+//       forceResendingToken: resendTokenId,
+//       verificationFailed: (FirebaseAuthException e) {
+//         if (e.code == 'invalid-phone-number') {
+//           debugPrint('The provided phone number is not valid.');
+//         }
+//       },
+//       codeSent: (String verificationId, int? resendToken) async {
+//         verId = verificationId;
+//         resendTokenId = resendToken;
+//       },
+//       codeAutoRetrievalTimeout: (String verificationId) {},
+//     );
+//   } catch (e) {
+//     if (e is SocketException) {
+//       internet = false;
+//     }
+//   }
+// }
 
 //get local bearer token
 
@@ -371,20 +371,20 @@ List<BearerClass> bearerToken = <BearerClass>[];
 
 //call firebase otp
 
-otpCall() async {
-  dynamic result;
-  try {
-    var otp = await FirebaseDatabase.instance.ref().child('call_FB_OTP').get();
-    result = otp;
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-      result = 'no Internet';
-      valueNotifierHome.incrementNotifier();
-    }
-  }
-  return result;
-}
+// otpCall() async {
+//   dynamic result;
+//   try {
+//     var otp = await FirebaseDatabase.instance.ref().child('call_FB_OTP').get();
+//     result = otp;
+//   } catch (e) {
+//     if (e is SocketException) {
+//       internet = false;
+//       result = 'no Internet';
+//       valueNotifierHome.incrementNotifier();
+//     }
+//   }
+//   return result;
+// }
 
 // verify user already exist
 
@@ -1490,25 +1490,25 @@ getSosData(lat, lng) async {
 
 //sos admin notification
 
-notifyAdmin() async {
-  var db = FirebaseDatabase.instance.ref();
-  // var result;
+// notifyAdmin() async {
+//   var db = FirebaseDatabase.instance.ref();
+//   // var result;
 
-  try {
-    await db.child('SOS/' + userRequestData['id']).update({
-      "is_driver": "0",
-      "is_user": "1",
-      "req_id": userRequestData['id'],
-      "serv_loc_id": userRequestData['service_location_id'],
-      "updated_at": ServerValue.timestamp
-    });
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
-  }
-  return true;
-}
+//   try {
+//     await db.child('SOS/' + userRequestData['id']).update({
+//       "is_driver": "0",
+//       "is_user": "1",
+//       "req_id": userRequestData['id'],
+//       "serv_loc_id": userRequestData['service_location_id'],
+//       "updated_at": ServerValue.timestamp
+//     });
+//   } catch (e) {
+//     if (e is SocketException) {
+//       internet = false;
+//     }
+//   }
+//   return true;
+// }
 
 //get current ride messages
 
