@@ -100,8 +100,9 @@ class CustomTextField extends StatelessWidget {
           fontWeight: FontWeight.w400,
         ),
         // errorText: errorText,
+        prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
-
+        prefixIconColor: const Color(0xff616161),
         suffixIconColor: const Color(0xff616161),
 
         contentPadding: EdgeInsets.all(12.sp),

@@ -7,10 +7,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../presentation/controller/auth/auth_controller.dart';
-import '../../widgets/widgets.dart';
-import '../loadingPage/loading.dart';
-import '../noInternet/no_internet.dart';
+import '../../controller/auth/auth_controller.dart';
+import '../../../widgets/widgets.dart';
+import '../../../pages/loadingPage/loading.dart';
+import '../../../pages/noInternet/no_internet.dart';
 
 class SetPasswordPage extends StatefulWidget {
   const SetPasswordPage({

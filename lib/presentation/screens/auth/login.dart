@@ -1,4 +1,5 @@
-import 'package:eaglerides/pages/auth/register.dart';
+import 'package:eaglerides/presentation/screens/auth/forgot_password.dart';
+import 'package:eaglerides/presentation/screens/auth/register.dart';
 import 'package:eaglerides/presentation/controller/auth/auth_controller.dart';
 import 'package:eaglerides/presentation/screens/home/home.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final setPasswordFormKey = GlobalKey<FormState>();
+  final loginFormKey = GlobalKey<FormState>();
   final AuthController _authController = Get.find();
 
   @override
@@ -84,7 +85,7 @@ class _LoginState extends State<Login> {
                               height: 30.h,
                             ),
                             Form(
-                              key: setPasswordFormKey,
+                              key: loginFormKey,
                               child: Column(
                                 children: [
                                   CustomTextFieldWidget(
@@ -119,6 +120,25 @@ class _LoginState extends State<Login> {
                                     // validator: validateFirst,
                                   ),
                                   SizedBox(
+                                    height: 5.h,
+                                  ),
+                                  Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          Get.to(const ForgotPasswordScreen());
+                                        },
+                                        child: Text(
+                                          'Forget Password?',
+                                          style: GoogleFonts.poppins(
+                                              color: backgroundColor,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
                                     height: 20.h,
                                   ),
                                   Align(
@@ -138,27 +158,22 @@ class _LoginState extends State<Login> {
                                         ),
                                       ),
                                       onPressed: () {
-                                        FocusScope.of(context).unfocus();
-                                        if (_emailController.text.isNotEmpty &&
-                                            _passwordController
-                                                .text.isNotEmpty &&
-                                            GetUtils.isEmail(
-                                                _emailController.text)) {
-                                          _authController.loginUser(
-                                            _emailController.text,
-                                            _passwordController.text,
-                                          );
-                                        } else {
-                                          Get.snackbar(
-                                              "error", "invalid values!");
-                                        }
-                                        // Navigator.pushAndRemoveUntil(
-                                        //     context,
-                                        //     MaterialPageRoute(
-                                        //       builder: (context) =>
-                                        //           const NavigationPage(),
-                                        //     ),
-                                        //     (route) => false);
+                                        // FocusScope.of(context).unfocus();
+                                        // if (_emailController.text.isNotEmpty &&
+                                        //     _passwordController
+                                        //         .text.isNotEmpty &&
+                                        //     GetUtils.isEmail(
+                                        //         _emailController.text)) {
+                                        //   _authController.loginUser(
+                                        //     _emailController.text,
+                                        //     _passwordController.text,
+                                        //   );
+                                        // } else {
+                                        //   Get.snackbar(
+                                        //       "error", "invalid values!");
+                                        // }
+
+                                        Get.offAll(const NavigationPage());
                                       },
                                       child: Text(
                                         'Login',
@@ -198,7 +213,7 @@ class _LoginState extends State<Login> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Get.to(Register());
+                              Get.to(const Register());
                             },
                             child: Text(
                               'Sign Up',

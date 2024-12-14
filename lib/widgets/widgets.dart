@@ -136,6 +136,7 @@ class CustomTextFieldWidget extends StatelessWidget {
   const CustomTextFieldWidget(
       {super.key,
       this.labelText,
+      this.textAlign = TextAlign.start,
       this.hintText,
       required this.controller,
       this.suffixIcon,
@@ -157,6 +158,7 @@ class CustomTextFieldWidget extends StatelessWidget {
       this.suffix,
       this.suffixIconColor});
   final String? labelText;
+  final TextAlign? textAlign;
   final String? hintText;
   final TextEditingController controller;
   final Widget? suffixIcon;
@@ -204,6 +206,7 @@ class CustomTextFieldWidget extends StatelessWidget {
           obscureText: obscureText,
           controller: controller,
           cursorColor: textColor,
+          textAlign: textAlign!,
           cursorHeight: 14,
           enableInteractiveSelection: enableInteractiveSelection,
           style: GoogleFonts.dmSans(color: textColor, fontSize: 14),

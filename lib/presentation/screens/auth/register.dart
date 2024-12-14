@@ -1,19 +1,17 @@
-import 'package:eaglerides/pages/auth/set_password.dart';
+import 'package:eaglerides/presentation/screens/auth/set_password.dart';
+import 'package:eaglerides/presentation/screens/auth/verify_email.dart';
 import 'package:eaglerides/styles/styles.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
-import '../../functions/function.dart';
-import '../../presentation/controller/auth/auth_controller.dart';
-import '../../widgets/widgets.dart';
-import '../loadingPage/loading.dart';
-import '../noInternet/no_internet.dart';
+import '../../../functions/function.dart';
+import '../../../widgets/widgets.dart';
+import '../../../pages/loadingPage/loading.dart';
+import '../../../pages/noInternet/no_internet.dart';
+import 'login.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -116,42 +114,6 @@ class _RegisterState extends State<Register> {
       body: SafeArea(
         child: Stack(
           children: [
-            // Positioned(
-            //   // bottom: 0.h,
-            //   child: Center(
-            //     child: Container(
-            //       width: double.maxFinite,
-            //       margin: EdgeInsets.symmetric(vertical: 20.h),
-            //       padding:
-            //           EdgeInsets.symmetric(horizontal: 10.w, vertical: 0.h),
-            //       alignment: Alignment.bottomCenter,
-            //       child: Wrap(
-            //         children: [
-            //           Text(
-            //             'Already have an account? ',
-            //             style: GoogleFonts.dmSans(
-            //               color: textColor,
-            //               fontSize: 12,
-            //               fontWeight: FontWeight.w500,
-            //             ),
-            //           ),
-            //           GestureDetector(
-            //             onTap: () {},
-            //             child: Text(
-            //               'Login ',
-            //               style: GoogleFonts.dmSans(
-            //                 color: backgroundColor,
-            //                 fontSize: 12,
-            //                 fontWeight: FontWeight.w600,
-            //               ),
-            //             ),
-            //           ),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
-
             SingleChildScrollView(
               child: Column(
                 children: [
@@ -329,44 +291,6 @@ class _RegisterState extends State<Register> {
                                     // spacing: 8.0,
                                     // runSpacing: 8.0,
                                     children: [
-                                      // Container(
-                                      //   padding: EdgeInsets.zero,
-                                      //   margin: EdgeInsets.zero,
-                                      //   // alignment: Alignment.centerLeft,
-                                      //   child: Checkbox.adaptive(
-                                      //     visualDensity:
-                                      //         VisualDensity.adaptivePlatformDensity,
-                                      //     value: false,
-                                      //     onChanged: (bool? value) {
-                                      //       // setState(() {
-                                      //       //   signOutDevices = value!;
-                                      //       // });
-                                      //     },
-                                      //     overlayColor:
-                                      //         MaterialStateColor.resolveWith(
-                                      //       (states) => backgroundColor,
-                                      //     ),
-                                      //     fillColor:
-                                      //         MaterialStateProperty.resolveWith<
-                                      //             Color>((Set<MaterialState> states) {
-                                      //       if (states
-                                      //           .contains(MaterialState.selected)) {
-                                      //         return backgroundColor;
-                                      //       }
-                                      //       return const Color(0xffF2F2F2);
-                                      //     }),
-                                      //     focusColor: MaterialStateColor.resolveWith(
-                                      //       (states) => backgroundColor,
-                                      //     ),
-                                      //     activeColor: MaterialStateColor.resolveWith(
-                                      //       (states) => backgroundColor,
-                                      //     ),
-                                      //     side: const BorderSide(
-                                      //       color: Color(0xffBDBDBD),
-                                      //     ),
-                                      //   ),
-                                      // ),
-
                                       GestureDetector(
                                         onTap: () {
                                           setState(() {
@@ -454,31 +378,31 @@ class _RegisterState extends State<Register> {
                                   ),
                                   onPressed: () {
                                     FocusScope.of(context).unfocus();
-                                    if (signUpFormKey.currentState!
-                                        .validate()) {
-                                      if (terms == true) {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                SetPasswordPage(
-                                              fullName:
-                                                  _fullNameController.text,
-                                              email: _emailController.text,
-                                              phoneNumber:
-                                                  _phoneNumberController.text,
-                                              address: _addressController.text,
-                                            ),
-                                          ),
-                                        );
-                                      } else {
-                                        Get.snackbar('Error!',
-                                            'You have to agree to the terms of service');
-                                      }
-                                    } else {
-                                      Get.snackbar('Error!',
-                                          'Please fill the form properly');
-                                    }
+                                    // if (signUpFormKey.currentState!
+                                    //     .validate()) {
+                                    //   if (terms == true) {
+                                    //     Navigator.push(
+                                    //       context,
+                                    //       MaterialPageRoute(
+                                    //         builder: (context) =>
+                                    //             SetPasswordPage(
+                                    //           fullName:
+                                    //               _fullNameController.text,
+                                    //           email: _emailController.text,
+                                    //           phoneNumber:
+                                    //               _phoneNumberController.text,
+                                    //           address: _addressController.text,
+                                    //         ),
+                                    //       ),
+                                    //     );
+                                    //   } else {
+                                    //     Get.snackbar('Error!',
+                                    //         'You have to agree to the terms of service');
+                                    //   }
+                                    // } else {
+                                    //   Get.snackbar('Error!',
+                                    //       'Please fill the form properly');
+                                    // }
                                     // _authController.register({
                                     //   'fullName': _fullNameController.text,
                                     //   'email': _emailController.text,
@@ -486,6 +410,11 @@ class _RegisterState extends State<Register> {
                                     //       _phoneNumberController.text,
                                     //   'address': _addressController.text
                                     // });
+                                    Get.to(
+                                      const VerifyEmail(
+                                        email: 'text@gmail.com',
+                                      ),
+                                    );
                                   },
                                   child: Text(
                                     'Continue',
@@ -519,7 +448,9 @@ class _RegisterState extends State<Register> {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () {},
+                                  onTap: () {
+                                    Get.to(const Login());
+                                  },
                                   child: Text(
                                     'Login ',
                                     style: GoogleFonts.dmSans(

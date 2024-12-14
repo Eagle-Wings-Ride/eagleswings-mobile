@@ -1,5 +1,5 @@
 import 'package:eaglerides/presentation/screens/auth/login.dart';
-import 'package:eaglerides/pages/auth/register.dart';
+import 'package:eaglerides/presentation/screens/auth/register.dart';
 import 'package:eaglerides/styles/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

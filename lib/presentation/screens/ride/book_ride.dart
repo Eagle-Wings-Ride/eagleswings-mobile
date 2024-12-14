@@ -1,3 +1,4 @@
+import 'package:eaglerides/presentation/screens/ride/confirm_booking.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -19,6 +20,9 @@ class _BookRideState extends State<BookRide> {
   final TextEditingController sourceController = TextEditingController();
   final TextEditingController destinationController = TextEditingController();
   final RideController _uberMapController = Get.put(di.sl<RideController>());
+  final TextEditingController startDateController = TextEditingController();
+  final TextEditingController pickupTimeController = TextEditingController();
+  final TextEditingController returnTimeController = TextEditingController();
 
   @override
   void dispose() {
@@ -434,32 +438,116 @@ class _BookRideState extends State<BookRide> {
                   Column(
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Start Date:',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
+                          Flexible(
+                            flex: 4,
+                            child: Text(
+                              'Start Date:',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                          SizedBox(),
+                          // SizedBox(
+                          //   width: 10.w,
+                          // ),
                           Flexible(
+                            flex: 6,
                             child: CustomTextField(
                               onChanged: (val) {
-                                _uberMapController.getPredictions(
-                                    val, 'source');
+                                // _uberMapController.getPredictions(
+                                //     val, 'source');
                               },
-                              controller: sourceController
-                                ..text =
-                                    _uberMapController.sourcePlaceName.value,
+                              controller: startDateController,
                               obscureText: false,
                               filled: true,
                               keyboardType: TextInputType.text,
-                              hintText: 'Please enter pick up',
+                              hintText: 'Enter date here',
                               readOnly: false,
-                              suffixIcon: const Icon(
-                                Icons.my_location_outlined,
+                              prefixIcon: const Icon(
+                                Icons.calendar_today_outlined,
+                                color: Colors.black,
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 14.h,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            flex: 4,
+                            child: Text(
+                              'Pickup time:',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          // SizedBox(
+                          //   width: 10.w,
+                          // ),
+                          Flexible(
+                            flex: 6,
+                            child: CustomTextField(
+                              onChanged: (val) {},
+                              controller: pickupTimeController,
+                              obscureText: false,
+                              filled: true,
+                              keyboardType: TextInputType.text,
+                              hintText: 'Enter time here',
+                              readOnly: false,
+                              prefixIcon: const Icon(
+                                Icons.access_time,
+                                color: Colors.black,
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 14.h,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            flex: 4,
+                            child: Text(
+                              'Return time:',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          // SizedBox(
+                          //   width: 10.w,
+                          // ),
+                          Flexible(
+                            flex: 6,
+                            child: CustomTextField(
+                              onChanged: (val) {},
+                              controller: returnTimeController,
+                              obscureText: false,
+                              filled: true,
+                              keyboardType: TextInputType.text,
+                              hintText: 'Enter time here',
+                              readOnly: false,
+                              prefixIcon: const Icon(
+                                Icons.access_time,
+                                color: Colors.black,
                                 size: 16,
                               ),
                             ),
@@ -467,6 +555,37 @@ class _BookRideState extends State<BookRide> {
                         ],
                       ),
                     ],
+                  ),
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize:
+                            Size(MediaQuery.of(context).size.width - 100, 50),
+                        backgroundColor: backgroundColor,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            50,
+                          ),
+                        ),
+                      ),
+                      onPressed: () {
+                        Get.to(ConfirmBooking());
+                      },
+                      child: Text(
+                        'Confirm',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.dmSans(
+                          color: buttonText,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
