@@ -76,7 +76,7 @@ class _BookRideState extends State<BookRide> {
                                 size: 15,
                               ),
                             ),
-                            for (var i = 0; i < 15; i++)
+                            for (var i = 0; i < 10; i++)
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 1),
@@ -145,7 +145,7 @@ class _BookRideState extends State<BookRide> {
                                 ),
                               ],
                             ),
-                            for (var i = 0; i < 10; i++)
+                            for (var i = 0; i < 5; i++)
                               const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 1),
                                 child: SizedBox(

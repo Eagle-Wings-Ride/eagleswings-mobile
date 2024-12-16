@@ -2,6 +2,7 @@ import 'package:eaglerides/pages/onTripPage/booking_confirmation.dart';
 // import 'package:eaglerides/pages/onTripPage/invoice.dart';
 // import 'package:eaglerides/pages/onTripPage/map_page.dart';
 import 'package:eaglerides/presentation/screens/home/home.dart';
+import 'package:eaglerides/presentation/screens/ride/rides_screen.dart';
 // import 'package:eaglerides/presentation/screens/ride/map_with_source_destination_field.dart';
 import 'package:eaglerides/styles/styles.dart';
 import 'package:flutter/material.dart';
@@ -29,11 +30,19 @@ class _NavigationPageState extends State<NavigationPage> {
         child: _buildPage(currentIndex),
       ),
       bottomNavigationBar: Container(
-        margin: const EdgeInsets.only(bottom: 15, top: 0, left: 20, right: 20),
-        height: (MediaQuery.of(context).size.height >= 1000) ? 120 : 80,
+        margin: const EdgeInsets.only(bottom: 0, top: 0, left: 0, right: 0),
+        padding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+        height: (MediaQuery.of(context).size.height >= 1000) ? 140 : 90,
         decoration: BoxDecoration(
-          color: Theme.of(context).canvasColor,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(
+              color: Color.fromRGBO(9, 39, 127, .15),
+              blurRadius: 30.0,
+              spreadRadius: -4.0,
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -105,9 +114,9 @@ class _NavigationPageState extends State<NavigationPage> {
       case 0:
         return const HomePage();
       case 1:
-        return HomePage();
+        return const RidesScreen();
       case 2:
-        return const BookingConfirmation();
+        return const HomePage();
       default:
         return const HomePage();
     }

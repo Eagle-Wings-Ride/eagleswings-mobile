@@ -1,35 +1,27 @@
-import 'dart:ui';
-
-
-import 'package:eaglerides/styles/styles.dart';
+import 'package:eaglerides/presentation/screens/auth/register.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../controller/auth/auth_controller.dart';
+import '../../../styles/styles.dart';
 import '../../../widgets/widgets.dart';
+import 'login.dart';
+import 'verification_confirmation_screen.dart';
 
-class SetPasswordPage extends StatefulWidget {
-  const SetPasswordPage({
-    super.key,
-    required this.email,
-    required this.phoneNumber,
-    required this.fullName,
-    required this.address,
-  });
-  final String email, phoneNumber, fullName, address;
+class SetNewPasswordScreen extends StatefulWidget {
+  const SetNewPasswordScreen({super.key, required this.email});
+  final String email;
 
   @override
-  State<SetPasswordPage> createState() => _SetPasswordPageState();
+  State<SetNewPasswordScreen> createState() => _SetNewPasswordScreenState();
 }
 
-class _SetPasswordPageState extends State<SetPasswordPage> {
+class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  final setPasswordFormKey = GlobalKey<FormState>();
-  final AuthController _authController = Get.find();
+  final setNewPasswordFormKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
@@ -111,22 +103,31 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                           height: 21.h,
                         ),
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              'Secure your account',
-                              textAlign: TextAlign.start,
-                              style: GoogleFonts.dmSans(
+                              'Forget Password?',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
                                 color: textColor,
-                                fontSize: 16,
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Not a Problem, let\'s sign you back in!',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                color: textColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                             SizedBox(
                               height: 30.h,
                             ),
                             Form(
-                              key: setPasswordFormKey,
+                              key: setNewPasswordFormKey,
                               child: Column(
                                 children: [
                                   CustomTextFieldWidget(
@@ -189,26 +190,33 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                                         ),
                                       ),
                                       onPressed: () {
+                                        Get.to(
+                                          () => VerificationConfirmationScreen(
+                                            path: 'login',
+                                            nextScreenBuilder: () =>
+                                                const Login(), // Builder function for the next page
+                                          ),
+                                        );
                                         // Navigator.pushReplacement(
                                         //   context,
                                         //   MaterialPageRoute(
                                         //     builder: (context) => const Login(),
                                         //   ),
                                         // );
-                                        if (setPasswordFormKey.currentState!
-                                            .validate()) {
-                                          _authController.register({
-                                            'fullname': widget.fullName,
-                                            'email': widget.email,
-                                            'password':
-                                                _passwordController.text,
-                                            'phone_number': widget.phoneNumber,
-                                            'address': widget.address,
-                                          });
-                                        }
+                                        // if (setNewPasswordFormKey.currentState!
+                                        //     .validate()) {
+                                        //   // _authController.register({
+                                        //   //   'fullname': widget.fullName,
+                                        //   //   'email': widget.email,
+                                        //   //   'password':
+                                        //   //       _passwordController.text,
+                                        //   //   'phone_number': widget.phoneNumber,
+                                        //   //   'address': widget.address,
+                                        //   // });
+                                        // }
                                       },
                                       child: Text(
-                                        'Create Account',
+                                        'Continue',
                                         textAlign: TextAlign.center,
                                         style: GoogleFonts.dmSans(
                                           color: buttonText,
@@ -226,38 +234,40 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                       ],
                     ),
                   ),
-                  // Center(
-                  //   child: Container(
-                  //     width: double.maxFinite,
-                  //     margin: EdgeInsets.symmetric(vertical: 30.h),
-                  //     padding:
-                  //         EdgeInsets.symmetric(horizontal: 10.w, vertical: 0.h),
-                  //     alignment: Alignment.bottomCenter,
-                  //     child: Wrap(
-                  //       children: [
-                  //         Text(
-                  //           'Already have an account? ',
-                  //           style: GoogleFonts.dmSans(
-                  //             color: textColor,
-                  //             fontSize: 12,
-                  //             fontWeight: FontWeight.w500,
-                  //           ),
-                  //         ),
-                  //         GestureDetector(
-                  //           onTap: () {},
-                  //           child: Text(
-                  //             'Login ',
-                  //             style: GoogleFonts.dmSans(
-                  //               color: backgroundColor,
-                  //               fontSize: 12,
-                  //               fontWeight: FontWeight.w600,
-                  //             ),
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
+                  Center(
+                    child: Container(
+                      width: double.maxFinite,
+                      margin: EdgeInsets.symmetric(vertical: 30.h),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 0.h),
+                      alignment: Alignment.bottomCenter,
+                      child: Wrap(
+                        children: [
+                          Text(
+                            'Don\'t have an account? ',
+                            style: GoogleFonts.dmSans(
+                              color: textColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Get.to(const Register());
+                            },
+                            child: Text(
+                              'Sign Up',
+                              style: GoogleFonts.dmSans(
+                                color: backgroundColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

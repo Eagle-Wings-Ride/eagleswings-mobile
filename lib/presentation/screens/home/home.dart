@@ -75,234 +75,9 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   SizedBox(
-                    height: 20.h,
+                    height: 40.h,
                   ),
-                  Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Current Rides',
-                              style: GoogleFonts.dmSans(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
-                              ),
-                            ),
-                            Text(
-                              'View all',
-                              style: GoogleFonts.dmSans(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: textColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 13.h,
-                  ),
-                  // Text(
-                  //   'You have no current rides',
-                  //   style: GoogleFonts.dmSans(
-                  //     fontSize: 12,
-                  //     fontWeight: FontWeight.w500,
-                  //     color: textColor,
-                  //   ),
-                  // ),
-
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: page,
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color.fromRGBO(9, 39, 127, .15),
-                          blurRadius: 30.0,
-                          spreadRadius: -4.0,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          flex: 2,
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/rides_img.jpg',
-                              width: 45,
-                              height: 45,
-                              fit: BoxFit.fitWidth,
-                            ),
-                          ),
-                        ),
-                        Flexible(
-                          flex: 8,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
-                                flex: 8,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      '102 fox drive to Millennium Drive',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.dmSans(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5.h,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 5, vertical: 3),
-                                          decoration: BoxDecoration(
-                                            color: const Color.fromRGBO(
-                                                255, 85, 0, 0.14),
-                                            borderRadius:
-                                                BorderRadius.circular(40),
-                                          ),
-                                          child: Text(
-                                            'In-House Driver',
-                                            style: GoogleFonts.dmSans(
-                                                color: backgroundColor,
-                                                fontSize: 8,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 6.w,
-                                        ),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 5, vertical: 3),
-                                          decoration: BoxDecoration(
-                                            color: const Color.fromRGBO(
-                                                9, 39, 127, .15),
-                                            borderRadius:
-                                                BorderRadius.circular(40),
-                                          ),
-                                          child: Text(
-                                            'Return trip',
-                                            style: GoogleFonts.dmSans(
-                                                color: const Color(0xff133BB7),
-                                                fontSize: 8,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 5.h,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Image.asset(
-                                          'assets/images/arrow_location.png',
-                                          width: 16,
-                                          height: 10.25,
-                                          color: Colors.black,
-                                        ),
-                                        SizedBox(
-                                          width: 2.w,
-                                        ),
-                                        Text(
-                                          'From: 102 fox drive',
-                                          style: GoogleFonts.dmSans(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 5.h,
-                                    ),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Iconsax.clock,
-                                          size: 14,
-                                          weight: 4,
-                                          color: Colors.black,
-                                        ),
-                                        SizedBox(
-                                          width: 2.w,
-                                        ),
-                                        Text(
-                                          'Starting Time: 3:50pm',
-                                          style: GoogleFonts.dmSans(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: 10.w,
-                              ),
-                              Flexible(
-                                flex: 2,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5, vertical: 3),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            255, 185, 4, 0.14),
-                                        borderRadius: BorderRadius.circular(40),
-                                      ),
-                                      child: Text(
-                                        'Ongoing',
-                                        style: GoogleFonts.dmSans(
-                                            color: const Color(0xffFFB904),
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 15.h,
-                                    ),
-                                    const Icon(Icons.keyboard_arrow_right),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(
-                    height: 20.h,
-                  ),
+                
                   Column(
                     children: [
                       Padding(
@@ -912,7 +687,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(15),
                       decoration: BoxDecoration(
                         color: const Color.fromRGBO(148, 163, 208, 0.2),
                         borderRadius: BorderRadius.circular(40),
@@ -920,7 +695,7 @@ class _HomePageState extends State<HomePage> {
                       child: Icon(
                         Icons.notifications_none_outlined,
                         color: Colors.white.withOpacity(.7),
-                        size: 16,
+                        size: 26,
                       ),
                     ),
                   ],
