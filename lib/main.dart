@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // import 'package:rcdit_user/functions/notifications.dart';
 // import 'pages/loadingPage/loadingpage.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -14,6 +15,7 @@ import 'injection_container.dart' as di;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  configLoading();
   await Hive.initFlutter();
   await Hive.openBox('authBox');
   await di.init();
@@ -28,6 +30,24 @@ void main() async {
 
   // initMessaging();
   runApp(const MyApp());
+}
+
+void configLoading() {
+  EasyLoading.instance
+    ..displayDuration = const Duration(milliseconds: 2000)
+    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorSize = 25.0
+    ..radius = 10.0
+    ..progressColor = Colors.yellow
+    ..backgroundColor = Colors.green
+    ..indicatorColor = Colors.yellow
+    ..textColor = Colors.yellow
+    ..maskColor = Colors.blue.withOpacity(0.5)
+    ..userInteractions = true
+    ..dismissOnTap = false;
+
+  // ..customAnimation = CustomAnimation();
 }
 
 class MyApp extends StatelessWidget {
@@ -54,6 +74,7 @@ class MyApp extends StatelessWidget {
           title: 'EaglesRides',
           theme: ThemeData(),
           home: const LoadingPage(),
+          builder: EasyLoading.init(),
         ),
       ),
     );

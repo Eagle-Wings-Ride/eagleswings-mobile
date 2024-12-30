@@ -189,9 +189,9 @@ class CustomTextFieldWidget extends StatelessWidget {
           padding: EdgeInsets.only(bottom: 10.h, left: 3.w, right: 3.w),
           child: Text(
             labelText!,
-            style: GoogleFonts.dmSans(
+            style: GoogleFonts.poppins(
               color: textColor,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w500,
               fontSize: 14,
             ),
           ),
@@ -209,7 +209,7 @@ class CustomTextFieldWidget extends StatelessWidget {
           textAlign: textAlign!,
           cursorHeight: 14,
           enableInteractiveSelection: enableInteractiveSelection,
-          style: GoogleFonts.dmSans(color: textColor, fontSize: 14),
+          style: GoogleFonts.poppins(color: textColor, fontSize: 14,fontWeight: FontWeight.w500),
 
           inputFormatters: [],
           maxLength: maxLength,
@@ -238,12 +238,12 @@ class CustomTextFieldWidget extends StatelessWidget {
               borderSide: const BorderSide(color: Colors.red, width: 1),
             ),
             hintText: hintText,
-            errorStyle: GoogleFonts.dmSans(
+            errorStyle: GoogleFonts.poppins(
               color: Colors.red,
               fontSize: 12,
               fontWeight: FontWeight.w400,
             ),
-            hintStyle: GoogleFonts.dmSans(
+            hintStyle: GoogleFonts.poppins(
               color: Colors.grey,
               fontSize: 12,
               fontWeight: FontWeight.w400,
@@ -259,7 +259,7 @@ class CustomTextFieldWidget extends StatelessWidget {
           maxLines: 1,
 
           validator: validator,
-          //  onChanged: onChanged,
+           onChanged: onChanged,
         ),
       ],
     );

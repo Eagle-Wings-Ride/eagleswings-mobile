@@ -127,17 +127,17 @@ class _VerifyEmailState extends State<VerifyEmail> {
                                       ),
                                       onPressed: () {
                                         FocusScope.of(context).unfocus();
-                                        Get.to(
-                                          () => VerificationConfirmationScreen(
-                                            nextScreenBuilder: () =>
-                                                const SetPasswordPage(
-                                              fullName: '',
-                                              email: '',
-                                              phoneNumber: '',
-                                              address: '',
-                                            ), // Builder function for the next page
-                                          ),
-                                        );
+                                        // Get.to(
+                                        //   () => VerificationConfirmationScreen(
+                                        //     nextScreenBuilder: () =>
+                                        //         const SetPasswordPage(
+                                        //       fullName: '',
+                                        //       email: '',
+                                        //       phoneNumber: '',
+                                        //       address: '',
+                                        //     ), // Builder function for the next page
+                                        //   ),
+                                        // );
                                         // Navigator.push(
                                         //   context,
                                         //   MaterialPageRoute(

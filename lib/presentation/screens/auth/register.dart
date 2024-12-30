@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:eaglerides/presentation/screens/auth/set_password.dart';
 import 'package:eaglerides/presentation/screens/auth/verify_email.dart';
 import 'package:eaglerides/styles/styles.dart';
@@ -6,11 +8,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
+import '../../../config/map_api_key.dart';
 import '../../../functions/function.dart';
 import '../../../widgets/widgets.dart';
 import '../../../pages/loadingPage/loading.dart';
 import '../../../pages/noInternet/no_internet.dart';
+import 'package:http/http.dart' as http;
+import '../../controller/auth/auth_controller.dart';
 import 'login.dart';
 
 class Register extends StatefulWidget {
@@ -21,11 +28,18 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  final AuthController _authController = Get.find();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final signUpFormKey = GlobalKey<FormState>();
+  final GlobalKey _textFieldKey = GlobalKey();
+  double _textFieldOffset = 0; // Position of the TextField
+  bool _showDropdown = false;
 
   // bool enableSignIn = false;
   bool obscureText = true;
@@ -61,6 +75,33 @@ class _RegisterState extends State<Register> {
     super.dispose();
   }
 
+  List<dynamic> _suggestions = [];
+
+  // Fetch suggestions from Google Places API
+  Future<void> getSuggestions(String input) async {
+    if (input.isEmpty) {
+      setState(() {
+        _suggestions.clear(); // Clear suggestions if input is empty
+        _showDropdown = false;
+      });
+      return;
+    }
+
+    final String url =
+        "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&key=$apiKey";
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      setState(() {
+        _suggestions = data['predictions'] ?? [];
+        _showDropdown = _suggestions.isNotEmpty;
+      });
+    } else {
+      print("Error fetching suggestions");
+    }
+  }
+
   // validateLast(lastValue) {
   //   if (lastValue.isEmpty) {
   //     return 'last name cannot be empty';
@@ -68,6 +109,16 @@ class _RegisterState extends State<Register> {
 
   //   return null;
   // }
+
+  // Get the position of the TextField
+  void getTextFieldPosition() {
+    final RenderBox renderBox =
+        _textFieldKey.currentContext!.findRenderObject() as RenderBox;
+    final Offset position = renderBox.localToGlobal(Offset.zero);
+    setState(() {
+      _textFieldOffset = position.dy + renderBox.size.height;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +161,28 @@ class _RegisterState extends State<Register> {
       }
     }
 
+    validatePass(passValue) {
+      RegExp uppercaseRegex = RegExp(r'[A-Z]');
+      RegExp lowercaseRegex = RegExp(r'[a-z]');
+      RegExp digitsRegex = RegExp(r'[0-9]');
+      RegExp specialCharRegex = RegExp(r'[#\$%&*?@]');
+      if (passValue == null || passValue.isEmpty) {
+        return 'Input a valid password';
+      } else if (passValue.length < 8) {
+        return "Password must be at least 8 characters long.";
+      } else if (!uppercaseRegex.hasMatch(passValue)) {
+        return "Password must contain at least one uppercase letter.";
+      } else if (!lowercaseRegex.hasMatch(passValue)) {
+        return "Password must contain at least one lowercase letter.";
+      } else if (!digitsRegex.hasMatch(passValue)) {
+        return "Password must contain at least one number.";
+      } else if (!specialCharRegex.hasMatch(passValue)) {
+        return "Password must contain at least one special character (%&*?@).";
+      } else {
+        return null;
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -133,7 +206,7 @@ class _RegisterState extends State<Register> {
                         Text(
                           'Let’s get you set up',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.dmSans(
+                          style: GoogleFonts.poppins(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: textColor,
@@ -178,6 +251,49 @@ class _RegisterState extends State<Register> {
                               SizedBox(
                                 height: 20.h,
                               ),
+                              CustomTextFieldWidget(
+                                controller: _passwordController,
+                                keyboardType: TextInputType.text,
+                                obscureText: true,
+                                filled: false,
+                                readOnly: false,
+                                labelText: 'Enter Password',
+                                hintText: '********',
+                                autoValidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                maxLines: 1,
+                                validator: validatePass,
+                              ),
+                              SizedBox(
+                                height: 20.h,
+                              ),
+                              CustomTextFieldWidget(
+                                controller: _confirmPasswordController,
+                                keyboardType: TextInputType.text,
+                                obscureText: true,
+                                filled: false,
+                                readOnly: false,
+
+                                labelText: 'Confirm Password',
+                                hintText: '********',
+                                autoValidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                maxLines: 1,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please confirm your password';
+                                  }
+                                  if (value != _passwordController.text) {
+                                    return 'Passwords do not match';
+                                  }
+
+                                  return null;
+                                },
+                                // validator: validateFirst,
+                              ),
+                              SizedBox(
+                                height: 20.h,
+                              ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -186,9 +302,9 @@ class _RegisterState extends State<Register> {
                                         bottom: 10.h, left: 3.w, right: 3.w),
                                     child: Text(
                                       'Phone Number',
-                                      style: GoogleFonts.dmSans(
+                                      style: GoogleFonts.poppins(
                                         color: textColor,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w500,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -202,7 +318,7 @@ class _RegisterState extends State<Register> {
                                         EdgeInsets.only(left: 14.sp),
                                     cursorColor: textColor,
                                     cursorHeight: 14,
-                                    style: GoogleFonts.dmSans(
+                                    style: GoogleFonts.poppins(
                                         color: textColor, fontSize: 14),
                                     decoration: InputDecoration(
                                       filled: false,
@@ -231,12 +347,12 @@ class _RegisterState extends State<Register> {
                                             color: Colors.red, width: 1),
                                       ),
                                       hintText: '005 094 098',
-                                      errorStyle: GoogleFonts.dmSans(
+                                      errorStyle: GoogleFonts.poppins(
                                         color: Colors.red,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400,
                                       ),
-                                      hintStyle: GoogleFonts.dmSans(
+                                      hintStyle: GoogleFonts.poppins(
                                         color: Colors.grey,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400,
@@ -258,11 +374,16 @@ class _RegisterState extends State<Register> {
                                 height: 10.h,
                               ),
                               CustomTextFieldWidget(
+                                key: _textFieldKey,
                                 controller: _addressController,
                                 keyboardType: TextInputType.streetAddress,
                                 obscureText: false,
                                 filled: false,
                                 readOnly: false,
+                                onChanged: (value) {
+                                  getTextFieldPosition(); // Update position dynamically
+                                  getSuggestions(value); // Fetch suggestions
+                                },
                                 prefixIcon: Icon(
                                   Icons.location_on_sharp,
                                   color: greyColor,
@@ -275,8 +396,45 @@ class _RegisterState extends State<Register> {
                                 validator: validateAddress,
                               ),
                               SizedBox(
-                                height: 20.h,
+                                height: 10.h,
                               ),
+                              // if (_suggestions.isNotEmpty &&
+                              //     _addressController.text.isNotEmpty)
+                              //   Positioned(
+                              //     left: 16,
+                              //     right: 16,
+                              //     top: 90,
+                              //     child: Material(
+                              //       elevation: 2,
+                              //       borderRadius: BorderRadius.circular(8),
+                              //       child: Container(
+                              //         height: 200,
+                              //         decoration: BoxDecoration(
+                              //           borderRadius: BorderRadius.circular(8),
+                              //           color: Colors.white,
+                              //         ),
+                              //         child: ListView.builder(
+                              //           itemCount: _suggestions.length,
+                              //           itemBuilder: (context, index) {
+                              //             final suggestion =
+                              //                 _suggestions[index];
+                              //             return ListTile(
+                              //               title:
+                              //                   Text(suggestion['description']),
+                              //               onTap: () {
+                              //                 _addressController.text =
+                              //                     suggestion['description'];
+                              //                 setState(() {
+                              //                   _suggestions.clear();
+                              //                 });
+                              //               },
+                              //             );
+                              //           },
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ),
+
                               Center(
                                 child: Container(
                                   width: double.maxFinite,
@@ -378,48 +536,64 @@ class _RegisterState extends State<Register> {
                                   ),
                                   onPressed: () {
                                     FocusScope.of(context).unfocus();
-                                    // if (signUpFormKey.currentState!
-                                    //     .validate()) {
-                                    //   if (terms == true) {
-                                    //     Navigator.push(
-                                    //       context,
-                                    //       MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             SetPasswordPage(
-                                    //           fullName:
-                                    //               _fullNameController.text,
-                                    //           email: _emailController.text,
-                                    //           phoneNumber:
-                                    //               _phoneNumberController.text,
-                                    //           address: _addressController.text,
-                                    //         ),
-                                    //       ),
-                                    //     );
-                                    //   } else {
-                                    //     Get.snackbar('Error!',
-                                    //         'You have to agree to the terms of service');
-                                    //   }
-                                    // } else {
-                                    //   Get.snackbar('Error!',
-                                    //       'Please fill the form properly');
-                                    // }
-                                    // _authController.register({
-                                    //   'fullName': _fullNameController.text,
-                                    //   'email': _emailController.text,
-                                    //   'phoneNumber':
-                                    //       _phoneNumberController.text,
-                                    //   'address': _addressController.text
-                                    // });
-                                    Get.to(
-                                      const VerifyEmail(
-                                        email: 'text@gmail.com',
-                                      ),
-                                    );
+                                    if (signUpFormKey.currentState!
+                                        .validate()) {
+                                      if (terms == true) {
+                                        // Navigator.push(
+                                        //   context,
+                                        //   MaterialPageRoute(
+                                        //     builder: (context) =>
+                                        //         SetPasswordPage(
+                                        //       fullName:
+                                        //           _fullNameController.text,
+                                        //       email: _emailController.text,
+                                        //       phoneNumber:
+                                        //           _phoneNumberController.text,
+                                        //       address: _addressController.text,
+                                        //     ),
+                                        //   ),
+                                        // );
+                                        _authController.register({
+                                          'fullname': _fullNameController.text.trim(),
+                                          'email': _emailController.text.trim().toLowerCase(),
+                                          'password':_passwordController.text.trim(),
+                                          'phone_number':
+                                              _phoneNumberController.text,
+                                          'address': _addressController.text
+                                        }, context);
+                                      } else {
+                                        showTopSnackBar(
+                                          Overlay.of(context),
+                                          const CustomSnackBar.error(
+                                            message:
+                                                'You have to agree to the terms of service',
+                                          ),
+                                        );
+                                        // Get.snackbar('Error!',
+                                        //     'You have to agree to the terms of service');
+                                      }
+                                    } else {
+                                      showTopSnackBar(
+                                        Overlay.of(context),
+                                        const CustomSnackBar.error(
+                                          message:
+                                              'Please fill the form properly',
+                                        ),
+                                      );
+                                      // Get.snackbar('Error!',
+                                      //     'Please fill the form properly');
+                                    }
+
+                                    // Get.to(
+                                    //   const VerifyEmail(
+                                    //     email: 'text@gmail.com',
+                                    //   ),
+                                    // );
                                   },
                                   child: Text(
                                     'Continue',
                                     textAlign: TextAlign.center,
-                                    style: GoogleFonts.dmSans(
+                                    style: GoogleFonts.poppins(
                                       color: buttonText,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
@@ -441,7 +615,7 @@ class _RegisterState extends State<Register> {
                               children: [
                                 Text(
                                   'Already have an account? ',
-                                  style: GoogleFonts.dmSans(
+                                  style: GoogleFonts.poppins(
                                     color: textColor,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -453,7 +627,7 @@ class _RegisterState extends State<Register> {
                                   },
                                   child: Text(
                                     'Login ',
-                                    style: GoogleFonts.dmSans(
+                                    style: GoogleFonts.poppins(
                                       color: backgroundColor,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -464,12 +638,46 @@ class _RegisterState extends State<Register> {
                             ),
                           ),
                         ),
+                        // Dropdown Suggestions
                       ],
                     ),
                   ),
                 ],
               ),
             ),
+            if (_showDropdown && _addressController.text.isNotEmpty)
+              Positioned(
+                left: 20, // Align with form padding
+                right: 20,
+                top: _textFieldOffset - 20, // Dynamically positioned
+                child: Material(
+                  elevation: 2,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    height: 200, // Adjust height as needed
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                    ),
+                    child: ListView.builder(
+                      itemCount: _suggestions.length,
+                      itemBuilder: (context, index) {
+                        final suggestion = _suggestions[index];
+                        return ListTile(
+                          title: Text(suggestion['description']),
+                          onTap: () {
+                            _addressController.text = suggestion['description'];
+                            setState(() {
+                              _suggestions.clear();
+                              _showDropdown = false;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
             //No internet
             (internet == false)
                 ? Positioned(

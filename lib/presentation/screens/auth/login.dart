@@ -7,6 +7,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../../styles/styles.dart';
 import '../../../widgets/widgets.dart';
@@ -158,22 +160,29 @@ class _LoginState extends State<Login> {
                                         ),
                                       ),
                                       onPressed: () {
-                                        // FocusScope.of(context).unfocus();
-                                        // if (_emailController.text.isNotEmpty &&
-                                        //     _passwordController
-                                        //         .text.isNotEmpty &&
-                                        //     GetUtils.isEmail(
-                                        //         _emailController.text)) {
-                                        //   _authController.loginUser(
-                                        //     _emailController.text,
-                                        //     _passwordController.text,
-                                        //   );
-                                        // } else {
-                                        //   Get.snackbar(
-                                        //       "error", "invalid values!");
-                                        // }
+                                        FocusScope.of(context).unfocus();
+                                        if (_emailController.text.isNotEmpty &&
+                                            _passwordController
+                                                .text.isNotEmpty &&
+                                            GetUtils.isEmail(
+                                                _emailController.text)) {
+                                          _authController.loginUser(
+                                            _emailController.text,
+                                            _passwordController.text,
+                                            context,
+                                          );
+                                        } else {
+                                          showTopSnackBar(
+                                            Overlay.of(context),
+                                            const CustomSnackBar.error(
+                                              message: '"invalid values!"',
+                                            ),
+                                          );
+                                          // Get.snackbar(
+                                          //     "error", "invalid values!");
+                                        }
 
-                                        Get.offAll(const NavigationPage());
+                                        // Get.offAll(const NavigationPage());
                                       },
                                       child: Text(
                                         'Login',

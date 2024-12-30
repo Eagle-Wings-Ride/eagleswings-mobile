@@ -961,8 +961,6 @@ PODS:
   - connectivity_plus (0.0.1):
     - Flutter
     - FlutterMacOS
-  - contacts_service (0.2.2):
-    - Flutter
   - Firebase/CoreOnly (10.25.0):
     - FirebaseCore (= 10.25.0)
   - Firebase/Firestore (10.25.0):
@@ -1135,7 +1133,6 @@ DEPENDENCIES:
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/darwin`)
-  - contacts_service (from `.symlinks/plugins/contacts_service/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
@@ -1179,8 +1176,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/darwin"
-  contacts_service:
-    :path: ".symlinks/plugins/contacts_service/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   Flutter:
@@ -1218,7 +1213,6 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: 1e2348957acdbcad360b80a264a90799984b2ba6
   cloud_firestore: 003d53b6b8b392600b7769acf9421cc4f23e5911
   connectivity_plus: ddd7f30999e1faaef5967c23d5b6d503d10434db
-  contacts_service: 849e1f84281804c8bfbec1b4c3eedcb23c5d3eca
   Firebase: 0312a2352584f782ea56f66d91606891d4607f06
   firebase_core: a626d00494efa398e7c54f25f1454a64c8abf197
   FirebaseAppCheckInterop: 6a1757cfd4067d8e00fccd14fcc1b8fd78cfac07
