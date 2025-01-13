@@ -3,7 +3,7 @@ abstract class EagleRidesAuthRepository {
 
   Future<void> eagleRidesAuthPhoneVerification(String phoneNumber);
 
-  Future<void> eagleRidesAuthOtpVerification(String otp);
+  Future<String> eagleRidesAuthOtpVerification(String email, String otp);
 
   Future<String> eagleRidesAuthGetUserUid();
 

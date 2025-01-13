@@ -57,8 +57,9 @@ class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
   }
 
   @override
-  Future<void> eagleRidesAuthOtpVerification(String otp) async {
-    return await eagleRidesAuthDataSource.eagleridesAuthOtpVerification(otp);
+  Future<String> eagleRidesAuthOtpVerification(String email, String otp) async {
+    return await eagleRidesAuthDataSource.eagleridesAuthOtpVerification(
+        email, otp);
   }
 
   @override

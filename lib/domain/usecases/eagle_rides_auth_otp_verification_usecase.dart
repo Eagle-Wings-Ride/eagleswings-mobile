@@ -6,7 +6,7 @@ class EagleRidesAuthOtpVerificationUseCase {
   EagleRidesAuthOtpVerificationUseCase(
       {required this.eagleRidesAuthRepository});
 
-  Future<void> call(String otp) async {
-    return await eagleRidesAuthRepository.eagleRidesAuthOtpVerification(otp);
+  Future<String> call(String email, String otp) async {
+    return await eagleRidesAuthRepository.eagleRidesAuthOtpVerification(email, otp);
   }
 }

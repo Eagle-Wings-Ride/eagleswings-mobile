@@ -558,8 +558,8 @@ class _RegisterState extends State<Register> {
                                           'email': _emailController.text.trim().toLowerCase(),
                                           'password':_passwordController.text.trim(),
                                           'phone_number':
-                                              _phoneNumberController.text,
-                                          'address': _addressController.text
+                                              _phoneNumberController.text.toString(),
+                                          'address': _addressController.text.toString()
                                         }, context);
                                       } else {
                                         showTopSnackBar(

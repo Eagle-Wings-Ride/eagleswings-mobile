@@ -1,6 +1,8 @@
+import 'package:eaglerides/presentation/screens/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import '../styles/styles.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -156,6 +158,7 @@ class CustomTextFieldWidget extends StatelessWidget {
       this.maxLengthEnforcement,
       this.autoValidateMode,
       this.suffix,
+      this.focusNode,
       this.suffixIconColor});
   final String? labelText;
   final TextAlign? textAlign;
@@ -170,6 +173,7 @@ class CustomTextFieldWidget extends StatelessWidget {
   final bool filled;
   final TextInputType keyboardType;
   final String? errorText;
+  final FocusNode? focusNode;
   final int? maxLength;
   final void Function(String)? onChanged;
   final bool? enableInteractiveSelection;
@@ -197,10 +201,11 @@ class CustomTextFieldWidget extends StatelessWidget {
           ),
         ),
         TextFormField(
+          focusNode: focusNode,
           autovalidateMode: autoValidateMode,
           readOnly: readOnly,
           onTap: onTap,
-          autofocus: true,
+          autofocus: false,
           enableSuggestions: true,
           keyboardType: keyboardType,
           obscureText: obscureText,
@@ -209,8 +214,8 @@ class CustomTextFieldWidget extends StatelessWidget {
           textAlign: textAlign!,
           cursorHeight: 14,
           enableInteractiveSelection: enableInteractiveSelection,
-          style: GoogleFonts.poppins(color: textColor, fontSize: 14,fontWeight: FontWeight.w500),
-
+          style: GoogleFonts.poppins(
+              color: textColor, fontSize: 14, fontWeight: FontWeight.w500),
           inputFormatters: [],
           maxLength: maxLength,
           decoration: InputDecoration(
@@ -257,11 +262,100 @@ class CustomTextFieldWidget extends StatelessWidget {
             contentPadding: EdgeInsets.all(14.sp),
           ),
           maxLines: 1,
-
           validator: validator,
-           onChanged: onChanged,
+          onChanged: onChanged,
         ),
       ],
     );
   }
+}
+
+void customSuccessDialog(BuildContext context) async {
+  showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: null,
+          scrollable: true,
+          elevation: 0,
+          content: SizedBox(
+            // height: 220.h,
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.asset(
+                      'assets/images/app_name.png',
+                      height: 20.5.h,
+                      width: 50,
+                    ),
+                  ],
+                ),
+                Column(
+                  // mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.verified_outlined,
+                      color: Colors.green,
+                      size: 30,
+                    ),
+                    SizedBox(
+                      height: 10.w,
+                    ),
+                    Text(
+                      'Verification Successful',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(
+                  height: 29,
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize:
+                          Size(MediaQuery.of(context).size.width - 50, 50),
+                      backgroundColor: textColor,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          50,
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      FocusScope.of(context).unfocus();
+                   
+                      Get.to(const Login());
+                    },
+                    child: Text(
+                      'Go to Login',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        color: buttonText,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      });
 }

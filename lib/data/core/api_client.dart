@@ -48,8 +48,9 @@ class ApiClient {
 
       // Print raw response for debugging
       print("Response Body: ${response.body}");
+      // print("Response Body: ${response.statusCode}");
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
         debugPrint('response.body here');
         debugPrint(response.body);
         return json.decode(response.body); // Success case
@@ -69,7 +70,8 @@ class ApiClient {
       }
     } on UnauthorisedException {
       throw UnauthorisedException();
-    } catch (e) {
+    } 
+    catch (e) {
       // Handle other exceptions
       rethrow;
     }

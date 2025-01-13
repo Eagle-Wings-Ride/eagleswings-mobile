@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../../styles/styles.dart';
 import '../../../widgets/widgets.dart';
+import '../../controller/auth/auth_controller.dart';
 import 'login.dart';
-import 'set_password.dart';
-import 'verification_confirmation_screen.dart';
 
 class VerifyEmail extends StatefulWidget {
   const VerifyEmail({super.key, required this.email});
@@ -18,6 +19,7 @@ class VerifyEmail extends StatefulWidget {
 }
 
 class _VerifyEmailState extends State<VerifyEmail> {
+  final AuthController _authController = Get.find();
   final TextEditingController _codeController = TextEditingController();
   final verifyCodeFormKey = GlobalKey<FormState>();
 
@@ -127,6 +129,37 @@ class _VerifyEmailState extends State<VerifyEmail> {
                                       ),
                                       onPressed: () {
                                         FocusScope.of(context).unfocus();
+                                        if (_codeController.text
+                                            .trim()
+                                            .isEmpty) {
+                                          showTopSnackBar(
+                                            Overlay.of(context),
+                                            const CustomSnackBar.error(
+                                              message: 'Please enter your code',
+                                            ),
+                                          );
+                                          return;
+                                        } else if (_codeController.text
+                                                .trim()
+                                                .length !=
+                                            6) {
+                                          showTopSnackBar(
+                                            Overlay.of(context),
+                                            const CustomSnackBar.error(
+                                              message:
+                                                  'Please enter a valid 6 digits code',
+                                            ),
+                                          );
+                                          return;
+                                        } else {
+                                          print(widget.email);
+                                          print(_codeController.text.trim());
+                                          _authController.verifyOtp(
+                                              widget.email,
+                                              _codeController.text.trim(),
+                                              context);
+                                        }
+                                        // customSuccessDialog(context);
                                         // Get.to(
                                         //   () => VerificationConfirmationScreen(
                                         //     nextScreenBuilder: () =>

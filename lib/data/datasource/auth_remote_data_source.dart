@@ -1,10 +1,9 @@
-
 abstract class EagleRidesAuthDataSource {
   Future<bool> eagleridesAuthIsSignIn();
 
   Future<void> eagleridesAuthPhoneVerification(String phoneNumber);
 
-  Future<void> eagleridesAuthOtpVerification(String otp);
+  Future<String> eagleridesAuthOtpVerification(String email, String otp);
 
   Future<String> eagleridesAuthGetUserUid();
 

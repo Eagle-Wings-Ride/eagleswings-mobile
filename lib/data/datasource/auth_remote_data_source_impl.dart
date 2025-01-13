@@ -61,7 +61,7 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
       debugPrint('Response Body: $response');
       // Assume the response is a map, not a string
       if (response is Map<String, dynamic>) {
-        print('error here');
+        // print('error here');
         debugPrint(response['message']);
         return response['message'];
       } else {
@@ -105,15 +105,32 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
   }
 
   @override
-  Future<void> eagleridesAuthOtpVerification(String otp) async {
-    // try {
-    //   final AuthCredential authCredential = PhoneAuthProvider.credential(
-    //       verificationId: verId.value, smsCode: otp);
-    //   await auth.signInWithCredential(authCredential);
-    //   // Get.to(() => const UberHomePage());
-    // } on FirebaseAuthException catch (e) {
-    //   Get.snackbar('error', e.code.toString());
-    // }
+  Future<String> eagleridesAuthOtpVerification(String email, String otp) async {
+ const uri = '/users/verify-mail';
+    print('Sending OTP verification request...');
+    print('testing');
+    try {
+      final response = await _client.post(
+        uri,
+        params: {
+          'email': email.toString(),
+          'otp': otp.toString(),
+        },
+      );
+
+      debugPrint('Response Body: $response');
+      // Assume the response is a map, not a string
+      if (response is Map<String, dynamic>) {
+        print('response here');
+        debugPrint(response['message']);
+        return response['message'];
+      } else {
+        return 'Unexpected response format';
+      }
+    } catch (e) {
+      debugPrint('Exception: $e');
+      rethrow;
+    }
   }
 
   @override

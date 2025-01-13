@@ -26,13 +26,28 @@ class _LoginState extends State<Login> {
   final TextEditingController _passwordController = TextEditingController();
   final loginFormKey = GlobalKey<FormState>();
   final AuthController _authController = Get.find();
+  // final FocusNode _passwordFocusNode = FocusNode();
+  // final FocusNode _emailFocusNode = FocusNode();
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+        // _passwordFocusNode.dispose();
+    // _emailFocusNode.dispose();
     super.dispose();
   }
+
+  // @override
+  // void initState() {
+  //   // TODO: implement initState
+  //   super.initState();
+  //   // Ensure nothing is focused on the first load
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     _passwordFocusNode.unfocus();
+  //     _emailFocusNode.unfocus();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -91,12 +106,12 @@ class _LoginState extends State<Login> {
                               child: Column(
                                 children: [
                                   CustomTextFieldWidget(
+                                    // foc
                                     controller: _emailController,
                                     keyboardType: TextInputType.text,
                                     obscureText: false,
                                     filled: false,
                                     readOnly: false,
-
                                     labelText: 'Enter Email',
                                     hintText: 'user@email.com',
                                     autoValidateMode:
@@ -228,7 +243,7 @@ class _LoginState extends State<Login> {
                               'Sign Up',
                               style: GoogleFonts.dmSans(
                                 color: backgroundColor,
-                                fontSize: 12,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
