@@ -202,7 +202,7 @@ class _RidesScreenState extends State<RidesScreen> {
                           ),
                           Text(
                             'Timmy Spark',
-                            style: GoogleFonts.dmSans(
+                            style: GoogleFonts.poppins(
                                 color: backgroundColor,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500),
@@ -247,7 +247,7 @@ class _RidesScreenState extends State<RidesScreen> {
                           children: [
                             Text(
                               'Ongoing Rides',
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: textColor,
@@ -255,7 +255,7 @@ class _RidesScreenState extends State<RidesScreen> {
                             ),
                             // Text(
                             //   'View all',
-                            //   style: GoogleFonts.dmSans(
+                            //   style: GoogleFonts.poppins(
                             //     fontSize: 12,
                             //     fontWeight: FontWeight.w500,
                             //     color: textColor,
@@ -333,7 +333,7 @@ class _RidesScreenState extends State<RidesScreen> {
                                                     maxLines: 1,
                                                     overflow:
                                                         TextOverflow.ellipsis,
-                                                    style: GoogleFonts.dmSans(
+                                                    style: GoogleFonts.poppins(
                                                       fontSize: 14,
                                                       fontWeight:
                                                           FontWeight.bold,
@@ -367,7 +367,7 @@ class _RidesScreenState extends State<RidesScreen> {
                                                         child: Text(
                                                           '${ongoing['rideType']} Driver',
                                                           style: GoogleFonts
-                                                              .dmSans(
+                                                              .poppins(
                                                             color: (ongoing[
                                                                         'rideType'] ==
                                                                     'In-House')
@@ -399,7 +399,7 @@ class _RidesScreenState extends State<RidesScreen> {
                                                         child: Text(
                                                           ongoing['status']!,
                                                           style: GoogleFonts
-                                                              .dmSans(
+                                                              .poppins(
                                                             color: getStatusTextColor(
                                                                 ongoing[
                                                                     'status']),
@@ -414,7 +414,7 @@ class _RidesScreenState extends State<RidesScreen> {
                                                   SizedBox(height: 8.h),
                                                   Text(
                                                     'Arrives in ${ongoing['time']}',
-                                                    style: GoogleFonts.dmSans(
+                                                    style: GoogleFonts.poppins(
                                                       fontSize: 10,
                                                       fontWeight:
                                                           FontWeight.w500,
@@ -453,7 +453,7 @@ class _RidesScreenState extends State<RidesScreen> {
                                         Text(
                                           ongoing[
                                               'driverName']!, // Replace with dynamic text if needed
-                                          style: GoogleFonts.dmSans(
+                                          style: GoogleFonts.poppins(
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
                                             color:
@@ -484,7 +484,7 @@ class _RidesScreenState extends State<RidesScreen> {
                           children: [
                             Text(
                               'Recent Rides',
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: textColor,
@@ -492,7 +492,7 @@ class _RidesScreenState extends State<RidesScreen> {
                             ),
                             // Text(
                             //   'View all',
-                            //   style: GoogleFonts.dmSans(
+                            //   style: GoogleFonts.poppins(
                             //     fontSize: 12,
                             //     fontWeight: FontWeight.w500,
                             //     color: textColor,
@@ -562,7 +562,7 @@ class _RidesScreenState extends State<RidesScreen> {
                                                   maxLines: 1,
                                                   overflow:
                                                       TextOverflow.ellipsis,
-                                                  style: GoogleFonts.dmSans(
+                                                  style: GoogleFonts.poppins(
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.bold,
                                                     color: textColor,
@@ -599,7 +599,7 @@ class _RidesScreenState extends State<RidesScreen> {
                                                       child: Text(
                                                         '${recent['rideType']} Driver',
                                                         style:
-                                                            GoogleFonts.dmSans(
+                                                            GoogleFonts.poppins(
                                                           color: (recent[
                                                                       'rideType'] ==
                                                                   'In-House')
@@ -628,7 +628,7 @@ class _RidesScreenState extends State<RidesScreen> {
                                                       child: Text(
                                                         recent['status']!,
                                                         style:
-                                                            GoogleFonts.dmSans(
+                                                            GoogleFonts.poppins(
                                                           color:
                                                               getStatusTextColor(
                                                                   recent[
@@ -644,7 +644,7 @@ class _RidesScreenState extends State<RidesScreen> {
                                                 SizedBox(height: 8.h),
                                                 Text(
                                                   recent['time']!,
-                                                  style: GoogleFonts.dmSans(
+                                                  style: GoogleFonts.poppins(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w500,
                                                     color: textColor,

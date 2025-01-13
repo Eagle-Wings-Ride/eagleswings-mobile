@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Text(
                               'Current Rides',
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: textColor,
@@ -53,13 +53,12 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Text(
                               'View all',
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                                 color: textColor,
                               ),
                             ),
-                            
                           ],
                         ),
                       ),
@@ -92,7 +91,7 @@ class _HomePageState extends State<HomePage> {
         ),
         Text(
           text,
-          style: GoogleFonts.dmSans(
+          style: GoogleFonts.poppins(
             fontSize: 12,
             color: textColor,
             fontWeight: FontWeight.bold,
@@ -132,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Text(
                     'My location',
-                    style: GoogleFonts.dmSans(
+                    style: GoogleFonts.poppins(
                       fontSize: 12,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -161,7 +160,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Text(
                         '102 Fox drive, Dominion Road. T9H3V2',
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.poppins(
                           fontSize: 12,
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
@@ -210,7 +209,7 @@ class _HomePageState extends State<HomePage> {
                             padding: const EdgeInsets.only(left: 5),
                             child: Text(
                               'Timmy Spark',
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.poppins(
                                   color: Colors.white.withOpacity(.7),
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500),
@@ -244,7 +243,7 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   'Ready for a Safe Ride?',
                   textAlign: TextAlign.start,
-                  style: GoogleFonts.dmSans(
+                  style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -261,7 +260,7 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       'Let’s book a ride for your child.',
                       textAlign: TextAlign.start,
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,

@@ -14,4 +14,6 @@ abstract class EagleRidesAuthRepository {
   Future<String> eagleRidesAddProfileImg(String riderId);
   Future<String> loginUser(String email, String password);
   Future<String> register(Map<String, dynamic> requestBody);
+
+  Future<Map<String, dynamic>> getUser(); 
 }

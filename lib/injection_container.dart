@@ -6,8 +6,10 @@ import 'package:eaglerides/domain/usecases/cancel_trip_usecase.dart';
 import 'package:eaglerides/domain/usecases/direction_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_check_user_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_otp_verification_usecase.dart';
+import 'package:eaglerides/domain/usecases/eagle_rides_auth_sign_out_usecase.dart';
 import 'package:eaglerides/domain/usecases/generate_rental_charges_usecase.dart';
 import 'package:eaglerides/domain/usecases/generate_trip_usecase.dart';
+import 'package:eaglerides/domain/usecases/getUserUseCase.dart';
 import 'package:eaglerides/domain/usecases/get_address_use_case.dart';
 import 'package:eaglerides/domain/usecases/login_user.dart';
 import 'package:eaglerides/domain/usecases/register.dart';
@@ -102,6 +104,8 @@ Future<void> init() async {
       eagleRidesAuthCheckUserUseCase: sl.call(),
       eagleRidesRegisterUseCase: sl.call(),
       eagleRidesAuthOtpVerificationUseCase: sl.call(),
+      eagleRidesAuthSignOutUseCase: sl.call(),
+      getUserUsecase: sl.call(),
       // eagleRidesAuthGetUserUidUseCase: sl.call(),
       // uberAuthCheckUserStatusUseCase: sl.call(),
       // uberAuthGetUserUidUseCase: sl.call(),
@@ -121,6 +125,11 @@ Future<void> init() async {
       eagleRidesAuthRepository: sl.call(),
     ),
   );
+  sl.registerLazySingleton<EagleRidesAuthSignOutUseCase>(
+    () => EagleRidesAuthSignOutUseCase(
+      eagleRidesAuthRepository: sl.call(),
+    ),
+  );
   sl.registerLazySingleton<EagleRidesRegisterUseCase>(
     () => EagleRidesRegisterUseCase(
       eagleRidesAuthRepository: sl.call(),
@@ -133,6 +142,11 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<EagleRidesAuthCheckUserUseCase>(
     () => EagleRidesAuthCheckUserUseCase(
+      eagleRidesAuthRepository: sl.call(),
+    ),
+  );
+  sl.registerLazySingleton<GetUserUsecase>(
+    () => GetUserUsecase(
       eagleRidesAuthRepository: sl.call(),
     ),
   );

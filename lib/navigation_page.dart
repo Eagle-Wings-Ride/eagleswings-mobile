@@ -1,6 +1,7 @@
-import 'package:eaglerides/pages/onTripPage/booking_confirmation.dart';
+
 // import 'package:eaglerides/pages/onTripPage/invoice.dart';
 // import 'package:eaglerides/pages/onTripPage/map_page.dart';
+import 'package:eaglerides/presentation/screens/account/account.dart';
 import 'package:eaglerides/presentation/screens/home/home.dart';
 import 'package:eaglerides/presentation/screens/ride/rides_screen.dart';
 // import 'package:eaglerides/presentation/screens/ride/map_with_source_destination_field.dart';
@@ -32,7 +33,7 @@ class _NavigationPageState extends State<NavigationPage> {
       bottomNavigationBar: Container(
         margin: const EdgeInsets.only(bottom: 0, top: 0, left: 0, right: 0),
         padding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-        height: (MediaQuery.of(context).size.height >= 1000) ? 140 : 90,
+        height: (MediaQuery.of(context).size.height >= 1000) ? 70 : 70,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
@@ -78,7 +79,7 @@ class _NavigationPageState extends State<NavigationPage> {
                   ),
                   Text(
                     navText[index],
-                    style: GoogleFonts.dmSans(
+                    style: GoogleFonts.poppins(
                       fontSize: 12,
                       color:
                           index == currentIndex ? backgroundColor : Colors.grey,
@@ -87,7 +88,7 @@ class _NavigationPageState extends State<NavigationPage> {
                           : FontWeight.w500,
                     ),
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.width * .03),
+                  // SizedBox(height: MediaQuery.of(context).size.width * .06),
                 ],
               ),
             );
@@ -116,7 +117,7 @@ class _NavigationPageState extends State<NavigationPage> {
       case 1:
         return const RidesScreen();
       case 2:
-        return const HomePage();
+        return const AccountScreen();
       default:
         return const HomePage();
     }

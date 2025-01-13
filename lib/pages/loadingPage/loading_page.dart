@@ -31,12 +31,13 @@ class _LoadingPageState extends State<LoadingPage> {
     _authController.checkIsSignIn();
     Timer(const Duration(seconds: 3), () async {
       if (_authController.isSignIn.value) {
-        // if (await _authController.checkUserStatus()) {
-        //   Get.off(() => const NavigationPage());
-        // } else {
-        //   Get.off(() => const Register());
-        // }
-        Get.off(() => const Login());
+        // print(_authController.isSignIn.value);
+        if (await _authController.checkUserStatus()) {
+          Get.off(() => const NavigationPage());
+        } else {
+          Get.off(() => const Login());
+        }
+        Get.off(() => const NavigationPage());
       } else {
         Get.off(() => const Login());
       }

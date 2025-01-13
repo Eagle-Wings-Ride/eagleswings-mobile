@@ -188,7 +188,7 @@ class _VerificationConfirmationScreenState
                     child: Text(
                       (widget.path == 'login') ? 'Login' : 'Continue',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.poppins(
                         color: buttonText,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,

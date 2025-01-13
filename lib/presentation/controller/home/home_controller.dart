@@ -75,15 +75,6 @@ class HomeController extends GetxController {
     _controller.animateCamera(CameraUpdate.newCameraPosition(_newCameraPos));
   }
 
-  // startLocationUpdates() async {
-  //   _locationUpdateTimer =
-  //       Timer.periodic(const Duration(seconds: 5), (timer) async {
-  //     print('fetching');
-  //     await getUserCurrentAddressUsecase.call().then((value) {
-  //       address.value = value.address;
-  //     });
-  //   });
-  // }
   startLocationUpdates() async {
     _locationUpdateTimer =
         Timer.periodic(const Duration(seconds: 5), (timer) async {
@@ -108,6 +99,9 @@ class HomeController extends GetxController {
         (oldPosition.longitude - newPosition.longitude).abs();
     return latDifference > threshold || lngDifference > threshold;
   }
+
+
+
 
   @override
   void onClose() {

@@ -151,7 +151,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                             ),
                                             Text(
                                               '102, Fox Drive',
-                                              style: GoogleFonts.dmSans(
+                                              style: GoogleFonts.poppins(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w500,
                                                 color: textColor,
@@ -194,7 +194,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                             ),
                                             Text(
                                               'Millennium Drive',
-                                              style: GoogleFonts.dmSans(
+                                              style: GoogleFonts.poppins(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w500,
                                                 color: textColor,
@@ -237,7 +237,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                           0.5), // Shadow color with opacity
                                       spreadRadius:
                                           2, // How wide the shadow spreads
-                                      blurRadius: 
+                                      blurRadius:
                                           5, // The softness of the shadow
                                       offset: const Offset(3,
                                           3), // Position of shadow: x, y (right, down)
@@ -255,8 +255,8 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                       ),
                                     ),
                                     const SizedBox(
-                                          height: 10,
-                                        ),
+                                      height: 10,
+                                    ),
                                     Row(
                                       children: [
                                         Container(
@@ -272,7 +272,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                           ),
                                           child: Text(
                                             'In-house Driver',
-                                            style: GoogleFonts.dmSans(
+                                            style: GoogleFonts.poppins(
                                               fontSize: 10,
                                               color: const Color(0xffFF5500),
                                               fontWeight: FontWeight.bold,
@@ -295,7 +295,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                           ),
                                           child: Text(
                                             'Return trip',
-                                            style: GoogleFonts.dmSans(
+                                            style: GoogleFonts.poppins(
                                               fontSize: 10,
                                               color: const Color(0xff133BB7),
                                               fontWeight: FontWeight.bold,

@@ -1,7 +1,10 @@
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_check_user_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_is_signed_in_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_otp_verification_usecase.dart';
+import 'package:eaglerides/domain/usecases/eagle_rides_auth_sign_out_usecase.dart';
+import 'package:eaglerides/domain/usecases/getUserUseCase.dart';
 import 'package:eaglerides/domain/usecases/register.dart';
+import 'package:eaglerides/presentation/screens/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -10,6 +13,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
+import '../../../data/models/user_model.dart';
 import '../../../domain/usecases/login_user.dart';
 import '../../../navigation_page.dart';
 import '../../../widgets/widgets.dart';
@@ -23,18 +27,29 @@ class AuthController extends GetxController {
   final EagleRidesRegisterUseCase eagleRidesRegisterUseCase;
   final EagleRidesAuthOtpVerificationUseCase
       eagleRidesAuthOtpVerificationUseCase;
-  // final EagleRidesAuthGetUserUidUseCase eagleRidesAuthGetUserUidUseCase;
+  final EagleRidesAuthSignOutUseCase eagleRidesAuthSignOutUseCase;
+  final GetUserUsecase getUserUsecase;
+
+  var user = Rx<UserModel?>(null);
 
   var isSignIn = false.obs;
 
-  AuthController(
-      {required this.eagleRidesAuthIsSignInUseCase,
-      required this.eagleRidesLoginUserUseCase,
-      required this.eagleRidesAuthCheckUserUseCase,
-      required this.eagleRidesRegisterUseCase,
-      required this.eagleRidesAuthOtpVerificationUseCase
-      // required this.eagleRidesAuthGetUserUidUseCase,
-      });
+  @override
+  void onInit() {
+    super.onInit();
+    _loadUser(); // Load user data when the controller is initialized
+  }
+
+  AuthController({
+    required this.eagleRidesAuthIsSignInUseCase,
+    required this.eagleRidesLoginUserUseCase,
+    required this.eagleRidesAuthCheckUserUseCase,
+    required this.eagleRidesRegisterUseCase,
+    required this.eagleRidesAuthOtpVerificationUseCase,
+    required this.eagleRidesAuthSignOutUseCase,
+    required this.getUserUsecase,
+    // required this.eagleRidesAuthGetUserUidUseCase,
+  });
 
   checkIsSignIn() async {
     bool eagleRideAuthIsSignIn = await eagleRidesAuthIsSignInUseCase.call();
@@ -63,16 +78,42 @@ class AuthController extends GetxController {
       print(token);
       // Save token or navigate to another page
       EasyLoading.dismiss();
-      showTopSnackBar(
-        Overlay.of(context),
-        const CustomSnackBar.success(
-          message: 'Login Successful',
-        ),
-      );
+      // showTopSnackBar(
+      //   Overlay.of(context),
+      //   const CustomSnackBar.success(
+      //     message: 'Login Successful',
+      //   ),
+      // );
       Get.offAll(const NavigationPage());
     } catch (e) {
       EasyLoading.dismiss();
       print(e);
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: e.toString(),
+        ),
+      );
+      // Get.snackbar("Login Failed", e.toString());
+    }
+  }
+
+  logout(context) async {
+    try {
+      EasyLoading.show(
+        indicator: const CustomLoader(),
+        maskType: EasyLoadingMaskType.black,
+        dismissOnTap: false,
+      );
+      await eagleRidesAuthSignOutUseCase.call();
+      user.value = null;
+      // print(res);
+      EasyLoading.dismiss();
+      Get.offAll(const Login());
+    } catch (e) {
+      // print(e);
+      EasyLoading.dismiss();
+      // print(e);
       showTopSnackBar(
         Overlay.of(context),
         CustomSnackBar.error(
@@ -153,6 +194,79 @@ class AuthController extends GetxController {
         ),
       );
       // Get.snackbar('OTP Verification Failed', e.toString());
+    }
+  }
+
+  // Method to update the user data
+  void setUser(UserModel userModel) {
+    user.value = userModel; // This updates the observable user.
+    _saveUser(userModel); // Optionally save the user info to local storage
+  }
+
+  // Load user data from Hive storage (if available)
+  Future<void> _loadUser() async {
+    var box = await Hive.openBox('authBox');
+    String? token = box.get('auth_token'); // Fetch the auth token
+
+    if (token != null) {
+      // Token exists, attempt to load user data from storage
+      var userInfo = box.get('user_info');
+      if (userInfo != null) {
+        // If user data exists, update the user value
+        user.value = UserModel.fromMap(Map<String, dynamic>.from(userInfo));
+      } else {
+        // Fetch user info from the API (if it's not available in local storage)
+        try {
+          final dynamic response = await getUserUsecase.call();
+
+          // Ensure the response is of the correct type
+          if (response is Map<dynamic, dynamic>) {
+            final userInfo = Map<String, dynamic>.from(response);
+            setUser(UserModel.fromJson(userInfo));
+          } else {
+            throw Exception('Invalid response type from getUserUsecase.call');
+          }
+        } catch (e) {
+          print("Error fetching user data: $e");
+          if (e.toString().contains('Unauthorized')) {
+            Get.offAll(const Login());
+          }
+        }
+      }
+    } else {
+      // No token found, user is not logged in, redirect to login screen
+      Get.offAll(const Login());
+    }
+  }
+
+  // Save user data to Hive storage (for persistence)
+  Future<void> _saveUser(UserModel userModel) async {
+    var box = await Hive.openBox('authBox');
+    await box.put(
+        'user_info', userModel.toJson()); // Save the user data as JSON
+  }
+
+  getUser(context) async {
+    try {
+      EasyLoading.show(
+        indicator: const CustomLoader(),
+        maskType: EasyLoadingMaskType.black,
+        dismissOnTap: false,
+      );
+      final userInfo = await getUserUsecase.call();
+      print(userInfo);
+      UserModel userModel = UserModel.fromJson(userInfo);
+      setUser(userModel);
+      EasyLoading.dismiss();
+    } catch (e) {
+      EasyLoading.dismiss();
+      print(e);
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: e.toString(),
+        ),
+      );
     }
   }
 }

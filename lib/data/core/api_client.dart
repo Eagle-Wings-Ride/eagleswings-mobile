@@ -1,13 +1,19 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:eaglerides/functions/function.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart';
+import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:http/http.dart' as https;
 
+import '../../presentation/screens/auth/login.dart';
 import 'api_constants.dart';
 import 'unauthorised_exception.dart';
 
 class ApiClient {
-  final Client _client;
+  final https.Client _client;
 
   final String? _bearerToken; // Store the bearer token
 
@@ -25,26 +31,63 @@ class ApiClient {
   // }
 
   dynamic get(String path, {Map<dynamic, dynamic>? params}) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    final response = await _client.get(
-      getPath(path, params),
-      headers: _buildHeaders(),
-    );
+    // await Future.delayed(const Duration(milliseconds: 500));
+    final box = await Hive.openBox('authBox');
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception(response.reasonPhrase);
+    try {
+      final response = await _client.get(
+        getPath(path, params),
+        headers: _buildHeaders(),
+      ); // 10 seconds timeout
+
+      // print('Response Status Code: ${response.statusCode}');
+      // print('Response Body: ${response.body}');
+      // print('Is 401: ${response.statusCode == 401}');
+
+      // Check if the response body is empty or not
+      if (response.body.isEmpty) {
+        print('Empty response body');
+        throw Exception('Empty response body');
+      }
+
+      if (response.statusCode == 200) {
+        // Log and return the decoded body
+        print('Decoding response body');
+        print(json.decode(response.body));
+        return json.decode(response.body);
+      } else if (response.statusCode == 401) {
+        await box.delete('auth_token');
+        await box.clear();
+        // Log the response before redirecting
+        print('Unauthorized access, redirecting to login');
+        Get.offAll(const Login());
+        throw 'Unauthorized';
+      } else {
+        print('Error response: ${response.reasonPhrase}');
+        throw Exception(
+            'Error: ${response.statusCode} - ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Exception caught: $e');
+      rethrow;
     }
   }
 
   dynamic post(String path, {Map<dynamic, dynamic>? params}) async {
     try {
+      print(path);
       final response = await _client.post(
         getPath(path, null),
         body: jsonEncode(params),
         headers: _buildHeaders(),
       );
+
+      // final errorResponse = json.decode(response.body);
+      // debugPrint('errorResponse');
+      print('response.statusCode');
+      print(json.decode(response.body)['message']);
+      print('here');
+      print(response.reasonPhrase);
 
       // Print raw response for debugging
       print("Response Body: ${response.body}");
@@ -70,19 +113,19 @@ class ApiClient {
       }
     } on UnauthorisedException {
       throw UnauthorisedException();
-    } 
-    catch (e) {
+    } catch (e) {
       // Handle other exceptions
+
       rethrow;
     }
   }
 
   dynamic deleteWithBody(String path, {Map<dynamic, dynamic>? params}) async {
-    Request request = Request('DELETE', getPath(path, null));
+    https.Request request = https.Request('DELETE', getPath(path, null));
     request.headers.addAll(_buildHeaders());
     request.body = jsonEncode(params);
     final response = await _client.send(request).then(
-          (value) => Response.fromStream(value),
+          (value) => https.Response.fromStream(value),
         );
 
     if (response.statusCode == 200) {
@@ -113,6 +156,9 @@ class ApiClient {
     if (_bearerToken != null) {
       headers['Authorization'] = 'Bearer $_bearerToken';
     }
+
+    print('_bearerToken');
+    print(_bearerToken);
 
     return headers;
   }

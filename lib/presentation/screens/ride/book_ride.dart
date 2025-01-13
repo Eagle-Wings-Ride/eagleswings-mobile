@@ -39,7 +39,7 @@ class _BookRideState extends State<BookRide> {
         centerTitle: true,
         title: Text(
           'Book a ride',
-          style: GoogleFonts.dmSans(fontSize: 25, fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(fontSize: 25, fontWeight: FontWeight.bold),
         ),
         leading: const Icon(
           Icons.arrow_back_ios,
@@ -116,7 +116,7 @@ class _BookRideState extends State<BookRide> {
                               children: [
                                 Text(
                                   'Pick-up location',
-                                  style: GoogleFonts.dmSans(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: textColor,
@@ -158,7 +158,7 @@ class _BookRideState extends State<BookRide> {
                               children: [
                                 Text(
                                   'Drop-off location',
-                                  style: GoogleFonts.dmSans(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: textColor,
@@ -203,7 +203,7 @@ class _BookRideState extends State<BookRide> {
                         children: [
                           Text(
                             'Booking Details',
-                            style: GoogleFonts.dmSans(
+                            style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -221,7 +221,7 @@ class _BookRideState extends State<BookRide> {
                           //       ),
                           //       child: Text(
                           //         'For you',
-                          //         style: GoogleFonts.dmSans(
+                          //         style: GoogleFonts.poppins(
                           //           fontSize: 10,
                           //           color: const Color(0xff133BB7),
                           //           fontWeight: FontWeight.bold,
@@ -233,7 +233,7 @@ class _BookRideState extends State<BookRide> {
                           //     ),
                           //     Text(
                           //       'For others',
-                          //       style: GoogleFonts.dmSans(
+                          //       style: GoogleFonts.poppins(
                           //         fontSize: 10,
                           //         fontWeight: FontWeight.bold,
                           //         color: textColor,
@@ -248,7 +248,7 @@ class _BookRideState extends State<BookRide> {
                       ),
                       Text(
                         'Ride Type',
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.poppins(
                           color: textColor,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -272,7 +272,7 @@ class _BookRideState extends State<BookRide> {
                                 ),
                                 child: Text(
                                   'Freelance Driver',
-                                  style: GoogleFonts.dmSans(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 10,
                                     color: const Color(0xff133BB7),
                                     fontWeight: FontWeight.bold,
@@ -293,7 +293,7 @@ class _BookRideState extends State<BookRide> {
                                 ),
                                 child: Text(
                                   'In-house Driver',
-                                  style: GoogleFonts.dmSans(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 10,
                                     color: const Color(0xffFF5500),
                                     fontWeight: FontWeight.bold,
@@ -318,7 +318,7 @@ class _BookRideState extends State<BookRide> {
                                 ),
                                 child: Text(
                                   'One way trip',
-                                  style: GoogleFonts.dmSans(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 10,
                                     color: const Color(0xffFF5500),
                                     fontWeight: FontWeight.bold,
@@ -339,7 +339,7 @@ class _BookRideState extends State<BookRide> {
                                 ),
                                 child: Text(
                                   'Return trip',
-                                  style: GoogleFonts.dmSans(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 10,
                                     color: const Color(0xffFF5500),
                                     fontWeight: FontWeight.bold,
@@ -355,7 +355,7 @@ class _BookRideState extends State<BookRide> {
                       ),
                       Text(
                         'Schedule',
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.poppins(
                           color: textColor,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -385,7 +385,7 @@ class _BookRideState extends State<BookRide> {
                                   ),
                                   child: Text(
                                     'Two Weeks',
-                                    style: GoogleFonts.dmSans(
+                                    style: GoogleFonts.poppins(
                                       fontSize: 10,
                                       color: const Color(0xff133BB7),
                                       fontWeight: FontWeight.bold,
@@ -407,7 +407,7 @@ class _BookRideState extends State<BookRide> {
                                   ),
                                   child: Text(
                                     'One Month',
-                                    style: GoogleFonts.dmSans(
+                                    style: GoogleFonts.poppins(
                                       fontSize: 10,
                                       color: const Color(0xff133BB7),
                                       fontWeight: FontWeight.bold,
@@ -419,7 +419,7 @@ class _BookRideState extends State<BookRide> {
                                 ),
                                 Text(
                                   'Enter Manually',
-                                  style: GoogleFonts.dmSans(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 10,
                                     color: const Color(0xff133BB7),
                                     fontWeight: FontWeight.bold,
@@ -579,7 +579,7 @@ class _BookRideState extends State<BookRide> {
                       child: Text(
                         'Confirm',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.poppins(
                           color: buttonText,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,

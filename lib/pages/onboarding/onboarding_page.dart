@@ -53,7 +53,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           Text(
                             'Welcome to Eagle’s Rides',
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.dmSans(
+                            style: GoogleFonts.poppins(
                               fontWeight: FontWeight.bold,
                               fontSize: 22,
                               color: textColor,
@@ -62,7 +62,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           SizedBox(height: 20.h),
                           Text(
                             'Earn While They Learn: Make Money on the School Run!',
-                            style: GoogleFonts.dmSans(
+                            style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
                               // height: 1.5714,
@@ -97,14 +97,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       },
                       style: TextButton.styleFrom(
                         elevation: 0,
-                        textStyle: GoogleFonts.dmSans(
+                        textStyle: GoogleFonts.poppins(
                             color: textColor,
                             fontWeight: FontWeight.w500,
                             fontSize: 12),
                       ),
                       child: Text(
                         "Login",
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.poppins(
                             color: textColor,
                             fontWeight: FontWeight.w500,
                             fontSize: 12),
@@ -131,7 +131,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       ),
                       child: Text(
                         "Sign Up",
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.poppins(
                           color: buttonText,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,

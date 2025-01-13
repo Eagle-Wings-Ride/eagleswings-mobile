@@ -1,3 +1,4 @@
+import 'package:eaglerides/presentation/controller/auth/auth_controller.dart';
 import 'package:eaglerides/presentation/screens/ride/book_ride.dart';
 // import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final HomeController _homeController = Get.put(di.sl<HomeController>());
+  // final AuthController _authController = Get.find();
   // String address = '';
   // static const CameraPosition _defaultLocation = CameraPosition(
   //   target: LatLng(23.030357, 72.517845),
@@ -37,6 +39,7 @@ class _HomePageState extends State<HomePage> {
     // setState(() {
     //   address = _homeController.address.value;
     // });
+    // _authController.getUser(context);
     super.initState();
   }
 
@@ -77,7 +80,6 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(
                     height: 40.h,
                   ),
-                
                   Column(
                     children: [
                       Padding(
@@ -87,7 +89,7 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Text(
                               'Ride History',
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: textColor,
@@ -95,7 +97,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Text(
                               'See all',
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                                 color: textColor,
@@ -160,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                                             '124 Nicholson dr to Heritage drive',
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.dmSans(
+                                            style: GoogleFonts.poppins(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                               color: textColor,
@@ -184,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 child: Text(
                                                   'In-House Driver',
-                                                  style: GoogleFonts.dmSans(
+                                                  style: GoogleFonts.poppins(
                                                       color: backgroundColor,
                                                       fontSize: 8,
                                                       fontWeight:
@@ -207,7 +209,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 child: Text(
                                                   'Completed',
-                                                  style: GoogleFonts.dmSans(
+                                                  style: GoogleFonts.poppins(
                                                       color: const Color(
                                                           0xff11CD01),
                                                       fontSize: 8,
@@ -222,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           Text(
                                             '34 minutes ago',
-                                            style: GoogleFonts.dmSans(
+                                            style: GoogleFonts.poppins(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w500,
                                               color: textColor,
@@ -294,7 +296,7 @@ class _HomePageState extends State<HomePage> {
                                             '124 Nicholson dr to Heritage drive',
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.dmSans(
+                                            style: GoogleFonts.poppins(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                               color: textColor,
@@ -318,7 +320,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 child: Text(
                                                   'In-House Driver',
-                                                  style: GoogleFonts.dmSans(
+                                                  style: GoogleFonts.poppins(
                                                       color: backgroundColor,
                                                       fontSize: 8,
                                                       fontWeight:
@@ -341,7 +343,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 child: Text(
                                                   'Completed',
-                                                  style: GoogleFonts.dmSans(
+                                                  style: GoogleFonts.poppins(
                                                       color: const Color(
                                                           0xff11CD01),
                                                       fontSize: 8,
@@ -356,7 +358,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           Text(
                                             '34 minutes ago',
-                                            style: GoogleFonts.dmSans(
+                                            style: GoogleFonts.poppins(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w500,
                                               color: textColor,
@@ -428,7 +430,7 @@ class _HomePageState extends State<HomePage> {
                                             '124 Nicholson dr to Heritage drive',
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.dmSans(
+                                            style: GoogleFonts.poppins(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                               color: textColor,
@@ -452,7 +454,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 child: Text(
                                                   'In-House Driver',
-                                                  style: GoogleFonts.dmSans(
+                                                  style: GoogleFonts.poppins(
                                                       color: backgroundColor,
                                                       fontSize: 8,
                                                       fontWeight:
@@ -475,7 +477,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 child: Text(
                                                   'Completed',
-                                                  style: GoogleFonts.dmSans(
+                                                  style: GoogleFonts.poppins(
                                                       color: const Color(
                                                           0xff11CD01),
                                                       fontSize: 8,
@@ -490,7 +492,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           Text(
                                             '34 minutes ago',
-                                            style: GoogleFonts.dmSans(
+                                            style: GoogleFonts.poppins(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w500,
                                               color: textColor,
@@ -544,7 +546,7 @@ class _HomePageState extends State<HomePage> {
         ),
         Text(
           text,
-          style: GoogleFonts.dmSans(
+          style: GoogleFonts.poppins(
             fontSize: 12,
             color: textColor,
             fontWeight: FontWeight.bold,
@@ -584,7 +586,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Text(
                     'My location',
-                    style: GoogleFonts.dmSans(
+                    style: GoogleFonts.poppins(
                       fontSize: 12,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -621,7 +623,7 @@ class _HomePageState extends State<HomePage> {
                             _homeController.address.value.isNotEmpty
                                 ? _homeController.address.value
                                 : 'Fetching address...',
-                            style: GoogleFonts.dmSans(
+                            style: GoogleFonts.poppins(
                               fontSize: 12,
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
@@ -670,13 +672,20 @@ class _HomePageState extends State<HomePage> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 5),
-                            child: Text(
-                              'Timmy Spark',
-                              style: GoogleFonts.dmSans(
-                                  color: Colors.white.withOpacity(.7),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500),
-                            ),
+                            child: Obx(() {
+                              // Observe changes to the user data in UserController
+                              var user = Get.find<AuthController>().user.value;
+                              // User data is available
+                              return Text(
+                                (user != null)
+                                    ? 'Hello, ${user.email}'
+                                    : 'Loading...', // Display user's name
+                                style: GoogleFonts.poppins(
+                                    color: Colors.white.withOpacity(.7),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500),
+                              );
+                            }),
                           ),
                           Icon(
                             Icons.keyboard_arrow_down,
@@ -706,7 +715,7 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   'Ready for a Safe Ride?',
                   textAlign: TextAlign.start,
-                  style: GoogleFonts.dmSans(
+                  style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -723,7 +732,7 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       'Let’s book a ride for your child.',
                       textAlign: TextAlign.start,
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,

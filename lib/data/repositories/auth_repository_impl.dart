@@ -66,6 +66,10 @@ class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
   Future<String> eagleRidesAuthGetUserUid() async {
     return await eagleRidesAuthDataSource.eagleridesAuthGetUserUid();
   }
+  @override
+  Future<Map<String, dynamic>> getUser() async {
+    return await eagleRidesAuthDataSource.getUser();
+  }
 
   @override
   Future<bool> eagleRidesAuthCheckUserStatus(String userId) async {

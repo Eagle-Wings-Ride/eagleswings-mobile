@@ -218,7 +218,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                                       child: Text(
                                         'Continue',
                                         textAlign: TextAlign.center,
-                                        style: GoogleFonts.dmSans(
+                                        style: GoogleFonts.poppins(
                                           color: buttonText,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w700,
@@ -245,7 +245,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                         children: [
                           Text(
                             'Don\'t have an account? ',
-                            style: GoogleFonts.dmSans(
+                            style: GoogleFonts.poppins(
                               color: textColor,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -257,7 +257,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                             },
                             child: Text(
                               'Sign Up',
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.poppins(
                                 color: backgroundColor,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,

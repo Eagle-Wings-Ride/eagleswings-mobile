@@ -116,7 +116,7 @@
 //                             Text(
 //                               'Secure your account',
 //                               textAlign: TextAlign.start,
-//                               style: GoogleFonts.dmSans(
+//                               style: GoogleFonts.poppins(
 //                                 color: textColor,
 //                                 fontSize: 16,
 //                                 fontWeight: FontWeight.bold,
@@ -210,7 +210,7 @@
 //                                       child: Text(
 //                                         'Create Account',
 //                                         textAlign: TextAlign.center,
-//                                         style: GoogleFonts.dmSans(
+//                                         style: GoogleFonts.poppins(
 //                                           color: buttonText,
 //                                           fontSize: 14,
 //                                           fontWeight: FontWeight.w700,
@@ -237,7 +237,7 @@
 //                   //       children: [
 //                   //         Text(
 //                   //           'Already have an account? ',
-//                   //           style: GoogleFonts.dmSans(
+//                   //           style: GoogleFonts.poppins(
 //                   //             color: textColor,
 //                   //             fontSize: 12,
 //                   //             fontWeight: FontWeight.w500,
@@ -247,7 +247,7 @@
 //                   //           onTap: () {},
 //                   //           child: Text(
 //                   //             'Login ',
-//                   //             style: GoogleFonts.dmSans(
+//                   //             style: GoogleFonts.poppins(
 //                   //               color: backgroundColor,
 //                   //               fontSize: 12,
 //                   //               fontWeight: FontWeight.w600,

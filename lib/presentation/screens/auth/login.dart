@@ -33,21 +33,23 @@ class _LoginState extends State<Login> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-        // _passwordFocusNode.dispose();
+    // _passwordFocusNode.dispose();
     // _emailFocusNode.dispose();
     super.dispose();
   }
 
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   super.initState();
-  //   // Ensure nothing is focused on the first load
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     _passwordFocusNode.unfocus();
-  //     _emailFocusNode.unfocus();
-  //   });
-  // }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _authController.checkIsSignIn();
+    // Ensure nothing is focused on the first load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if(_authController.isSignIn == true.obs){
+        
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +85,7 @@ class _LoginState extends State<Login> {
                             Text(
                               'Welcome Back',
                               textAlign: TextAlign.start,
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.poppins(
                                 color: textColor,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -92,7 +94,7 @@ class _LoginState extends State<Login> {
                             Text(
                               'Let’s sign you back in!',
                               textAlign: TextAlign.start,
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.poppins(
                                 color: textColor,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -182,8 +184,8 @@ class _LoginState extends State<Login> {
                                             GetUtils.isEmail(
                                                 _emailController.text)) {
                                           _authController.loginUser(
-                                            _emailController.text,
-                                            _passwordController.text,
+                                            _emailController.text.trim(),
+                                            _passwordController.text.trim(),
                                             context,
                                           );
                                         } else {
@@ -202,7 +204,7 @@ class _LoginState extends State<Login> {
                                       child: Text(
                                         'Login',
                                         textAlign: TextAlign.center,
-                                        style: GoogleFonts.dmSans(
+                                        style: GoogleFonts.poppins(
                                           color: buttonText,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w700,
@@ -229,7 +231,7 @@ class _LoginState extends State<Login> {
                         children: [
                           Text(
                             'Don\'t have an account? ',
-                            style: GoogleFonts.dmSans(
+                            style: GoogleFonts.poppins(
                               color: textColor,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -241,7 +243,7 @@ class _LoginState extends State<Login> {
                             },
                             child: Text(
                               'Sign Up',
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.poppins(
                                 color: backgroundColor,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
