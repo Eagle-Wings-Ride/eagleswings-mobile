@@ -37,7 +37,7 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadUser(); // Load user data when the controller is initialized
+    // loadUser(); // Load user data when the controller is initialized
   }
 
   AuthController({
@@ -50,6 +50,11 @@ class AuthController extends GetxController {
     required this.getUserUsecase,
     // required this.eagleRidesAuthGetUserUidUseCase,
   });
+
+  Future<String?> getToken() async {
+    final box = await Hive.openBox('authBox');
+    return box.get('auth_token'); // Retrieve the token from storage
+  }
 
   checkIsSignIn() async {
     bool eagleRideAuthIsSignIn = await eagleRidesAuthIsSignInUseCase.call();
@@ -68,6 +73,11 @@ class AuthController extends GetxController {
   // return eagleRidesAuthCheckUserUseCase.call(riderId);
 
   loginUser(String email, String password, context) async {
+    final box = await Hive.openBox('authBox');
+    final token = box.get('auth_token');
+    // Clear token and navigate to login
+    await box.delete('auth_token'); // Explicitly delete the auth token
+    await box.clear();
     try {
       EasyLoading.show(
         indicator: const CustomLoader(),
@@ -76,6 +86,7 @@ class AuthController extends GetxController {
       );
       final token = await eagleRidesLoginUserUseCase.call(email, password);
       print(token);
+      await loadUser();
       // Save token or navigate to another page
       EasyLoading.dismiss();
       // showTopSnackBar(
@@ -107,10 +118,15 @@ class AuthController extends GetxController {
       );
       await eagleRidesAuthSignOutUseCase.call();
       user.value = null;
-      // print(res);
+
+      // Ensure token is cleared before navigating
+      final box = await Hive.openBox('authBox');
+      final token = box.get('auth_token');
+      print('Token after logout: $token'); // Ensure it's null or removed
+
       EasyLoading.dismiss();
       Get.offAll(const Login());
-    } catch (e) {
+    } catch (e) { 
       // print(e);
       EasyLoading.dismiss();
       // print(e);
@@ -204,25 +220,33 @@ class AuthController extends GetxController {
   }
 
   // Load user data from Hive storage (if available)
-  Future<void> _loadUser() async {
+  Future<void> loadUser() async {
     var box = await Hive.openBox('authBox');
     String? token = box.get('auth_token'); // Fetch the auth token
 
     if (token != null) {
       // Token exists, attempt to load user data from storage
       var userInfo = box.get('user_info');
+      print('userInfo from storage');
+      print(userInfo);
       if (userInfo != null) {
         // If user data exists, update the user value
         user.value = UserModel.fromMap(Map<String, dynamic>.from(userInfo));
+        update();
       } else {
         // Fetch user info from the API (if it's not available in local storage)
         try {
           final dynamic response = await getUserUsecase.call();
+          print('response');
+          print(response);
 
           // Ensure the response is of the correct type
           if (response is Map<dynamic, dynamic>) {
             final userInfo = Map<String, dynamic>.from(response);
+            print('userInfo');
+            print(userInfo);
             setUser(UserModel.fromJson(userInfo));
+            update();
           } else {
             throw Exception('Invalid response type from getUserUsecase.call');
           }

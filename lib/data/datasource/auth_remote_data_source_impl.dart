@@ -4,7 +4,9 @@ import 'package:eaglerides/data/models/register_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart';
 
+import '../../injection_container.dart';
 import '../../presentation/screens/auth/login.dart';
 import '../core/api_client.dart';
 import '../models/user_model.dart';
@@ -32,6 +34,14 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
         var box = await Hive.openBox('authBox');
         await box.put('auth_token', response['token']);
         debugPrint("Token saved: ${response['token']}");
+
+        // Update the token in ApiClient instead of re-registering
+        final apiClient = sl<ApiClient>();
+        print('Current Token after login: ${apiClient.token}');
+        apiClient.setToken(
+            response['token']); // Update the token in the existing instance
+
+        // await init();
         return response['token'];
       } else {
         throw Exception('Failed to login: No token found');
@@ -194,30 +204,55 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
     try {
       final box = await Hive.openBox('authBox');
 
-      // Ensure token is included in headers
+      
+
+      // Logout API call (optional)
       final response = await _client.post(
         '/users/logout',
-        params: {}, // If logout doesn't require params, pass an empty map
+        params: {},
       );
-
-      print('Logout Response: $response');
-
-      // Clear token and navigate to login
+      // Clear the token from storage
       await box.delete('auth_token');
       await box.clear();
+      // // Clear the token in GetIt
+      // sl.unregister<ApiClient>(); // Unregister ApiClient
+      // sl.registerLazySingleton<ApiClient>(() {
+      //   return ApiClient(sl<Client>(), null); // Register with null token
+      // });
       final token = box.get('auth_token');
-      print(token);
-      // Navigator.pushNamedAndRemoveUntil(
-      //   context,
-      //   '/login',
-      //   (route) => false,
-      // );
+      print('Token after logout: $token');
+      print('Logout Response: $response');
     } catch (error) {
       print('Logout Error: $error');
       rethrow;
-      // Optionally show error message to the user
     }
   }
+
+  // @override
+  // Future<void> eagleridesAuthSignOut() async {
+  //   try {
+  //     final box = await Hive.openBox('authBox');
+
+  //     // Ensure token is included in headers for logout request (if necessary)
+  //     final response = await _client.post(
+  //       '/users/logout',
+  //       params: {}, // If logout doesn't require params, pass an empty map
+  //     );
+
+  //     print('Logout Response: $response');
+
+  //     // Clear token and navigate to login
+  //     await box.delete('auth_token'); // Explicitly delete the auth token
+  //     await box.clear(); // Ensure everything in the box is cleared
+
+  //     // Confirm token is removed
+  //     final token = box.get('auth_token');
+  //     print('Token after logout: $token'); // Should be null or undefined
+  //   } catch (error) {
+  //     print('Logout Error: $error');
+  //     rethrow;
+  //   }
+  // }
 
   @override
   Future<String> eagleridesAddProfileImg(String riderId) async {

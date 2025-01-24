@@ -9,7 +9,7 @@
 //   @override
 //   void onInit() {
 //     super.onInit();
-//     _loadUser();
+//     loadUser();
 //   }
 
 //   // Method to update the user.
@@ -17,7 +17,7 @@
 //     user.value = userModel; // This updates the observable user.
 //   }
 
-//   Future<void> _loadUser() async {
+//   Future<void> loadUser() async {
 //     var box = await Hive.openBox('authBox');
 //     String? token = box.get('auth_token');
 //     if (token != null) {

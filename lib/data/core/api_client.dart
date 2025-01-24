@@ -15,9 +15,17 @@ import 'unauthorised_exception.dart';
 class ApiClient {
   final https.Client _client;
 
-  final String? _bearerToken; // Store the bearer token
+  String? _bearerToken; // Store the bearer token
+  String? get token => _bearerToken;
 
   ApiClient(this._client, [this._bearerToken]);
+
+  // Method to update the token after login
+  void setToken(String newToken) async {
+    _bearerToken = newToken;
+    print('New bearer token: $_bearerToken');
+    print('New  token: $newToken');
+  }
 
   // Helper function to get headers including the token if available
   // Map<String, String> _getHeaders() {
@@ -32,16 +40,17 @@ class ApiClient {
 
   dynamic get(String path, {Map<dynamic, dynamic>? params}) async {
     // await Future.delayed(const Duration(milliseconds: 500));
-    final box = await Hive.openBox('authBox');
+    var box = await Hive.openBox('authBox');
+    final token = box.get('auth_token');
 
     try {
       final response = await _client.get(
         getPath(path, params),
-        headers: _buildHeaders(),
+        headers: _buildHeaders(token),
       ); // 10 seconds timeout
 
       // print('Response Status Code: ${response.statusCode}');
-      // print('Response Body: ${response.body}');
+      print('Response Body: ${response.body}');
       // print('Is 401: ${response.statusCode == 401}');
 
       // Check if the response body is empty or not
@@ -56,8 +65,8 @@ class ApiClient {
         print(json.decode(response.body));
         return json.decode(response.body);
       } else if (response.statusCode == 401) {
-        await box.delete('auth_token');
-        await box.clear();
+        // await box.delete('auth_token');
+        // await box.clear();
         // Log the response before redirecting
         print('Unauthorized access, redirecting to login');
         Get.offAll(const Login());
@@ -74,12 +83,14 @@ class ApiClient {
   }
 
   dynamic post(String path, {Map<dynamic, dynamic>? params}) async {
+    var box = await Hive.openBox('authBox');
+    final token = box.get('auth_token');
     try {
       print(path);
       final response = await _client.post(
         getPath(path, null),
         body: jsonEncode(params),
-        headers: _buildHeaders(),
+        headers: _buildHeaders(token),
       );
 
       // final errorResponse = json.decode(response.body);
@@ -121,8 +132,10 @@ class ApiClient {
   }
 
   dynamic deleteWithBody(String path, {Map<dynamic, dynamic>? params}) async {
+    var box = await Hive.openBox('authBox');
+    final token = box.get('auth_token');
     https.Request request = https.Request('DELETE', getPath(path, null));
-    request.headers.addAll(_buildHeaders());
+    request.headers.addAll(_buildHeaders(token));
     request.body = jsonEncode(params);
     final response = await _client.send(request).then(
           (value) => https.Response.fromStream(value),
@@ -148,18 +161,17 @@ class ApiClient {
     return Uri.parse('${ApiConstants.baseUrl}$path$paramsString');
   }
 
-  Map<String, String> _buildHeaders() {
+  Map<String, String> _buildHeaders(token) {
     final headers = {
+      'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
     };
 
-    if (_bearerToken != null) {
-      headers['Authorization'] = 'Bearer $_bearerToken';
-    }
+    // if (_bearerToken != null) {
+    //   headers['Authorization'] = 'Bearer $_bearerToken';
+    // }
 
-    print('_bearerToken');
-    print(_bearerToken);
-
+    print('Headers: $headers');
     return headers;
   }
 }

@@ -41,23 +41,20 @@ import 'presentation/controller/auth/auth_controller.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  sl.registerLazySingleton<Client>(() => Client());
+  // sl.registerLazySingleton<Client>(() => Client());
+  if (!sl.isRegistered<Client>()) {
+    sl.registerLazySingleton<Client>(() => Client());
+  }
 
-  // sl.registerLazySingleton<ApiClient>(() => ApiClient(sl()));
+  final token =
+      await _getTokenFromHive(); // Get token from Hive or secure storage
+  print('Token in injection: $token');
 
-  // // Register ApiClient with optional token if available
-  // sl.registerLazySingleton<ApiClient>(() {
-  //   final token =
-  //       _getTokenFromHive(); // Implement this function to get the token
-  //   return ApiClient(Client(), token);
-  // });
-
-  // Register ApiClient with optional token
-  sl.registerLazySingleton<ApiClient>(() {
-    final token =
-        _getTokenFromHive(); // Implement this function to get the token
-    return ApiClient(sl<Client>(), token);
-  });
+  if (!sl.isRegistered<ApiClient>()) {
+    sl.registerLazySingleton<ApiClient>(() {
+      return ApiClient(sl<Client>(), token); // Initial registration with token
+    });
+  }
   //network getx
   sl.registerFactory<NetWorkStatusChecker>(
     () => NetWorkStatusChecker(),
@@ -237,8 +234,9 @@ Future<void> init() async {
   // sl.registerLazySingleton(() => http.Client());
 }
 
-String? _getTokenFromHive() {
-  // Function to retrieve the token from Hive
-  final box = Hive.box('authBox');
-  return box.get('auth_token');
+Future<String?> _getTokenFromHive() async {
+  var box = await Hive.openBox('authBox');
+  print('box.get');
+  print(box.get('auth_token'));
+  return box.get('auth_token'); // Return the token or null
 }

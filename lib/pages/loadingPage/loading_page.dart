@@ -33,6 +33,7 @@ class _LoadingPageState extends State<LoadingPage> {
       if (_authController.isSignIn.value) {
         // print(_authController.isSignIn.value);
         if (await _authController.checkUserStatus()) {
+          // await _authController.loadUser();
           Get.off(() => const NavigationPage());
         } else {
           Get.off(() => const Login());

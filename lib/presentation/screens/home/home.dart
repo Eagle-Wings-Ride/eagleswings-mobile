@@ -678,7 +678,7 @@ class _HomePageState extends State<HomePage> {
                               // User data is available
                               return Text(
                                 (user != null)
-                                    ? 'Hello, ${user.email}'
+                                    ? 'Hello, ${user.name}'
                                     : 'Loading...', // Display user's name
                                 style: GoogleFonts.poppins(
                                     color: Colors.white.withOpacity(.7),

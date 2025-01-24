@@ -3,6 +3,7 @@ import 'package:eaglerides/presentation/screens/auth/register.dart';
 import 'package:eaglerides/presentation/controller/auth/auth_controller.dart';
 import 'package:eaglerides/presentation/screens/home/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_utils/get_utils.dart';
@@ -42,12 +43,22 @@ class _LoginState extends State<Login> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    // Ensure unfocus happens after the first frame is drawn
+
     _authController.checkIsSignIn();
     // Ensure nothing is focused on the first load
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if(_authController.isSignIn == true.obs){
-        
+          FocusScope.of(context).unfocus();  // This removes focus from any focused widget
+    SystemChannels.textInput.invokeMethod('TextInput.hide'); 
+      FocusScopeNode currentFocus = FocusScope.of(context);
+
+      if (!currentFocus.hasPrimaryFocus) {
+        currentFocus.unfocus(); // Unfocus the current field
       }
+
+      // Optionally, set focus to another widget (e.g., an empty container or a dummy FocusNode)
+      FocusScope.of(context).requestFocus(FocusNode());
+      if (_authController.isSignIn == true.obs) {}
     });
   }
 
@@ -110,7 +121,8 @@ class _LoginState extends State<Login> {
                                   CustomTextFieldWidget(
                                     // foc
                                     controller: _emailController,
-                                    keyboardType: TextInputType.text,
+                                    keyboardType: TextInputType.emailAddress,
+                                    
                                     obscureText: false,
                                     filled: false,
                                     readOnly: false,

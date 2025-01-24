@@ -81,7 +81,7 @@ class _AccountScreenState extends State<AccountScreen> {
                               return Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  AlertDialog.adaptive(
+                                  AlertDialog(
                                     contentPadding: const EdgeInsets.fromLTRB(
                                         30, 10, 30, 20),
                                     elevation: 0,
@@ -315,7 +315,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 Obx(() {
                   var user = Get.find<AuthController>().user.value;
                   return Text(
-                    (user != null) ? 'Hello, ${user.email}' : 'Loading...',
+                    (user != null) ? 'Hello, ${user.name}' : 'Loading...',
                     textAlign: TextAlign.start,
                     style: GoogleFonts.poppins(
                       color: Colors.white,

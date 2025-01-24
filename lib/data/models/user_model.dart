@@ -1,17 +1,17 @@
 class UserModel {
   final String id;
-  // final String name;
+  final String name;
   final String email;
-  // final String number;
-  // final String address;
+  final String number;
+  final String address;
   // final String isVerified;
 
   UserModel({
     required this.id,
-    // required this.name,
+    required this.name,
     required this.email,
-    // required this.number,
-    // required this.address,
+    required this.number,
+    required this.address,
     // required this.isVerified,
   });
 
@@ -19,10 +19,10 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['_id'] ?? '',
-      // name: json['full_name'] ?? '',
+      name: json['fullname'] ?? 'Guest',
       email: json['email'] ?? '',
-      // number: json['number'] ?? '',
-      // address: json['address'] ?? '',
+      number: json['number'] ?? '',
+      address: json['address'] ?? '',
       // isVerified: json['isVerified'] ?? '',
     );
   }
@@ -31,10 +31,10 @@ class UserModel {
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       id: map['_id'] ?? '',
-      // name: map['full_name'] ?? '',
+      name: map['fullname'] ?? '',
       email: map['email'] ?? '',
-      // number: map['number'] ?? '',
-      // address: map['address'] ?? '',
+      number: map['number'] ?? '',
+      address: map['address'] ?? '',
       // isVerified: map['isVerified'] ?? '',
     );
   }
@@ -43,10 +43,10 @@ class UserModel {
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
-      // 'full_name': name,
+      'fullname': name,
       'email': email,
-      // 'number': number,
-      // 'address': address,
+      'number': number,
+      'address': address,
       // 'isVerified': isVerified,
     };
   }
