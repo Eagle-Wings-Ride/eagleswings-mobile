@@ -1,3 +1,4 @@
+import 'package:eaglerides/styles/styles.dart';
 import 'package:flutter/material.dart';
 // import 'package:rcdit_user/functions/functions.dart';
 // import 'package:rcdit_user/functions/notifications.dart';
@@ -72,7 +73,9 @@ class MyApp extends StatelessWidget {
         child: GetMaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'EaglesRides',
-          theme: ThemeData(),
+          theme: ThemeData(
+            highlightColor: backgroundColor,
+          ),
           home: const LoadingPage(),
           builder: EasyLoading.init(),
         ),
