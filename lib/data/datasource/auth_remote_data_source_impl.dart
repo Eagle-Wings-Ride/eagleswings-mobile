@@ -9,6 +9,7 @@ import 'package:http/http.dart';
 import '../../injection_container.dart';
 import '../../presentation/screens/auth/login.dart';
 import '../core/api_client.dart';
+import '../models/child_model.dart';
 import '../models/user_model.dart';
 import 'auth_remote_data_source.dart';
 
@@ -65,6 +66,28 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
         // print('error here');
         debugPrint(response['message']);
         return response['message'];
+      } else {
+        return 'Unexpected response format';
+      }
+    } catch (e) {
+      debugPrint('Exception: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> addChild(Map<String, dynamic> requestBody) async {
+    const uri = '/users/child';
+
+    try {
+      final response = await _client.post(uri, params: requestBody);
+
+      debugPrint('Response Body: $response');
+      // Assume the response is a map, not a string
+      if (response is Map<String, dynamic>) {
+        // print('error here');
+        debugPrint(response['message']);
+        return response['message'] ?? 'Child Created Successfully';
       } else {
         return 'Unexpected response format';
       }
@@ -152,16 +175,6 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
 
       // Check if the response status is OK (200)
       if (response.containsKey('user')) {
-        // Decode the JSON response body
-        // final Map<String, dynamic> userInfo = jsonDecode(response.body);
-
-        // // Optionally, check the response structure
-        // if (userInfo.containsKey('message')) {
-        //   print('Message: ${userInfo['message']}');
-        // }
-
-        // // Return the decoded user data
-        // return userInfo;
         final userInfo = response['user'] as Map<String, dynamic>;
         print('User Info: $userInfo');
         return userInfo;
@@ -178,19 +191,60 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> fetchChildren(String userId) async {
+    const baseUri = '/users/children';
+    final uri = '$baseUri/$userId';
+
+    try {
+      print('Fetching children for userId: $userId');
+      final response = await _client.get(uri);
+
+      // if (response.statusCode == 200) {
+      //   // Parse the response body and return a list of children
+      //   return List<Map<String, dynamic>>.from(response.body);
+      //   // return List<Child>.from(
+      //   //     json.decode(response.body).map((x) => Child.fromJson(x)));
+      // } else if (response.statusCode == 404) {
+      //   // Return an empty list if no children found (404)
+      //   return [];
+      // } else {
+      //   throw Exception('Failed to fetch children: ${response.body}');
+      // }
+      // Handle 404 error when no children are found
+      if (response.statusCode == 404) {
+        return []; // Return an empty list if no children found
+      }
+
+      if (response.statusCode == 200) {
+        // Parse the response body to a list of maps
+        List<dynamic> data = json.decode(response.body);
+        print('data');
+        print(data);
+        print('data two');
+        print(List<Map<String, dynamic>>.from(data));
+        return List<Map<String, dynamic>>.from(data);
+      } else {
+        throw Exception('Failed to fetch children: ${response.statusCode}');
+      }
+      // final List<dynamic> decodedResponse = jsonDecode(response.body);
+      // return response;
+      // if (response.statusCode == 200) {
+      //   // Decode the response body to a list
+      //   final List<dynamic> decodedResponse = jsonDecode(response.body);
+      //   return decodedResponse; // Return the decoded list
+      // } else {
+      //   throw Exception('Failed to fetch children: ${response.body}');
+      // }
+    } catch (e) {
+      print('Error fetching children: $e');
+      rethrow;
+    }
+  }
+
+  @override
   Future<String> eagleridesAuthGetUserUid() async {
     return 'auth.currentUser!.uid';
   }
-
-  // @override
-  // Future<String> getUser() async {
-  //   // try {
-  //   //   object
-  //   // } catch (e) {
-  //   //   print(e);
-  //   // }
-  //   return '';
-  // }
 
   @override
   Future<bool> eagleridesAuthCheckUserStatus(String userId) async {
@@ -203,8 +257,6 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
   Future<void> eagleridesAuthSignOut() async {
     try {
       final box = await Hive.openBox('authBox');
-
-      
 
       // Logout API call (optional)
       final response = await _client.post(
@@ -227,32 +279,6 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
       rethrow;
     }
   }
-
-  // @override
-  // Future<void> eagleridesAuthSignOut() async {
-  //   try {
-  //     final box = await Hive.openBox('authBox');
-
-  //     // Ensure token is included in headers for logout request (if necessary)
-  //     final response = await _client.post(
-  //       '/users/logout',
-  //       params: {}, // If logout doesn't require params, pass an empty map
-  //     );
-
-  //     print('Logout Response: $response');
-
-  //     // Clear token and navigate to login
-  //     await box.delete('auth_token'); // Explicitly delete the auth token
-  //     await box.clear(); // Ensure everything in the box is cleared
-
-  //     // Confirm token is removed
-  //     final token = box.get('auth_token');
-  //     print('Token after logout: $token'); // Should be null or undefined
-  //   } catch (error) {
-  //     print('Logout Error: $error');
-  //     rethrow;
-  //   }
-  // }
 
   @override
   Future<String> eagleridesAddProfileImg(String riderId) async {

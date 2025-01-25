@@ -398,43 +398,7 @@ class _RegisterState extends State<Register> {
                               SizedBox(
                                 height: 10.h,
                               ),
-                              // if (_suggestions.isNotEmpty &&
-                              //     _addressController.text.isNotEmpty)
-                              //   Positioned(
-                              //     left: 16,
-                              //     right: 16,
-                              //     top: 90,
-                              //     child: Material(
-                              //       elevation: 2,
-                              //       borderRadius: BorderRadius.circular(8),
-                              //       child: Container(
-                              //         height: 200,
-                              //         decoration: BoxDecoration(
-                              //           borderRadius: BorderRadius.circular(8),
-                              //           color: Colors.white,
-                              //         ),
-                              //         child: ListView.builder(
-                              //           itemCount: _suggestions.length,
-                              //           itemBuilder: (context, index) {
-                              //             final suggestion =
-                              //                 _suggestions[index];
-                              //             return ListTile(
-                              //               title:
-                              //                   Text(suggestion['description']),
-                              //               onTap: () {
-                              //                 _addressController.text =
-                              //                     suggestion['description'];
-                              //                 setState(() {
-                              //                   _suggestions.clear();
-                              //                 });
-                              //               },
-                              //             );
-                              //           },
-                              //         ),
-                              //       ),
-                              //     ),
-                              //   ),
-
+                           
                               Center(
                                 child: Container(
                                   width: double.maxFinite,

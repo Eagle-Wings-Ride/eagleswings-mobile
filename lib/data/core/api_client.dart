@@ -50,7 +50,7 @@ class ApiClient {
       ); // 10 seconds timeout
 
       // print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      // print('Response Body: ${response.body}');
       // print('Is 401: ${response.statusCode == 401}');
 
       // Check if the response body is empty or not
@@ -61,8 +61,8 @@ class ApiClient {
 
       if (response.statusCode == 200) {
         // Log and return the decoded body
-        print('Decoding response body');
-        print(json.decode(response.body));
+        // print('Decoding response body');
+        // print(json.decode(response.body));
         return json.decode(response.body);
       } else if (response.statusCode == 401) {
         // await box.delete('auth_token');
@@ -96,12 +96,12 @@ class ApiClient {
       // final errorResponse = json.decode(response.body);
       // debugPrint('errorResponse');
       print('response.statusCode');
-      print(json.decode(response.body)['message']);
-      print('here');
-      print(response.reasonPhrase);
+      // print(json.decode(response.body)['message']);
+      // print('here');
+      // print(response.reasonPhrase);
 
       // Print raw response for debugging
-      print("Response Body: ${response.body}");
+      // print("Response Body: ${response.body}");
       // print("Response Body: ${response.statusCode}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {

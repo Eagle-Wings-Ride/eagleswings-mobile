@@ -1,3 +1,4 @@
+import 'package:eaglerides/presentation/screens/account/registered_children.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -66,7 +67,7 @@ class _MyInformationState extends State<MyInformation> {
               _buildTiles(
                 'Registered Children',
                 Icons.person_outline,
-                const MyInformation(),
+                const RegisteredChildren(),
                 true,
               ),
             ],

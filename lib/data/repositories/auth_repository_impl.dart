@@ -1,5 +1,6 @@
 import '../datasource/auth_remote_data_source.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../models/child_model.dart';
 
 class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
   final EagleRidesAuthDataSource eagleRidesAuthDataSource;
@@ -21,29 +22,15 @@ class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
     return await eagleRidesAuthDataSource.register(requestBody);
   }
 
-  // @override
-  // Future<Either<AppError, bool>> loginUser(Map<String, dynamic> body) async {
-  //   try {
-  //     // body.putIfAbsent('request_token', () => token1);
-  //     final validateWithLoginToken =
-  //         await eagleRidesAuthDataSource.validateWithLogin(body);
-  //     // final sessionId =
-  //     //     await eagleRidesAuthDataSource.createSession(validateWithLoginToken);
-  //     if (validateWithLoginToken != null) {
-  //       await authenticationLocalDataSource
-  //           .saveSessionId(validateWithLoginToken.message);
-  //       return const Right(true);
-  //     }
-  //     return const Left(AppError(AppErrorType.sessionDenied));
-  //   } on SocketException {
-  //     return const Left(AppError(AppErrorType.network));
-  //   } on UnauthorisedException {
-  //     return const Left(AppError(AppErrorType.unauthorised));
-  //   } on Exception {
-  //     return const Left(AppError(AppErrorType.api));
-  //   }
-  //   // return await eagleRidesAuthDataSource.eagleridesAuthIsSignIn();
-  // }
+  @override
+  Future<String> addChild(Map<String, dynamic> requestBody) async {
+    return await eagleRidesAuthDataSource.addChild(requestBody);
+  }
+
+  @override
+  Future<List<dynamic>> fetchChildren(String userId) async {
+    return await eagleRidesAuthDataSource.fetchChildren(userId);
+  }
 
   @override
   Future<bool> eagleRidesAuthIsSignIn() async {
@@ -66,6 +53,7 @@ class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
   Future<String> eagleRidesAuthGetUserUid() async {
     return await eagleRidesAuthDataSource.eagleridesAuthGetUserUid();
   }
+
   @override
   Future<Map<String, dynamic>> getUser() async {
     return await eagleRidesAuthDataSource.getUser();

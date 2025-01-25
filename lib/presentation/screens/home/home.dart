@@ -8,9 +8,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
+import '../../../data/models/child_model.dart';
 import '../../../injection_container.dart' as di;
 import '../../../styles/styles.dart';
 import '../../controller/home/home_controller.dart';
+import '../account/child_registration.dart';
 // import '../ride/map_with_source_destination_field.dart';
 
 class HomePage extends StatefulWidget {
@@ -25,22 +27,72 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final HomeController _homeController = Get.put(di.sl<HomeController>());
-  // final AuthController _authController = Get.find();
-  // String address = '';
-  // static const CameraPosition _defaultLocation = CameraPosition(
-  //   target: LatLng(23.030357, 72.517845),
-  //   zoom: 14.4746,
-  // );
+  // List<dynamic> childrenList = []; // List of Child objects
+  String? selectedChildId; // To store the selected child's ID
+  String? selectedChildName; // To store the selected child's name
+  bool isLoading = true;
+  bool idSelected = false;
+  final AuthController _authController = Get.find();
 
   @override
   void initState() {
     _homeController.getUserCurrentLocation();
-    // _homeController.startLocationUpdates();
-    // setState(() {
-    //   address = _homeController.address.value;
-    // });
-    // _authController.getUser(context);
+
+    fetchChildrenData();
     super.initState();
+    // Set default selection if children exist
+    // if (childrenList.isNotEmpty) {
+    //   selectedChildId =
+    //       childrenList.first.id; // Set first child's ID as default
+    //   selectedChildName =
+    //       childrenList.first.fullname; // Set first child's name as default
+    // } else {
+    //   selectedChildId = null;
+    //   selectedChildName = null;
+    // }
+  }
+
+  Future<void> fetchChildrenData() async {
+    // try {
+    //     final fetchedChildren = await _authController.fetchChildren();
+
+    // // Ensure the fetched children are properly converted into a list of Child objects
+    // final List<Child> children = fetchedChildren
+    //     .map<Child>((childJson) => Child.fromJson(childJson))
+    //     .toList();
+
+    //   // final fetchedChildren = _authController.children;
+    //   print('fetchedChildren');
+    //   print(fetchedChildren);
+    //   setState(() {
+    //     childrenList = fetchedChildren;
+    //     isLoading = false;
+    //   });
+    // } catch (e) {
+    //   setState(() {
+    //     isLoading = false;
+    //   });
+    //   print('Error fetching children: $e');
+    // }
+    try {
+      await _authController.fetchChildren();
+
+      setState(() {
+        if (_authController.children.isNotEmpty) {
+          selectedChildId = _authController.children.first.id;
+          selectedChildName = _authController.children.first.fullname;
+        } else {
+          selectedChildId = null;
+          selectedChildName = null;
+        }
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Error fetching children: $e');
+    }
   }
 
   @override
@@ -656,43 +708,207 @@ class _HomePageState extends State<HomePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(148, 163, 208, 0.2),
-                        borderRadius: BorderRadius.circular(40),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Iconsax.profile_circle,
-                            color: Colors.white.withOpacity(.7),
-                            size: 16,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5),
-                            child: Obx(() {
-                              // Observe changes to the user data in UserController
-                              var user = Get.find<AuthController>().user.value;
-                              // User data is available
-                              return Text(
-                                (user != null)
-                                    ? 'Hello, ${user.name}'
-                                    : 'Loading...', // Display user's name
-                                style: GoogleFonts.poppins(
-                                    color: Colors.white.withOpacity(.7),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500),
+                    GestureDetector(
+                      onTap: () {
+                        if (_authController.children.isEmpty) {
+                          // Redirect to create child page if no children are available
+                          Get.to(
+                              const ChildRegistration()); // Replace with your navigation route
+                        } else {
+                          showModalBottomSheet(
+                            isDismissible: true,
+                            showDragHandle: true,
+                            backgroundColor:
+                                Theme.of(context).scaffoldBackgroundColor,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return FractionallySizedBox(
+                                heightFactor: calculateHeightFactor(
+                                    _authController.children.length),
+                                child: Card(
+                                  child: Container(
+                                    // height: 350,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24, vertical: 10),
+                                    decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        borderRadius:
+                                            BorderRadius.circular(19)),
+                                    child: ListView(
+                                      children: [
+                                        Text(
+                                          'Select Child',
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 20,
+                                              color: textColor,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context).cardColor,
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                          ),
+                                          child: ListView.builder(
+                                            physics:
+                                                const BouncingScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemCount:
+                                                _authController.children.length,
+                                            itemBuilder: (context, idx) {
+                                              return Column(
+                                                children: [
+                                                  ListTileTheme(
+                                                    contentPadding:
+                                                        const EdgeInsets.only(
+                                                            left: 13.0,
+                                                            right: 13.0,
+                                                            top: 4,
+                                                            bottom: 4),
+                                                    selectedColor:
+                                                        Theme.of(context)
+                                                            .colorScheme
+                                                            .secondary,
+                                                    child: ListTile(
+                                                      title: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          const SizedBox(
+                                                            width: 8,
+                                                          ),
+                                                          SizedBox(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.4,
+                                                            child: Text(
+                                                              _authController
+                                                                  .children[idx]
+                                                                  .fullname,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: GoogleFonts
+                                                                  .poppins(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color:
+                                                                    textColor,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      onTap: () {
+                                                        setState(() {
+                                                          // idSelected = true;
+                                                          selectedChildId =
+                                                              _authController
+                                                                  .children[idx]
+                                                                  .id;
+                                                          selectedChildName =
+                                                              _authController
+                                                                  .children[idx]
+                                                                  .fullname;
+                                                        });
+
+                                                        // _genderController.text =
+                                                        //     childrenList[idx];
+
+                                                        Navigator.pop(
+                                                          context,
+                                                        );
+
+                                                        setState(() {});
+                                                      },
+                                                    ),
+                                                  ),
+                                                  (idx !=
+                                                          _authController
+                                                                  .children
+                                                                  .length -
+                                                              1)
+                                                      ? Divider(
+                                                          color: greyColor,
+                                                          height: 1,
+                                                          indent: 13,
+                                                          endIndent: 13,
+                                                        )
+                                                      : const SizedBox(),
+                                                ],
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               );
-                            }),
-                          ),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            size: 16,
-                            color: Colors.white.withOpacity(.7),
-                          ),
-                        ],
+                            },
+                          );
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color.fromRGBO(148, 163, 208, 0.2),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Iconsax.profile_circle,
+                              color: Colors.white.withOpacity(.7),
+                              size: 16,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: selectedChildName != null
+                                  ? Text(
+                                      'Hello $selectedChildName',
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white.withOpacity(.7),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    )
+                                  : GestureDetector(
+                                      onTap: () {
+                                        Get.to(
+                                            const ChildRegistration()); // Navigate to create child page
+                                      },
+                                      child: Text(
+                                        'No child available.',
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white.withOpacity(.7),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                             
+                            ),
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              size: 16,
+                              color: Colors.white.withOpacity(.7),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Container(
@@ -757,5 +973,11 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  double calculateHeightFactor(int childrenCount) {
+    // Minimum height factor is 0.6, increase by 0.1 for every 3 children
+    double heightFactor = 0.6 + (childrenCount / 10);
+    return heightFactor > 1.0 ? 1.0 : heightFactor; // Limit it to a max of 1.0
   }
 }

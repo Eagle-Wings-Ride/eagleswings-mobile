@@ -1,7 +1,9 @@
+import 'package:eaglerides/domain/usecases/add_child_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_check_user_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_is_signed_in_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_otp_verification_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_sign_out_usecase.dart';
+import 'package:eaglerides/domain/usecases/fetch_children_usecase.dart';
 import 'package:eaglerides/domain/usecases/getUserUseCase.dart';
 import 'package:eaglerides/domain/usecases/register.dart';
 import 'package:eaglerides/presentation/screens/auth/login.dart';
@@ -13,6 +15,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
+import '../../../data/models/child_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../../domain/usecases/login_user.dart';
 import '../../../navigation_page.dart';
@@ -29,8 +32,11 @@ class AuthController extends GetxController {
       eagleRidesAuthOtpVerificationUseCase;
   final EagleRidesAuthSignOutUseCase eagleRidesAuthSignOutUseCase;
   final GetUserUsecase getUserUsecase;
+  final AddChildUseCase addChildUseCase;
+  final FetchChildrenUseCase fetchChildrenUseCase;
 
   var user = Rx<UserModel?>(null);
+  RxList<Child> children = <Child>[].obs;
 
   var isSignIn = false.obs;
 
@@ -48,6 +54,8 @@ class AuthController extends GetxController {
     required this.eagleRidesAuthOtpVerificationUseCase,
     required this.eagleRidesAuthSignOutUseCase,
     required this.getUserUsecase,
+    required this.addChildUseCase,
+    required this.fetchChildrenUseCase,
     // required this.eagleRidesAuthGetUserUidUseCase,
   });
 
@@ -126,7 +134,7 @@ class AuthController extends GetxController {
 
       EasyLoading.dismiss();
       Get.offAll(const Login());
-    } catch (e) { 
+    } catch (e) {
       // print(e);
       EasyLoading.dismiss();
       // print(e);
@@ -176,6 +184,37 @@ class AuthController extends GetxController {
     }
   }
 
+  addChild(Map<String, dynamic> requestBody, context) async {
+    print('requestBody');
+    print(requestBody);
+    try {
+      EasyLoading.show(
+        indicator: const CustomLoader(),
+        maskType: EasyLoadingMaskType.black,
+        dismissOnTap: false,
+      );
+      final response = await addChildUseCase.call(requestBody);
+      debugPrint(response);
+      showTopSnackBar(
+        Overlay.of(context),
+        const CustomSnackBar.success(
+          message: 'Child Registration Successful',
+        ),
+      );
+      EasyLoading.dismiss();
+      Get.back();
+    } catch (e) {
+      print(e);
+      EasyLoading.dismiss();
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: e.toString(),
+        ),
+      );
+    }
+  }
+
   verifyOtp(String email, String otp, context) async {
     try {
       EasyLoading.show(
@@ -217,6 +256,18 @@ class AuthController extends GetxController {
   void setUser(UserModel userModel) {
     user.value = userModel; // This updates the observable user.
     _saveUser(userModel); // Optionally save the user info to local storage
+  }
+
+  void setChildren(List<Child> childModels) {
+    children
+        .assignAll(childModels); // Update the observable list with new children
+    _saveChildren(childModels); // Optionally save to local storage
+  }
+
+  void _saveChildren(List<Child> childModels) async {
+    var box = await Hive.openBox('childrenBox');
+    // Save the children list to local storage
+    await box.put('children', childModels.map((e) => e.toJson()).toList());
   }
 
   // Load user data from Hive storage (if available)
@@ -293,4 +344,79 @@ class AuthController extends GetxController {
       );
     }
   }
+
+Future<void> fetchChildren() async {
+  var box = await Hive.openBox('authBox');
+  String? token = box.get('auth_token');
+  var childrenBox = await Hive.openBox('childrenBox');
+
+  if (token != null) {
+    // Token exists, attempt to load user data from storage
+    var childrenInfo = childrenBox.get('children');
+    print('childrenInfo from storage');
+    print(childrenInfo);
+
+    if (childrenInfo != null) {
+      // Ensure childrenInfo is a list of maps (dynamic type issue)
+      if (childrenInfo is List) {
+        // Map the childrenInfo to List<Child>
+        List<Child> childrenList = childrenInfo
+            .map<Child>((childJson) => Child.fromJson(Map<String, dynamic>.from(childJson)))
+            .toList();
+            print(childrenList);
+        
+        // Update the reactive list with the deserialized data
+        children.assignAll(childrenList);
+        update();
+      } else {
+        // Handle unexpected structure of the childrenInfo
+        print('Error: The stored children data is not in the expected format.');
+      }
+    } else {
+      // If no children data found, fetch from API
+      try {
+        EasyLoading.show(
+          indicator: const CustomLoader(),
+          maskType: EasyLoadingMaskType.black,
+          dismissOnTap: false,
+        );
+
+        final userId = user.value?.id; // Get the user ID (check if it's available)
+        if (userId == null) {
+          throw Exception('User ID not found');
+        }
+
+        // Fetch children from the API
+        final fetchedChildren = await fetchChildrenUseCase.call(userId);
+
+        // Map the API response to a list of Child objects
+        List<Child> childrenList = fetchedChildren
+            .map<Child>((childJson) => Child.fromJson(childJson))
+            .toList();
+
+        // Save the children to local storage
+        childrenBox.put('children', fetchedChildren);
+
+        // Update the reactive list with the fetched children
+        children.assignAll(childrenList);
+        // setChildren(childrenList); // If necessary, use this method to set the children
+      } catch (e) {
+        print("Error fetching children: $e");
+        Get.snackbar(
+          'Error',
+          e.toString(),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      } finally {
+        EasyLoading.dismiss();
+      }
+    }
+  } else {
+    // No token found, user is not logged in, redirect to login screen
+    Get.offAll(const Login());
+  }
+}
+
 }

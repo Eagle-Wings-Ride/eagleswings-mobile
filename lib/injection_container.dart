@@ -2,11 +2,13 @@ import 'package:eaglerides/data/datasource/ride_map_data_source.dart';
 import 'package:eaglerides/data/datasource/ride_map_data_source_impl.dart';
 import 'package:eaglerides/data/repositories/ride_map_repository_impl.dart';
 import 'package:eaglerides/domain/repositories/ride_map_repository.dart';
+import 'package:eaglerides/domain/usecases/add_child_usecase.dart';
 import 'package:eaglerides/domain/usecases/cancel_trip_usecase.dart';
 import 'package:eaglerides/domain/usecases/direction_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_check_user_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_otp_verification_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_sign_out_usecase.dart';
+import 'package:eaglerides/domain/usecases/fetch_children_usecase.dart';
 import 'package:eaglerides/domain/usecases/generate_rental_charges_usecase.dart';
 import 'package:eaglerides/domain/usecases/generate_trip_usecase.dart';
 import 'package:eaglerides/domain/usecases/getUserUseCase.dart';
@@ -48,7 +50,7 @@ Future<void> init() async {
 
   final token =
       await _getTokenFromHive(); // Get token from Hive or secure storage
-  print('Token in injection: $token');
+  // print('Token in injection: $token');
 
   if (!sl.isRegistered<ApiClient>()) {
     sl.registerLazySingleton<ApiClient>(() {
@@ -103,6 +105,8 @@ Future<void> init() async {
       eagleRidesAuthOtpVerificationUseCase: sl.call(),
       eagleRidesAuthSignOutUseCase: sl.call(),
       getUserUsecase: sl.call(),
+      addChildUseCase: sl.call(),
+      fetchChildrenUseCase: sl.call(),
       // eagleRidesAuthGetUserUidUseCase: sl.call(),
       // uberAuthCheckUserStatusUseCase: sl.call(),
       // uberAuthGetUserUidUseCase: sl.call(),
@@ -144,6 +148,16 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<GetUserUsecase>(
     () => GetUserUsecase(
+      eagleRidesAuthRepository: sl.call(),
+    ),
+  );
+  sl.registerLazySingleton<AddChildUseCase>(
+    () => AddChildUseCase(
+      eagleRidesAuthRepository: sl.call(),
+    ),
+  );
+  sl.registerLazySingleton<FetchChildrenUseCase>(
+    () => FetchChildrenUseCase(
       eagleRidesAuthRepository: sl.call(),
     ),
   );

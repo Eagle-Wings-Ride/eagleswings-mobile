@@ -1,3 +1,5 @@
+import '../models/child_model.dart';
+
 abstract class EagleRidesAuthDataSource {
   Future<bool> eagleridesAuthIsSignIn();
 
@@ -16,4 +18,6 @@ abstract class EagleRidesAuthDataSource {
   Future<String> loginUser(String email, String password);
   Future<String> register(Map<String, dynamic> requestBody);
   Future<Map<String, dynamic>> getUser();
+  Future<String> addChild(Map<String, dynamic> requestBody);
+  Future<List<dynamic>> fetchChildren(String userId);
 }
