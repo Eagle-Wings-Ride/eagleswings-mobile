@@ -4,7 +4,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../data/models/book_rides_model.dart';
 import '../../../styles/styles.dart';
+import '../../controller/auth/auth_controller.dart';
+import '../../controller/home/home_controller.dart';
 import '../../controller/ride/ride_controller.dart';
 import '../../../injection_container.dart' as di;
 
@@ -16,14 +19,48 @@ class SingleRideInfoScreen extends StatefulWidget {
 }
 
 class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
+  final AuthController _authController = Get.find();
+    final HomeController _homeController = Get.find();
+
+  // Declare `ride` as nullable
+  Booking? ride;
+
+  @override
+  void initState() {
+    super.initState();
+    // Retrieve the rideId from arguments
+    final rideId = Get.arguments['rideId'];
+
+    // Find the ride that matches the rideId
+    setState(() {
+      ride = _authController.recentRides.firstWhere(
+        (r) => r.id == rideId,
+        // orElse: () {
+        //   return Booking(
+        //     id: 'placeholder',
+        //     pickUpLocation: 'Unknown',
+        //     dropOffLocation: 'Unknown',
+        //     status: 'Unknown',
+        //   );
+        //   ;
+        // }, // Return null if no match is found
+      );
+    });
+  }
+
   static const CameraPosition _defaultLocation = CameraPosition(
     target: LatLng(23.030357, 72.517845),
     zoom: 14.4746,
   );
-
   final RideController _uberMapController = Get.put(di.sl<RideController>());
   @override
   Widget build(BuildContext context) {
+    if (ride == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Ride Details')),
+        body: const Center(child: Text('Ride not found')),
+      );
+    }
     return Scaffold(
       body: SafeArea(
         child: Obx(
@@ -32,7 +69,10 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
               Positioned.fill(
                 child: GoogleMap(
                   mapType: MapType.terrain,
-                  initialCameraPosition: _defaultLocation,
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(_homeController.currentLat.value, _homeController.currentLng.value),
+                    zoom: 14.4746,
+                  ),
                   myLocationButtonEnabled: true,
                   myLocationEnabled: true,
                   compassEnabled: true,
@@ -67,7 +107,13 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
                     _uberMapController.controller.complete(controller);
                     // controller.setMapStyle('assets/map_style_black.json');
                     controller.animateCamera(
-                        CameraUpdate.newCameraPosition(_defaultLocation));
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(
+                          target: LatLng(ride!.latitude, ride!.longitude),
+                          zoom: 14.4746,
+                        ),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -103,7 +149,7 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    'Your Ride Arrives in 4 mins',
+                                    ride!.longitude.toString(),
                                     style: GoogleFonts.poppins(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
@@ -263,159 +309,136 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
                               SizedBox(
                                 height: 60.h,
                               ),
-                              Container(
-                                width: MediaQuery.of(context).size.width,
-                                padding: const EdgeInsets.all(23),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(
-                                    15,
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '102 fox drive to Millennium Drive',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(
-                                          0.5), // Shadow color with opacity
-                                      spreadRadius:
-                                          2, // How wide the shadow spreads
-                                      blurRadius:
-                                          5, // The softness of the shadow
-                                      offset: const Offset(3,
-                                          3), // Position of shadow: x, y (right, down)
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '102 fox drive to Millennium Drive',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8.h,
+                                          vertical: 5.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          color: const Color.fromRGBO(
+                                              255, 85, 0, .14),
+                                        ),
+                                        child: Text(
+                                          'In-house Driver',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 10,
+                                            color: const Color(0xffFF5500),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 8.h,
-                                            vertical: 5.h,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            color: const Color.fromRGBO(
-                                                255, 85, 0, .14),
-                                          ),
-                                          child: Text(
-                                            'In-house Driver',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 10,
-                                              color: const Color(0xffFF5500),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                                      SizedBox(
+                                        width: 10.w,
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8.h,
+                                          vertical: 5.h,
                                         ),
-                                        SizedBox(
-                                          width: 10.w,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          color: const Color.fromRGBO(
+                                              19, 59, 183, .14),
                                         ),
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 8.h,
-                                            vertical: 5.h,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            color: const Color.fromRGBO(
-                                                19, 59, 183, .14),
-                                          ),
-                                          child: Text(
-                                            'Return trip',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 10,
-                                              color: const Color(0xff133BB7),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Image.asset(
-                                          'assets/images/arrow_location.png',
-                                          width: 15,
-                                          height: 15,
-                                        ),
-                                        SizedBox(
-                                          width: 3.w,
-                                        ),
-                                        Text(
-                                          'From: 102 Fox drive',
+                                        child: Text(
+                                          'Return trip',
                                           style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                       
-                                      ],
-                                    ),
-                                     const SizedBox(
-                                          height: 10,
-                                        ),
-                                    Wrap(
-                                      runAlignment: WrapAlignment.center,
-                                      alignment: WrapAlignment.center,
-                                      crossAxisAlignment:
-                                          WrapCrossAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.access_time,
-                                          color: Colors.black,
-                                          size: 16,
-                                        ),
-                                        SizedBox(
-                                          width: 2.w,
-                                        ),
-                                        Text(
-                                          'Pick Up time: 8:30am',
-                                          style: GoogleFonts.poppins(
-                                            color: Colors.black,
                                             fontSize: 10,
-                                            fontWeight: FontWeight.w500,
+                                            color: const Color(0xff133BB7),
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        SizedBox(
-                                          width: 8.w,
-                                        ),
-                                        const Icon(
-                                          Icons.access_time,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/arrow_location.png',
+                                        width: 15,
+                                        height: 15,
+                                      ),
+                                      SizedBox(
+                                        width: 3.w,
+                                      ),
+                                      Text(
+                                        'From: 102 Fox drive',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
                                           color: Colors.black,
-                                          size: 16,
                                         ),
-                                        SizedBox(
-                                          width: 2.w,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Wrap(
+                                    runAlignment: WrapAlignment.center,
+                                    alignment: WrapAlignment.center,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.access_time,
+                                        color: Colors.black,
+                                        size: 16,
+                                      ),
+                                      SizedBox(
+                                        width: 2.w,
+                                      ),
+                                      Text(
+                                        'Pick Up time: 8:30am',
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.black,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w500,
                                         ),
-                                        Text(
-                                          'Arrival time: 8:30am',
-                                          style: GoogleFonts.poppins(
-                                            color: Colors.black,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                      ),
+                                      SizedBox(
+                                        width: 8.w,
+                                      ),
+                                      const Icon(
+                                        Icons.access_time,
+                                        color: Colors.black,
+                                        size: 16,
+                                      ),
+                                      SizedBox(
+                                        width: 2.w,
+                                      ),
+                                      Text(
+                                        'Arrival time: 8:30am',
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.black,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w500,
                                         ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ],
                           ),

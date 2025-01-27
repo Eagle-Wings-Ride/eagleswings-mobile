@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../../core/utils/get_status.dart';
+
 class RidesScreen extends StatefulWidget {
   const RidesScreen({super.key});
 
@@ -15,37 +17,6 @@ class RidesScreen extends StatefulWidget {
 }
 
 class _RidesScreenState extends State<RidesScreen> {
-  Color getStatusColor(String? status) {
-    switch (status) {
-      case 'Completed':
-        return const Color.fromRGBO(17, 205, 1, .15); // Light green
-      case 'Upcoming':
-        return const Color.fromARGB(33, 255, 81, 0); // Light orange
-      case 'In Progress':
-        return const Color.fromRGBO(0, 123, 255, .15); // Light blue
-      case 'Cancelled':
-        return const Color.fromRGBO(255, 0, 0, .15); // Light red
-      default:
-        return Colors.grey
-            .withOpacity(0.15); // Default color for unknown statuses
-    }
-  }
-
-  Color getStatusTextColor(String? status) {
-    switch (status) {
-      case 'Completed':
-        return const Color(0xff11CD01); // Green
-      case 'Upcoming':
-        return const Color(0xffFF5500); // Orange
-      case 'In Progress':
-        return const Color(0xff007BFF); // Blue
-      case 'Cancelled':
-        return const Color(0xffFF0000); // Red
-      default:
-        return Colors.black; // Default text color
-    }
-  }
-
   List<Map<String, String>> ongoingRides = [
     {
       'title': 'Toronto to Alberta Trip',
@@ -275,7 +246,7 @@ class _RidesScreenState extends State<RidesScreen> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              Get.to(SingleRideInfoScreen());
+                              // Get.to(SingleRideInfoScreen());
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
@@ -620,7 +591,9 @@ class _RidesScreenState extends State<RidesScreen> {
                                                           vertical: 3),
                                                       decoration: BoxDecoration(
                                                         color: getStatusColor(
-                                                            recent['status']),
+                                                                recent[
+                                                                    'status']!.toLowerCase())
+                                                            .withOpacity(0.14),
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(40),
@@ -629,10 +602,8 @@ class _RidesScreenState extends State<RidesScreen> {
                                                         recent['status']!,
                                                         style:
                                                             GoogleFonts.poppins(
-                                                          color:
-                                                              getStatusTextColor(
-                                                                  recent[
-                                                                      'status']),
+                                                          color: getStatusColor(
+                                                              recent['status']!.toLowerCase()),
                                                           fontSize: 8,
                                                           fontWeight:
                                                               FontWeight.bold,
