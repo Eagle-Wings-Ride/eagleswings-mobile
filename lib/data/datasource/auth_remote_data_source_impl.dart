@@ -218,26 +218,54 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
       if (response.statusCode == 200) {
         // Parse the response body to a list of maps
         List<dynamic> data = json.decode(response.body);
-        print('data');
-        print(data);
-        print('data two');
-        print(List<Map<String, dynamic>>.from(data));
+        // print('data');
+        // print(data);
+        // print('data two');
+        // print(List<Map<String, dynamic>>.from(data));
         return List<Map<String, dynamic>>.from(data);
       } else {
         throw Exception('Failed to fetch children: ${response.statusCode}');
       }
-      // final List<dynamic> decodedResponse = jsonDecode(response.body);
-      // return response;
-      // if (response.statusCode == 200) {
-      //   // Decode the response body to a list
-      //   final List<dynamic> decodedResponse = jsonDecode(response.body);
-      //   return decodedResponse; // Return the decoded list
-      // } else {
-      //   throw Exception('Failed to fetch children: ${response.body}');
-      // }
     } catch (e) {
       print('Error fetching children: $e');
       rethrow;
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchRecentRides(String childId) async {
+    const baseUri = '/book/rides/recent';
+    final uri = '$baseUri/$childId'; // Make sure the URI is properly parsed
+    try {
+      print('Fetching recent rides for childId: $childId');
+      final response = await _client.get(uri);
+
+      // print(response.statusCode);
+      // print(response);
+      // print(List<Map<String, dynamic>>.from(response['bookings']));
+      // var responseData =
+      //       jsonDecode(response.body); 
+      return List<Map<String, dynamic>>.from(response['bookings'] ?? []);
+      // if (response.statusCode == 404) {
+      //   print('No recent rides found.');
+      //   return [];
+      // }
+
+      // // Decode the response body from String to Map<String, dynamic>
+      // if (response.statusCode == 200) {
+      //   var responseData =
+      //       jsonDecode(response.body); // Decode the JSON response
+
+      //   print('Fetched data: $responseData');
+
+      //   // Assuming the response contains a 'bookings' key with the rides data
+      //   return List<Map<String, dynamic>>.from(responseData['bookings'] ?? []);
+      // } else {
+      //   throw Exception('Failed to load recent rides');
+      // }
+    } catch (e) {
+      print("Error fetching recent rides: $e");
+      rethrow; // Re-throw error to be handled elsewhere
     }
   }
 

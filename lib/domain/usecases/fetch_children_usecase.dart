@@ -1,6 +1,5 @@
 import 'package:eaglerides/domain/repositories/auth_repository.dart';
 
-import '../../data/models/child_model.dart';
 
 class FetchChildrenUseCase {
   final EagleRidesAuthRepository eagleRidesAuthRepository;

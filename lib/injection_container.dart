@@ -9,6 +9,7 @@ import 'package:eaglerides/domain/usecases/eagle_rides_auth_check_user_usecase.d
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_otp_verification_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_sign_out_usecase.dart';
 import 'package:eaglerides/domain/usecases/fetch_children_usecase.dart';
+import 'package:eaglerides/domain/usecases/fetch_recent_rides_usecase.dart';
 import 'package:eaglerides/domain/usecases/generate_rental_charges_usecase.dart';
 import 'package:eaglerides/domain/usecases/generate_trip_usecase.dart';
 import 'package:eaglerides/domain/usecases/getUserUseCase.dart';
@@ -107,6 +108,7 @@ Future<void> init() async {
       getUserUsecase: sl.call(),
       addChildUseCase: sl.call(),
       fetchChildrenUseCase: sl.call(),
+      fetchRecentRidesUseCase: sl.call(),
       // eagleRidesAuthGetUserUidUseCase: sl.call(),
       // uberAuthCheckUserStatusUseCase: sl.call(),
       // uberAuthGetUserUidUseCase: sl.call(),
@@ -158,6 +160,11 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<FetchChildrenUseCase>(
     () => FetchChildrenUseCase(
+      eagleRidesAuthRepository: sl.call(),
+    ),
+  );
+  sl.registerLazySingleton<FetchRecentRidesUseCase>(
+    () => FetchRecentRidesUseCase(
       eagleRidesAuthRepository: sl.call(),
     ),
   );

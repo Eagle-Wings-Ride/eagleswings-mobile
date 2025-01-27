@@ -40,40 +40,9 @@ class _HomePageState extends State<HomePage> {
 
     fetchChildrenData();
     super.initState();
-    // Set default selection if children exist
-    // if (childrenList.isNotEmpty) {
-    //   selectedChildId =
-    //       childrenList.first.id; // Set first child's ID as default
-    //   selectedChildName =
-    //       childrenList.first.fullname; // Set first child's name as default
-    // } else {
-    //   selectedChildId = null;
-    //   selectedChildName = null;
-    // }
   }
 
   Future<void> fetchChildrenData() async {
-    // try {
-    //     final fetchedChildren = await _authController.fetchChildren();
-
-    // // Ensure the fetched children are properly converted into a list of Child objects
-    // final List<Child> children = fetchedChildren
-    //     .map<Child>((childJson) => Child.fromJson(childJson))
-    //     .toList();
-
-    //   // final fetchedChildren = _authController.children;
-    //   print('fetchedChildren');
-    //   print(fetchedChildren);
-    //   setState(() {
-    //     childrenList = fetchedChildren;
-    //     isLoading = false;
-    //   });
-    // } catch (e) {
-    //   setState(() {
-    //     isLoading = false;
-    //   });
-    //   print('Error fetching children: $e');
-    // }
     try {
       await _authController.fetchChildren();
 
@@ -87,6 +56,7 @@ class _HomePageState extends State<HomePage> {
         }
         isLoading = false;
       });
+      // _authController.fetchRecentRides(selectedChildId!);
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -107,6 +77,85 @@ class _HomePageState extends State<HomePage> {
               padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 33.h),
               child: Column(
                 children: [
+                  _authController.children.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'No children found. Please create a child to view recent rides.',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              const SizedBox(height: 20),
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Navigate to create child screen
+                                  Get.to(const ChildRegistration());
+                                },
+                                child: const Text("Create Child"),
+                              ),
+                            ],
+                          ),
+                        )
+                      : selectedChildId == null
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Please select a child to see recent rides.',
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  DropdownButton<String>(
+                                    value: selectedChildId,
+                                    onChanged: (newChildId) {
+                                      setState(() {
+                                        selectedChildId = newChildId;
+                                      });
+                                      _authController
+                                          .fetchRecentRides(newChildId!);
+                                    },
+                                    items: _authController.children
+                                        .map(
+                                            (child) => DropdownMenuItem<String>(
+                                                  value: child.id,
+                                                  child: Text(child.fullname),
+                                                ))
+                                        .toList(),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : FutureBuilder(
+                              future: _authController
+                                  .fetchRecentRides(selectedChildId!),
+                              builder: (context, snapshot) {
+                                if (_authController.recentRides.isEmpty) {
+                                  return const Center(
+                                      child: const CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                      child: Text('Error: ${snapshot.error}'));
+                                } else {
+                                  return Container(
+                                    height: 500,
+                                    child: ListView.builder(
+                                      itemCount:
+                                          _authController.recentRides.length,
+                                      itemBuilder: (context, index) {
+                                        final ride =
+                                            _authController.recentRides[index];
+                                        return ListTile(
+                                          title: Text(ride.pickUpLocation),
+                                          subtitle: Text(ride.dropOffLocation),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -900,7 +949,6 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                     ),
-                             
                             ),
                             Icon(
                               Icons.keyboard_arrow_down,

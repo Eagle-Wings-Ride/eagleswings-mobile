@@ -54,14 +54,14 @@ class ApiClient {
       // print('Is 401: ${response.statusCode == 401}');
 
       // Check if the response body is empty or not
-      if (response.body.isEmpty) {
+      if (response.statusCode == 404) {
         print('Empty response body');
-        throw Exception('Empty response body');
+       return json.decode(response.body);
       }
 
       if (response.statusCode == 200) {
         // Log and return the decoded body
-        // print('Decoding response body');
+        print('Decoding response body');
         // print(json.decode(response.body));
         return json.decode(response.body);
       } else if (response.statusCode == 401) {
