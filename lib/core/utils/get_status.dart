@@ -15,12 +15,11 @@ Color getStatusColor(String? status) {
   }
 }
 
-
 Color getStatusTextColor(String? status) {
   switch (status) {
     case 'completed':
       return const Color(0xff11CD01); // Green
-    case 'ppcoming':
+    case 'upcoming':
       return const Color(0xffFF5500); // Orange
     case 'in progress':
       return const Color(0xff007BFF); // Blue
@@ -35,8 +34,27 @@ Color getRideTypeColor(String? rideType) {
   switch (rideType) {
     case 'In-House':
       return const Color(0xffFF5500); // Orange for In-House
+    case 'inhouse':
+      return const Color(0xffFF5500); // Orange for In-House
     case 'in-house driver':
       return const Color(0xffFF5500); // Orange for In-House
+    case 'freelance driver':
+      return const Color(0xff133BB7); // Blue for Freelance
+    case 'freelance':
+      return const Color(0xff133BB7); // Blue for Freelance
+    default:
+      return const Color(0xffB0BEC5); // Grey for unknown ride types
+  }
+}
+
+Color getRideTypeTextColor(String? rideType) {
+  switch (rideType) {
+    case 'In-House':
+      return const Color.fromRGBO(255, 85, 0, .14); // Orange for In-House
+    case 'inhouse':
+      return const Color.fromRGBO(255, 85, 0, .14); // Orange for In-House
+    case 'in-house driver':
+      return const Color.fromRGBO(255, 85, 0, .14); // Orange for In-House
     case 'freelance driver':
       return const Color(0xff133BB7); // Blue for Freelance
     case 'freelance':

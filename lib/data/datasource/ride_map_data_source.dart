@@ -22,4 +22,5 @@ abstract class RideMapDataSource {
 
   Future<String> tripPayment(String riderId, String driverId, int tripAmount,
       String tripId, String payMode);
+      
 }

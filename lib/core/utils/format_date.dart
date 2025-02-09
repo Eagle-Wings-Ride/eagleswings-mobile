@@ -7,7 +7,7 @@ String formatDate(String dateString) {
 
   if (difference.inHours < 2) {
     if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} minutes ago';
+      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''}  ago';
     } else {
       return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
     }

@@ -45,7 +45,7 @@ class CustomTextField extends StatelessWidget {
   final void Function(String)? onChanged;
   final bool? enableInteractiveSelection;
   final bool? willContainPrefix;
-  final bool readOnly;
+  final bool? readOnly;
   final String? Function(String?)? validator;
   final Function()? onTap;
   final AutovalidateMode? autoValidateMode;
@@ -53,39 +53,41 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: readOnly!,
       autofocus: true,
       enableSuggestions: true,
       keyboardType: keyboardType,
       obscureText: false,
+      onTap: () {
+        onTap?.call();
+      },
       cursorHeight: 12,
       controller: controller,
-      cursorColor: Theme.of(context).colorScheme.primary,
+      cursorColor: Colors.black,
       enableInteractiveSelection: false,
       style: GoogleFonts.lato(
-        color: Theme.of(context).colorScheme.primary,
+        color: Colors.black,
         fontSize: 14,
       ),
       decoration: InputDecoration(
-        filled: filled,
+        filled: false,
         fillColor: const Color(0xffF7F6F6),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(
-            color: Color(0xff616161),
-          ),
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: Colors.grey, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide(color: textColor, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(30),
           borderSide: const BorderSide(
-            color: Color(0xff616161),
+            color: Colors.grey,
           ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(30),
           borderSide: const BorderSide(color: Colors.red, width: 1),
         ),
         hintText: hintText,

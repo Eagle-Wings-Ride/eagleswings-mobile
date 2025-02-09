@@ -23,6 +23,12 @@ class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
   }
 
   @override
+  Future<String> bookRide(
+      Map<String, dynamic> requestBody, String childId) async {
+    return await eagleRidesAuthDataSource.bookRide(requestBody, childId);
+  }
+
+  @override
   Future<String> addChild(Map<String, dynamic> requestBody) async {
     return await eagleRidesAuthDataSource.addChild(requestBody);
   }

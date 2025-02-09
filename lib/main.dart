@@ -75,6 +75,11 @@ class MyApp extends StatelessWidget {
           title: 'EaglesRides',
           theme: ThemeData(
             highlightColor: backgroundColor,
+            scaffoldBackgroundColor: Colors.white,
+            appBarTheme: const AppBarTheme(
+              surfaceTintColor: Colors.white,
+              backgroundColor: Colors.white,
+            ),
           ),
           home: const LoadingPage(),
           builder: EasyLoading.init(),

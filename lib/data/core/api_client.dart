@@ -42,6 +42,8 @@ class ApiClient {
     // await Future.delayed(const Duration(milliseconds: 500));
     var box = await Hive.openBox('authBox');
     final token = box.get('auth_token');
+    // print('token==============');
+    // print(token);
 
     try {
       final response = await _client.get(
@@ -49,6 +51,8 @@ class ApiClient {
         headers: _buildHeaders(token),
       ); // 10 seconds timeout
 
+      // print(response.body);
+      // print(response.statusCode);
       // print('Response Status Code: ${response.statusCode}');
       // print('Response Body: ${response.body}');
       // print('Is 401: ${response.statusCode == 401}');
@@ -56,7 +60,7 @@ class ApiClient {
       // Check if the response body is empty or not
       if (response.statusCode == 404) {
         print('Empty response body');
-       return json.decode(response.body);
+        return json.decode(response.body);
       }
 
       if (response.statusCode == 200) {
@@ -171,7 +175,7 @@ class ApiClient {
     //   headers['Authorization'] = 'Bearer $_bearerToken';
     // }
 
-    print('Headers: $headers');
+    // print('Headers: $headers');
     return headers;
   }
 }

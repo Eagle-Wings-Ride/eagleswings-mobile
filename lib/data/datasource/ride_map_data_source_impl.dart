@@ -32,6 +32,7 @@ class RideMapDataSourceImpl extends RideMapDataSource {
       throw Exception();
     }
   }
+  
 
   @override
   // Future<Direction?> getMapDirection(String origin, String destination) async {

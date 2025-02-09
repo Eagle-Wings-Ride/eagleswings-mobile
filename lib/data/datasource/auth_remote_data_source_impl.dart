@@ -76,6 +76,27 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
   }
 
   @override
+  Future<String> bookRide(Map<String, dynamic> requestBody, childId) async {
+    final uri = '/book/$childId';
+    try {
+      final response = await _client.post(uri, params: requestBody);
+
+      debugPrint('Response Body: $response');
+      // Assume the response is a map, not a string
+      if (response is Map<String, dynamic>) {
+        // print('error here');
+        debugPrint(response['message']);
+        return response['message'];
+      } else {
+        return 'Unexpected response format';
+      }
+    } catch (e) {
+      debugPrint('Exception: $e');
+      rethrow;
+    }
+  }
+
+  @override
   Future<String> addChild(Map<String, dynamic> requestBody) async {
     const uri = '/users/child';
 
@@ -239,12 +260,13 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
     try {
       print('Fetching recent rides for childId: $childId');
       final response = await _client.get(uri);
+      print(response);
 
       // print(response.statusCode);
       // print(response);
       // print(List<Map<String, dynamic>>.from(response['bookings']));
       // var responseData =
-      //       jsonDecode(response.body); 
+      //       jsonDecode(response.body);
       return List<Map<String, dynamic>>.from(response['bookings'] ?? []);
       // if (response.statusCode == 404) {
       //   print('No recent rides found.');

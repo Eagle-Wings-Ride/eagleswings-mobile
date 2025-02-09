@@ -1,4 +1,5 @@
 import 'package:eaglerides/core/utils/format_date.dart';
+import 'package:eaglerides/data/models/book_rides_model.dart';
 import 'package:eaglerides/presentation/controller/auth/auth_controller.dart';
 import 'package:eaglerides/presentation/screens/ride/book_ride.dart';
 // import 'package:flutter/cupertino.dart';
@@ -30,7 +31,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final HomeController _homeController = Get.put(di.sl<HomeController>());
-  // List<dynamic> childrenList = []; // List of Child objects
+  List<Booking> childrenList = []; // List of Child objects
   String? selectedChildId; // To store the selected child's ID
   String? selectedChildName; // To store the selected child's name
   bool isLoading = true;
@@ -59,7 +60,12 @@ class _HomePageState extends State<HomePage> {
         }
         isLoading = false;
       });
-      // _authController.fetchRecentRides(selectedChildId!);
+      await _authController.fetchRecentRides(selectedChildId!);
+      setState(() {
+        childrenList = _authController.recentRides;
+      });
+      print('childrenList');
+      print(childrenList);
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -186,231 +192,437 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               ),
                             )
-                          : FutureBuilder(
-                              future: _authController
-                                  .fetchRecentRides(selectedChildId!),
-                              builder: (context, snapshot) {
-                                if (_authController.recentRides.isEmpty) {
-                                  return Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'No Recent activities yet',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14,
-                                          ),
+                          : (childrenList.isEmpty)
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'No Recent activities yet',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
                                         ),
-                                      ],
-                                    ),
-                                  );
-                                } else if (snapshot.hasError) {
-                                  return Center(
-                                      child: Text('Error: ${snapshot.error}'));
-                                } else {
-                                  return ListView.builder(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    itemCount:
-                                        _authController.recentRides.length,
-                                    itemBuilder: (context, index) {
-                                      final ride =
-                                          _authController.recentRides[index];
-                                      return Column(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              Get.to(
-                                                  const SingleRideInfoScreen(),
-                                                  arguments: {
-                                                    'rideId': ride.id
-                                                  });
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 10.w,
-                                                  vertical: 5.h),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                                color: page,
-                                                boxShadow: const [
-                                                  BoxShadow(
-                                                    color: Color.fromRGBO(
-                                                        9, 39, 127, .15),
-                                                    blurRadius: 30.0,
-                                                    spreadRadius: -4.0,
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Flexible(
-                                                    flex: 9,
-                                                    child: Row(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
-                                                      // main
-                                                      children: [
-                                                        Flexible(
-                                                          flex: 2,
-                                                          child: ClipOval(
-                                                            child: Image.asset(
-                                                              'assets/images/rides_img.jpg',
-                                                              width: 45,
-                                                              height: 45,
-                                                              fit: BoxFit
-                                                                  .fitWidth,
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  shrinkWrap: true,
+                                  itemCount: childrenList.length,
+                                  itemBuilder: (context, index) {
+                                    final ride = childrenList[index];
+                                    // print('ride');
+                                    // print(ride);
+                                    return Column(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            Get.to(const SingleRideInfoScreen(),
+                                                arguments: {'rideId': ride.id});
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 10.w,
+                                                vertical: 5.h),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              color: page,
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Color.fromRGBO(
+                                                      9, 39, 127, .15),
+                                                  blurRadius: 30.0,
+                                                  spreadRadius: -4.0,
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Flexible(
+                                                  flex: 9,
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    // main
+                                                    children: [
+                                                      Flexible(
+                                                        flex: 2,
+                                                        child: ClipOval(
+                                                          child: Image.asset(
+                                                            'assets/images/rides_img.jpg',
+                                                            width: 45,
+                                                            height: 45,
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 15.w),
+                                                      Flexible(
+                                                        flex: 8,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Text(
+                                                              '${ride.pickUpLocation} to ${ride.dropOffLocation}',
+                                                              maxLines: 1,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: GoogleFonts
+                                                                  .poppins(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color:
+                                                                    textColor,
+                                                              ),
                                                             ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(width: 15.w),
-                                                        Flexible(
-                                                          flex: 8,
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Text(
-                                                                '${ride.pickUpLocation} to ${ride.dropOffLocation}',
-                                                                maxLines: 1,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style:
-                                                                    GoogleFonts
-                                                                        .poppins(
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      textColor,
+                                                            SizedBox(
+                                                              height: 8.h,
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                Container(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          5,
+                                                                      vertical:
+                                                                          3),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: getRideTypeColor(ride
+                                                                            .rideType)
+                                                                        .withOpacity(
+                                                                            0.14),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            40),
+                                                                  ),
+                                                                  child: Text(
+                                                                    ride.rideType
+                                                                        .capitalizeFirst!,
+                                                                    style: GoogleFonts.poppins(
+                                                                        color: getRideTypeColor(ride
+                                                                            .rideType),
+                                                                        fontSize:
+                                                                            8,
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 8.h,
-                                                              ),
-                                                              Row(
-                                                                children: [
-                                                                  Container(
-                                                                    padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                        horizontal:
-                                                                            5,
-                                                                        vertical:
-                                                                            3),
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: getRideTypeColor(ride
-                                                                              .rideType)
-                                                                          .withOpacity(
-                                                                              0.14),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              40),
-                                                                    ),
-                                                                    child: Text(
-                                                                      ride.rideType
-                                                                          .capitalizeFirst!,
-                                                                      style: GoogleFonts.poppins(
-                                                                          color: getRideTypeColor(ride
-                                                                              .rideType),
-                                                                          fontSize:
-                                                                              8,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 6.w,
-                                                                  ),
-                                                                  Container(
-                                                                    padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                        horizontal:
-                                                                            5,
-                                                                        vertical:
-                                                                            3),
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: getStatusColor(ride
-                                                                              .status
-                                                                              .toLowerCase())
-                                                                          .withOpacity(
-                                                                              0.15),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              40),
-                                                                    ),
-                                                                    child: Text(
-                                                                      ride.status,
-                                                                      style: GoogleFonts.poppins(
-                                                                          color: getStatusColor(ride
-                                                                              .status
-                                                                              .toLowerCase()),
-                                                                          fontSize:
-                                                                              8,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                height: 8.h,
-                                                              ),
-                                                              Text(
-                                                                formatDate(ride
-                                                                    .createdAt),
-                                                                style:
-                                                                    GoogleFonts
-                                                                        .poppins(
-                                                                  fontSize: 12,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color:
-                                                                      textColor,
+                                                                SizedBox(
+                                                                  width: 6.w,
                                                                 ),
+                                                                Container(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          5,
+                                                                      vertical:
+                                                                          3),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: getStatusColor(ride
+                                                                            .status
+                                                                            .toLowerCase())
+                                                                        .withOpacity(
+                                                                            0.15),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            40),
+                                                                  ),
+                                                                  child: Text(
+                                                                    ride.status,
+                                                                    style: GoogleFonts.poppins(
+                                                                        color: getStatusColor(ride
+                                                                            .status
+                                                                            .toLowerCase()),
+                                                                        fontSize:
+                                                                            8,
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            SizedBox(
+                                                              height: 8.h,
+                                                            ),
+                                                            Text(
+                                                              formatDate(ride
+                                                                  .createdAt),
+                                                              style: GoogleFonts
+                                                                  .poppins(
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color:
+                                                                    textColor,
                                                               ),
-                                                            ],
-                                                          ),
+                                                            ),
+                                                          ],
                                                         ),
-                                                      ],
-                                                    ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                  // const Flexible(
-                                                  //   flex: 2,
-                                                  //   child: Icon(
-                                                  //     Icons.more_horiz,
-                                                  //   ),
-                                                  // ),
-                                                ],
-                                              ),
+                                                ),
+                                                // const Flexible(
+                                                //   flex: 2,
+                                                //   child: Icon(
+                                                //     Icons.more_horiz,
+                                                //   ),
+                                                // ),
+                                              ],
                                             ),
                                           ),
-                                          SizedBox(
-                                            height: 12.h,
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                }
-                              },
-                            ),
+                                        ),
+                                        SizedBox(
+                                          height: 12.h,
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                  // }
+                  //  FutureBuilder(
+                  //     future: _authController
+                  //         .fetchRecentRides(selectedChildId!),
+                  //     builder: (context, snapshot) {
+                  //       if (_authController.recentRides.isEmpty) {
+                  //         return Center(
+                  //           child: Column(
+                  //             mainAxisAlignment:
+                  //                 MainAxisAlignment.center,
+                  //             children: [
+                  //               Text(
+                  //                 'No Recent activities yet',
+                  //                 style: GoogleFonts.poppins(
+                  //                   fontSize: 14,
+                  //                 ),
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         );
+                  //       } else {
+                  //         return ListView.builder(
+                  //           padding: EdgeInsets.zero,
+                  //           shrinkWrap: true,
+                  //           itemCount:
+                  //               _authController.recentRides.length,
+                  //           itemBuilder: (context, index) {
+                  //             final ride =
+                  //                 _authController.recentRides[index];
+                  //             return Column(
+                  //               children: [
+                  //                 GestureDetector(
+                  //                   onTap: () {
+                  //                     Get.to(
+                  //                         const SingleRideInfoScreen(),
+                  //                         arguments: {
+                  //                           'rideId': ride.id
+                  //                         });
+                  //                   },
+                  //                   child: Container(
+                  //                     padding: EdgeInsets.symmetric(
+                  //                         horizontal: 10.w,
+                  //                         vertical: 5.h),
+                  //                     decoration: BoxDecoration(
+                  //                       borderRadius:
+                  //                           BorderRadius.circular(15),
+                  //                       color: page,
+                  //                       boxShadow: const [
+                  //                         BoxShadow(
+                  //                           color: Color.fromRGBO(
+                  //                               9, 39, 127, .15),
+                  //                           blurRadius: 30.0,
+                  //                           spreadRadius: -4.0,
+                  //                         ),
+                  //                       ],
+                  //                     ),
+                  //                     child: Row(
+                  //                       crossAxisAlignment:
+                  //                           CrossAxisAlignment.start,
+                  //                       mainAxisAlignment:
+                  //                           MainAxisAlignment
+                  //                               .spaceBetween,
+                  //                       children: [
+                  //                         Flexible(
+                  //                           flex: 9,
+                  //                           child: Row(
+                  //                             crossAxisAlignment:
+                  //                                 CrossAxisAlignment
+                  //                                     .center,
+                  //                             // main
+                  //                             children: [
+                  //                               Flexible(
+                  //                                 flex: 2,
+                  //                                 child: ClipOval(
+                  //                                   child: Image.asset(
+                  //                                     'assets/images/rides_img.jpg',
+                  //                                     width: 45,
+                  //                                     height: 45,
+                  //                                     fit: BoxFit
+                  //                                         .fitWidth,
+                  //                                   ),
+                  //                                 ),
+                  //                               ),
+                  //                               SizedBox(width: 15.w),
+                  //                               Flexible(
+                  //                                 flex: 8,
+                  //                                 child: Column(
+                  //                                   crossAxisAlignment:
+                  //                                       CrossAxisAlignment
+                  //                                           .start,
+                  //                                   mainAxisAlignment:
+                  //                                       MainAxisAlignment
+                  //                                           .center,
+                  //                                   children: [
+                  //                                     Text(
+                  //                                       '${ride.pickUpLocation} to ${ride.dropOffLocation}',
+                  //                                       maxLines: 1,
+                  //                                       overflow:
+                  //                                           TextOverflow
+                  //                                               .ellipsis,
+                  //                                       style:
+                  //                                           GoogleFonts
+                  //                                               .poppins(
+                  //                                         fontSize: 14,
+                  //                                         fontWeight:
+                  //                                             FontWeight
+                  //                                                 .bold,
+                  //                                         color:
+                  //                                             textColor,
+                  //                                       ),
+                  //                                     ),
+                  //                                     SizedBox(
+                  //                                       height: 8.h,
+                  //                                     ),
+                  //                                     Row(
+                  //                                       children: [
+                  //                                         Container(
+                  //                                           padding: const EdgeInsets
+                  //                                               .symmetric(
+                  //                                               horizontal:
+                  //                                                   5,
+                  //                                               vertical:
+                  //                                                   3),
+                  //                                           decoration:
+                  //                                               BoxDecoration(
+                  //                                             color: getRideTypeColor(ride
+                  //                                                     .rideType)
+                  //                                                 .withOpacity(
+                  //                                                     0.14),
+                  //                                             borderRadius:
+                  //                                                 BorderRadius.circular(
+                  //                                                     40),
+                  //                                           ),
+                  //                                           child: Text(
+                  //                                             ride.rideType
+                  //                                                 .capitalizeFirst!,
+                  //                                             style: GoogleFonts.poppins(
+                  //                                                 color: getRideTypeColor(ride
+                  //                                                     .rideType),
+                  //                                                 fontSize:
+                  //                                                     8,
+                  //                                                 fontWeight:
+                  //                                                     FontWeight.bold),
+                  //                                           ),
+                  //                                         ),
+                  //                                         SizedBox(
+                  //                                           width: 6.w,
+                  //                                         ),
+                  //                                         Container(
+                  //                                           padding: const EdgeInsets
+                  //                                               .symmetric(
+                  //                                               horizontal:
+                  //                                                   5,
+                  //                                               vertical:
+                  //                                                   3),
+                  //                                           decoration:
+                  //                                               BoxDecoration(
+                  //                                             color: getStatusColor(ride
+                  //                                                     .status
+                  //                                                     .toLowerCase())
+                  //                                                 .withOpacity(
+                  //                                                     0.15),
+                  //                                             borderRadius:
+                  //                                                 BorderRadius.circular(
+                  //                                                     40),
+                  //                                           ),
+                  //                                           child: Text(
+                  //                                             ride.status,
+                  //                                             style: GoogleFonts.poppins(
+                  //                                                 color: getStatusColor(ride
+                  //                                                     .status
+                  //                                                     .toLowerCase()),
+                  //                                                 fontSize:
+                  //                                                     8,
+                  //                                                 fontWeight:
+                  //                                                     FontWeight.bold),
+                  //                                           ),
+                  //                                         ),
+                  //                                       ],
+                  //                                     ),
+                  //                                     SizedBox(
+                  //                                       height: 8.h,
+                  //                                     ),
+                  //                                     Text(
+                  //                                       formatDate(ride
+                  //                                           .createdAt),
+                  //                                       style:
+                  //                                           GoogleFonts
+                  //                                               .poppins(
+                  //                                         fontSize: 12,
+                  //                                         fontWeight:
+                  //                                             FontWeight
+                  //                                                 .w500,
+                  //                                         color:
+                  //                                             textColor,
+                  //                                       ),
+                  //                                     ),
+                  //                                   ],
+                  //                                 ),
+                  //                               ),
+                  //                             ],
+                  //                           ),
+                  //                         ),
+                  //                         // const Flexible(
+                  //                         //   flex: 2,
+                  //                         //   child: Icon(
+                  //                         //     Icons.more_horiz,
+                  //                         //   ),
+                  //                         // ),
+                  //                       ],
+                  //                     ),
+                  //                   ),
+                  //                 ),
+                  //                 SizedBox(
+                  //                   height: 12.h,
+                  //                 ),
+                  //               ],
+                  //             );
+                  //           },
+                  //         );
+                  //       }
+                  //     },
+                  //   ),
                 ],
               ),
             ),
@@ -651,7 +863,7 @@ class _HomePageState extends State<HomePage> {
                                                           ),
                                                         ],
                                                       ),
-                                                      onTap: () {
+                                                      onTap: () async {
                                                         setState(() {
                                                           // idSelected = true;
                                                           selectedChildId =
@@ -663,10 +875,18 @@ class _HomePageState extends State<HomePage> {
                                                                   .children[idx]
                                                                   .fullname;
                                                         });
+                                                        await _authController
+                                                            .fetchRecentRides(
+                                                                _authController
+                                                                    .children[
+                                                                        idx]
+                                                                    .id);
 
                                                         // _genderController.text =
                                                         //     childrenList[idx];
-
+                                                        childrenList =
+                                                            _authController
+                                                                .recentRides;
                                                         Navigator.pop(
                                                           context,
                                                         );

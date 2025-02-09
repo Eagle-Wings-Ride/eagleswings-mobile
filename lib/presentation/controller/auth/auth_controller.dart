@@ -1,4 +1,5 @@
 import 'package:eaglerides/domain/usecases/add_child_usecase.dart';
+import 'package:eaglerides/domain/usecases/book_ride_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_check_user_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_is_signed_in_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_otp_verification_usecase.dart';
@@ -37,6 +38,7 @@ class AuthController extends GetxController {
   final AddChildUseCase addChildUseCase;
   final FetchChildrenUseCase fetchChildrenUseCase;
   final FetchRecentRidesUseCase fetchRecentRidesUseCase;
+  final BookRideUseCase bookRideUseCase;
 
   var user = Rx<UserModel?>(null);
   RxList<Child> children = <Child>[].obs;
@@ -50,19 +52,20 @@ class AuthController extends GetxController {
   //   // loadUser(); // Load user data when the controller is initialized
   // }
 
-  AuthController({
-    required this.eagleRidesAuthIsSignInUseCase,
-    required this.eagleRidesLoginUserUseCase,
-    required this.eagleRidesAuthCheckUserUseCase,
-    required this.eagleRidesRegisterUseCase,
-    required this.eagleRidesAuthOtpVerificationUseCase,
-    required this.eagleRidesAuthSignOutUseCase,
-    required this.getUserUsecase,
-    required this.addChildUseCase,
-    required this.fetchChildrenUseCase,
-    required this.fetchRecentRidesUseCase,
-    // required this.eagleRidesAuthGetUserUidUseCase,
-  });
+  AuthController(
+      {required this.eagleRidesAuthIsSignInUseCase,
+      required this.eagleRidesLoginUserUseCase,
+      required this.eagleRidesAuthCheckUserUseCase,
+      required this.eagleRidesRegisterUseCase,
+      required this.eagleRidesAuthOtpVerificationUseCase,
+      required this.eagleRidesAuthSignOutUseCase,
+      required this.getUserUsecase,
+      required this.addChildUseCase,
+      required this.fetchChildrenUseCase,
+      required this.fetchRecentRidesUseCase,
+      required this.bookRideUseCase
+      // required this.eagleRidesAuthGetUserUidUseCase,
+      });
 
   Future<String?> getToken() async {
     final box = await Hive.openBox('authBox');
@@ -440,42 +443,18 @@ class AuthController extends GetxController {
           dismissOnTap: false,
         );
 
-        // var lastSyncTimestamp = rideBox.get('lastSyncTimestamp',
-        //     defaultValue: DateTime.now()
-        //         .subtract(const Duration(days: 1))
-        //         .millisecondsSinceEpoch);
-
-        // bool shouldFetchFromApi =
-        //     DateTime.now().millisecondsSinceEpoch - lastSyncTimestamp >
-        //         const Duration(hours: 1).inMilliseconds;
-
         List<Booking> recentBookings = [];
-
-        // if (shouldFetchFromApi) {
-        //   var fetchedRides = await fetchRecentRidesUseCase.call(childId);
-        //   recentBookings = fetchedRides
-        //       .map((rideJson) => Booking.fromJson(rideJson))
-        //       .toList();
-
-        //   recentBookings =
-        //       recentBookings.where((ride) => ride.status != 'ongoing').toList();
-        //   recentBookings.sort((a, b) => b.startDate.compareTo(a.startDate));
-
-        //   await rideBox.put('recentRides', recentBookings);
-        //   await rideBox.put(
-        //       'lastSyncTimestamp', DateTime.now().millisecondsSinceEpoch);
-        // } else {
-        //   recentBookings = rideBox.get('recentRides', defaultValue: []);
-        // }
 
         var fetchedRides = await fetchRecentRidesUseCase.call(childId);
         print('fetchedRides');
         print(fetchedRides);
-        recentBookings =
-            fetchedRides.map((rideJson) => Booking.fromJson(rideJson)).toList();
+        recentBookings = fetchedRides
+            .map((rideJson) => Booking.fromJson(rideJson))
+            .where((ride) => ride.status != 'ongoing')
+            .toList();
 
-        recentBookings =
-            recentBookings.where((ride) => ride.status != 'ongoing').toList();
+        // recentBookings =
+        //     recentBookings.where((ride) => ride.status != 'ongoing').toList();
         recentBookings.sort((a, b) => b.startDate.compareTo(a.startDate));
         recentRides.assignAll(recentBookings);
       } catch (e) {
@@ -492,6 +471,43 @@ class AuthController extends GetxController {
       }
     } else {
       Get.offAll(const Login());
+    }
+  }
+
+  bookRide(Map<String, dynamic> requestBody, String childId, context) async {
+    print('requestBody');
+    print(requestBody);
+    print(childId);
+    try {
+      EasyLoading.show(
+        indicator: const CustomLoader(),
+        maskType: EasyLoadingMaskType.black,
+        dismissOnTap: false,
+      );
+      final response = await bookRideUseCase.call(requestBody, childId);
+      debugPrint(response);
+      showTopSnackBar(
+        Overlay.of(context),
+        const CustomSnackBar.success(
+          message: 'Booking Successful',
+        ),
+      );
+      EasyLoading.dismiss();
+      // Get.to(
+      //   VerifyEmail(
+      //     email: requestBody['email'],
+      //   ),
+      // );
+    } catch (e) {
+      print(e);
+      EasyLoading.dismiss();
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: e.toString(),
+        ),
+      );
+      // Get.snackbar('Registration Failed', e.toString());
     }
   }
 }
