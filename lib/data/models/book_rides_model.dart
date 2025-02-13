@@ -14,8 +14,10 @@ class Booking {
   final String? cancellationReason;
   final String? cancellationDate;
   final String createdAt;
-  final double latitude;
-  final double longitude;
+  final double startLatitude;
+  final double startLongitude;
+  final double endLatitude;
+  final double endLongitude;
 
   Booking({
     required this.id,
@@ -33,8 +35,10 @@ class Booking {
     this.cancellationReason,
     this.cancellationDate,
     required this.createdAt,
-    required this.latitude,
-    required this.longitude,
+    required this.startLatitude,
+    required this.startLongitude,
+    required this.endLatitude,
+    required this.endLongitude,
   });
 
   factory Booking.fromJson(Map<String, dynamic> json) {
@@ -42,7 +46,7 @@ class Booking {
       id: json['_id'] ?? 'Unknown',
       pickUpLocation: json['pick_up_location'] ?? 'Not provided',
       dropOffLocation: json['drop_off_location'] ?? 'Not provided',
-      rideType: json['ride_type'] ?? 'Standard',
+      rideType: json['ride_type'] ?? 'Freelance',
       tripType: json['trip_type'] ?? 'One-way',
       schedule: json['schedule'] ?? 'No schedule provided',
       startDate: json['start_date'] ?? 'Unknown',
@@ -54,8 +58,10 @@ class Booking {
       cancellationReason: json['cancellationReason'] ?? null, // Handle null explicitly
       cancellationDate: json['cancellationDate'] ?? null, // Handle null explicitly
       createdAt: json['createdAt'] ?? 'Unknown',
-      latitude: json['latitude'] != null ? double.tryParse(json['latitude'].toString()) ?? 0.0 : 0.0,
-      longitude: json['longitude'] != null ? double.tryParse(json['longitude'].toString()) ?? 0.0 : 0.0,
+      startLatitude: json['start_latitude'] != null ? double.tryParse(json['start_latitude'].toString()) ?? 0.0 : 0.0,
+      startLongitude: json['start_longitude'] != null ? double.tryParse(json['start_longitude'].toString()) ?? 0.0 : 0.0,
+      endLatitude: json['end_latitude'] != null ? double.tryParse(json['end_latitude'].toString()) ?? 0.0 : 0.0,
+      endLongitude: json['end_longitude'] != null ? double.tryParse(json['end_longitude'].toString()) ?? 0.0 : 0.0,
     );
   }
 }
