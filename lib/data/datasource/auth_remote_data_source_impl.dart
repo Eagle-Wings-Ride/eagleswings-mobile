@@ -212,40 +212,45 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
   }
 
   @override
+  Future<Map<String, dynamic>> fetchRates() async {
+    const uri = '/rates';
+    try {
+      // Making the GET request
+      final response = await _client.get(uri);
+
+      // Check if the response is null or invalid
+      if (response == null) {
+        throw Exception('Failed to get a valid response from the server.');
+      }
+
+      print('Response:');
+      print(response); // Print the response body to see its contents
+      return response as Map<String, dynamic>;
+    } catch (e) {
+      // Catch any errors such as network issues, JSON decoding errors, etc.
+      print('Exception caught: $e');
+      rethrow;
+    }
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> fetchChildren(String userId) async {
     const baseUri = '/users/children';
     final uri = '$baseUri/$userId';
 
     try {
       print('Fetching children for userId: $userId');
-      final response = await _client.get(uri);
 
-      // if (response.statusCode == 200) {
-      //   // Parse the response body and return a list of children
-      //   return List<Map<String, dynamic>>.from(response.body);
-      //   // return List<Child>.from(
-      //   //     json.decode(response.body).map((x) => Child.fromJson(x)));
-      // } else if (response.statusCode == 404) {
-      //   // Return an empty list if no children found (404)
-      //   return [];
-      // } else {
-      //   throw Exception('Failed to fetch children: ${response.body}');
-      // }
-      // Handle 404 error when no children are found
-      if (response.statusCode == 404) {
-        return []; // Return an empty list if no children found
-      }
+      // Ensure we are calling a function that returns decoded JSON, not Response
+      final data = await _client.get(uri);
 
-      if (response.statusCode == 200) {
-        // Parse the response body to a list of maps
-        List<dynamic> data = json.decode(response.body);
-        // print('data');
-        // print(data);
-        // print('data two');
-        // print(List<Map<String, dynamic>>.from(data));
+      print('Fetched data: $data');
+
+      if (data is List) {
         return List<Map<String, dynamic>>.from(data);
       } else {
-        throw Exception('Failed to fetch children: ${response.statusCode}');
+        throw Exception(
+            'Unexpected response format: Expected List, got ${data.runtimeType}');
       }
     } catch (e) {
       print('Error fetching children: $e');

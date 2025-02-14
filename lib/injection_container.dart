@@ -38,6 +38,7 @@ import 'data/datasource/user_current_location_data_source.dart';
 import 'data/datasource/user_current_location_data_source_impl.dart';
 import 'data/repositories/user_current_location_repository_impl.dart';
 import 'domain/repositories/user_current_location_repository.dart';
+import 'domain/usecases/fetch_rates_usecase.dart';
 import 'domain/usecases/get_user_current_location_usecase.dart';
 // import 'package:http/http.dart' as http;
 import 'presentation/controller/auth/auth_controller.dart';
@@ -110,7 +111,8 @@ Future<void> init() async {
         addChildUseCase: sl.call(),
         fetchChildrenUseCase: sl.call(),
         fetchRecentRidesUseCase: sl.call(),
-        bookRideUseCase: sl.call()
+        bookRideUseCase: sl.call(),
+        fetchRatesUsecase: sl.call()
         // eagleRidesAuthGetUserUidUseCase: sl.call(),
         // uberAuthCheckUserStatusUseCase: sl.call(),
         // uberAuthGetUserUidUseCase: sl.call(),
@@ -172,6 +174,11 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<BookRideUseCase>(
     () => BookRideUseCase(
+      eagleRidesAuthRepository: sl.call(),
+    ),
+  );
+  sl.registerLazySingleton<FetchRatesUsecase>(
+    () => FetchRatesUsecase(
       eagleRidesAuthRepository: sl.call(),
     ),
   );

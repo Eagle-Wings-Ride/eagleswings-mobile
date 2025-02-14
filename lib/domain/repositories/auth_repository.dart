@@ -18,6 +18,7 @@ abstract class EagleRidesAuthRepository {
   Future<String> register(Map<String, dynamic> requestBody);
 
   Future<Map<String, dynamic>> getUser();
+  Future<Map<String, dynamic>> fetchRates();
 
   Future<String> addChild(Map<String, dynamic> requestBody);
   Future<List<dynamic>> fetchChildren(String userId);

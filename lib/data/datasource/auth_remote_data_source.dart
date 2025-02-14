@@ -21,5 +21,6 @@ abstract class EagleRidesAuthDataSource {
   Future<List<Map<String, dynamic>>> fetchRecentRides(String childId);
   Future<String> addChild(Map<String, dynamic> requestBody);
   Future<List<dynamic>> fetchChildren(String userId);
+  Future<Map<String, dynamic>> fetchRates();
   Future<String> bookRide(Map<String, dynamic> requestBody, String childId);
 }

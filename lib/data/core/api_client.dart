@@ -59,22 +59,29 @@ class ApiClient {
 
       // Check if the response body is empty or not
       if (response.statusCode == 404) {
-        print('Empty response body');
         return json.decode(response.body);
       }
 
       if (response.statusCode == 200) {
         // Log and return the decoded body
         print('Decoding response body');
-        // print(json.decode(response.body));
+        print(json.decode(response.body));
         return json.decode(response.body);
-      } else if (response.statusCode == 401) {
-        // await box.delete('auth_token');
-        // await box.clear();
+      } else if (response.statusCode == 401 ||
+          jsonDecode(response.body)['message']
+              .contains('Invalid or expired token')) {
+        await box.delete('auth_token');
+        await box.clear();
+        // print('response.body');
+        // print(response.statusCode);
+        // final decodedBody = jsonDecode(response.body);
+
+        // print(decodedBody['message']);
         // Log the response before redirecting
         print('Unauthorized access, redirecting to login');
         Get.offAll(const Login());
-        throw 'Unauthorized';
+        throw 'Unauthorized access, redirecting to login';
+        // return;
       } else {
         print('Error response: ${response.reasonPhrase}');
         throw Exception(

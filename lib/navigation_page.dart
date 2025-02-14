@@ -40,7 +40,8 @@ class _NavigationPageState extends State<NavigationPage> {
     try {
       // Ensure that the token is set before any navigation or further actions
       await _authController.loadUser();
-      _authController.fetchChildren();
+      await _authController.fetchChildren();
+      await _authController.fetchRatesData();
 
       // Get the latest token (in case the AuthController modifies or fetches it)
       // Get the token from the AuthController (await it since getToken() is asynchronous)

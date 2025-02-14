@@ -66,6 +66,11 @@ class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
   }
 
   @override
+  Future<Map<String, dynamic>> fetchRates() async {
+    return await eagleRidesAuthDataSource.fetchRates();
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> fetchRecentRides(String childId) async {
     return await eagleRidesAuthDataSource.fetchRecentRides(childId);
   }

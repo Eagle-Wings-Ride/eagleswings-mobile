@@ -5,6 +5,7 @@ import 'package:eaglerides/domain/usecases/eagle_rides_auth_is_signed_in_usecase
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_otp_verification_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_sign_out_usecase.dart';
 import 'package:eaglerides/domain/usecases/fetch_children_usecase.dart';
+import 'package:eaglerides/domain/usecases/fetch_rates_usecase.dart';
 import 'package:eaglerides/domain/usecases/fetch_recent_rides_usecase.dart';
 import 'package:eaglerides/domain/usecases/getUserUseCase.dart';
 import 'package:eaglerides/domain/usecases/register.dart';
@@ -39,6 +40,7 @@ class AuthController extends GetxController {
   final FetchChildrenUseCase fetchChildrenUseCase;
   final FetchRecentRidesUseCase fetchRecentRidesUseCase;
   final BookRideUseCase bookRideUseCase;
+  final FetchRatesUsecase fetchRatesUsecase;
 
   var user = Rx<UserModel?>(null);
   RxList<Child> children = <Child>[].obs;
@@ -46,26 +48,30 @@ class AuthController extends GetxController {
 
   var isSignIn = false.obs;
 
+   var rates = Rxn<Map<String, dynamic>>(); // Use Rxn (nullable observable)
+  final String hiveBoxName = 'pricingBox';
+
   // @override
   // void onInit() {
   //   super.onInit();
   //   // loadUser(); // Load user data when the controller is initialized
   // }
 
-  AuthController(
-      {required this.eagleRidesAuthIsSignInUseCase,
-      required this.eagleRidesLoginUserUseCase,
-      required this.eagleRidesAuthCheckUserUseCase,
-      required this.eagleRidesRegisterUseCase,
-      required this.eagleRidesAuthOtpVerificationUseCase,
-      required this.eagleRidesAuthSignOutUseCase,
-      required this.getUserUsecase,
-      required this.addChildUseCase,
-      required this.fetchChildrenUseCase,
-      required this.fetchRecentRidesUseCase,
-      required this.bookRideUseCase
-      // required this.eagleRidesAuthGetUserUidUseCase,
-      });
+  AuthController({
+    required this.eagleRidesAuthIsSignInUseCase,
+    required this.eagleRidesLoginUserUseCase,
+    required this.eagleRidesAuthCheckUserUseCase,
+    required this.eagleRidesRegisterUseCase,
+    required this.eagleRidesAuthOtpVerificationUseCase,
+    required this.eagleRidesAuthSignOutUseCase,
+    required this.getUserUsecase,
+    required this.addChildUseCase,
+    required this.fetchChildrenUseCase,
+    required this.fetchRecentRidesUseCase,
+    required this.bookRideUseCase,
+    required this.fetchRatesUsecase,
+    // required this.eagleRidesAuthGetUserUidUseCase,
+  });
 
   Future<String?> getToken() async {
     final box = await Hive.openBox('authBox');
@@ -352,6 +358,128 @@ class AuthController extends GetxController {
       );
     }
   }
+
+  Future<void> fetchRatesData() async {
+    try {
+      final newRates = await fetchRatesUsecase.call();
+      rates.value = newRates; // Update observable
+      saveRatesToHive(newRates); // Save to Hive
+    } catch (e) {
+      print('Error fetching rates: $e');
+    }
+  }
+
+  void saveRatesToHive(Map<String, dynamic> newRates) async {
+    var box = await Hive.openBox('ratesBox');
+    box.put('rates', newRates);
+    box.put('createdAt', newRates['createdAt']);
+  }
+
+  void loadRatesFromHive() async {
+    var box = await Hive.openBox('ratesBox');
+    final storedRates = box.get('rates');
+    final storedCreatedAt = box.get('createdAt');
+
+    if (storedRates != null && storedCreatedAt != null) {
+      rates.value = storedRates; // Use existing stored data
+    } else {
+      await fetchRatesData(); // Fetch new data if not found
+    }
+  }
+
+  // Future<void> fetchRatesData() async {
+  //   var box = await Hive.openBox(hiveBoxName);
+
+  //   // ✅ 1️⃣ Check if rates exist in Hive
+  //   var storedRates = box.get('rates');
+
+  //   if (storedRates != null) {
+  //     // ✅ 2️⃣ Compare stored `createdAt` timestamp
+  //     Map<String, dynamic> storedData = Map<String, dynamic>.from(storedRates);
+  //     DateTime storedCreatedAt = DateTime.parse(storedData['createdAt']);
+
+  //     print('Stored createdAt: $storedCreatedAt');
+
+  //     // Fetch fresh rates from API
+  //     try {
+  //       final fetchedData = await fetchRatesUsecase.call();
+
+  //       DateTime fetchedCreatedAt = DateTime.parse(fetchedData['createdAt']);
+
+  //       print('Fetched createdAt: $fetchedCreatedAt');
+
+  //       if (storedCreatedAt == fetchedCreatedAt) {
+  //         print('✅ Using stored rates');
+  //         rates.value = storedData;
+  //         return;
+  //       }
+  //     } catch (e) {
+  //       print('Failed to fetch new rates, using stored data.');
+  //       rates.value = storedData;
+  //       return;
+  //     }
+  //   }
+
+  //   // ✅ 3️⃣ Fetch from API if no valid stored data
+  //   try {
+  //     final fetchedData = await fetchRatesUsecase.call();
+
+  //     print('✅ New rates fetched: $fetchedData');
+
+  //     // ✅ 4️⃣ Store in Hive
+  //     await box.put('rates', fetchedData);
+
+  //     // ✅ 5️⃣ Update state
+  //     rates.value = fetchedData;
+  //   } catch (e) {
+  //     print('Error fetching rates: $e');
+  //     throw Exception('Error fetching rates');
+  //   }
+  // }
+
+  // fetchRates(context) async {
+  //   var ratesBox = await Hive.openBox('ratesBox');
+  //   var ratesInfo = ratesBox.get('rates');
+  //   if (ratesInfo != null) {
+  //     // Ensure ratesInfo is a list of maps (dynamic type issue)
+  //     if (ratesInfo is List) {
+  //       // Map the ratesInfo to List<Child>
+  //       List<Child> childrenList = ratesInfo
+  //           .map<Child>((childJson) =>
+  //               Child.fromJson(Map<String, dynamic>.from(childJson)))
+  //           .toList();
+  //       // print(childrenList);
+
+  //       // Update the reactive list with the deserialized data
+  //       children.assignAll(childrenList);
+  //       update();
+  //     } else {
+  //       // Handle unexpected structure of the childrenInfo
+  //       print('Error: The stored children data is not in the expected format.');
+  //     }
+  //   }
+  //   try {
+  //     EasyLoading.show(
+  //       indicator: const CustomLoader(),
+  //       maskType: EasyLoadingMaskType.black,
+  //       dismissOnTap: false,
+  //     );
+  //     final userInfo = await fetchRatesUsecase.call();
+  //     print(userInfo);
+  //     UserModel userModel = UserModel.fromJson(userInfo);
+  //     setUser(userModel);
+  //     EasyLoading.dismiss();
+  //   } catch (e) {
+  //     EasyLoading.dismiss();
+  //     print(e);
+  //     showTopSnackBar(
+  //       Overlay.of(context),
+  //       CustomSnackBar.error(
+  //         message: e.toString(),
+  //       ),
+  //     );
+  //   }
+  // }
 
   Future<void> fetchChildren() async {
     var box = await Hive.openBox('authBox');
