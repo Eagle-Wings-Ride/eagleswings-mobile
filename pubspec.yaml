@@ -83,7 +83,7 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/audio/
+    # - assets/audio/
     - assets/map_style.json
     - assets/maps_style.json
     - assets/map_style_black.json
