@@ -33,7 +33,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
   final GlobalKey _textFieldKey = GlobalKey();
   double _textFieldOffset = 0; // Position of the TextField
   final registerChildFormKey = GlobalKey<FormState>();
-  bool _isLoading = true;
+  // bool _isLoading = true;
   List<String> genderList = ['Male', 'Female', 'Other'];
   bool idSelected = false;
   bool terms = false;

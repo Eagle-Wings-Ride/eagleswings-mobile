@@ -42,7 +42,7 @@ class _RegisterState extends State<Register> {
   bool obscureText = true;
 
   bool terms = false; //terms and conditions true or false
-  bool _isLoading = true;
+  // bool _isLoading = true;
 
   @override
   void initState() {
