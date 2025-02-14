@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    platform = Theme.of(context).platform;
+    // platform = Theme.of(context).platform;
     setUpScreenUtils(context);
     setStatusBar();
     return GestureDetector(

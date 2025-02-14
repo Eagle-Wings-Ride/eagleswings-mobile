@@ -127,18 +127,18 @@ class _LoadingPageState extends State<LoadingPage> {
             ),
 
             //no internet
-            (internet == false)
-                ? Positioned(
-                    top: 0,
-                    child: NoInternet(
-                      onTap: () {
-                        setState(() {
-                          internetTrue();
-                          // getLanguageDone();
-                        });
-                      },
-                    ))
-                : Container(),
+            // (internet == false)
+            //     ? Positioned(
+            //         top: 0,
+            //         child: NoInternet(
+            //           onTap: () {
+            //             setState(() {
+            //               internetTrue();
+            //               // getLanguageDone();
+            //             });
+            //           },
+            //         ))
+            //     : Container(),
           ],
         ),
       ),

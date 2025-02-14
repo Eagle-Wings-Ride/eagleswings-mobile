@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:eaglerides/presentation/screens/auth/set_password.dart';
-import 'package:eaglerides/presentation/screens/auth/verify_email.dart';
 import 'package:eaglerides/styles/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,7 +10,6 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../../config/map_api_key.dart';
-import '../../../functions/function.dart';
 import '../../../widgets/widgets.dart';
 import '../../../pages/loadingPage/loading.dart';
 import '../../../pages/noInternet/no_internet.dart';
@@ -49,22 +46,10 @@ class _RegisterState extends State<Register> {
 
   @override
   void initState() {
-    countryCode();
+
     super.initState();
   }
 
-  countryCode() async {
-    var result = await getCountryCode();
-    if (result == 'success') {
-      setState(() {
-        _isLoading = false;
-      });
-    } else {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   void dispose() {
@@ -643,17 +628,17 @@ class _RegisterState extends State<Register> {
                 ),
               ),
             //No internet
-            (internet == false)
-                ? Positioned(
-                    top: 0,
-                    child: NoInternet(onTap: () {
-                      setState(() {
-                        _isLoading = true;
-                        internet = true;
-                        countryCode();
-                      });
-                    }))
-                : Container(),
+            // (internet == false)
+            //     ? Positioned(
+            //         top: 0,
+            //         child: NoInternet(onTap: () {
+            //           setState(() {
+            //             _isLoading = true;
+            //             internet = true;
+                       
+            //           });
+            //         }))
+                // : Container(),
             (_isLoading == true)
                 ? const Positioned(top: 0, child: Loading())
                 : Container()

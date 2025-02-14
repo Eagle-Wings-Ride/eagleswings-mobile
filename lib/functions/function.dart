@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'dart:io';
 import 'dart:math';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -11,9 +11,9 @@ import 'package:http/http.dart' as http;
 // import 'package:firebase_database/firebase_database.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mqtt_client/mqtt_client.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:mqtt_client/mqtt_server_client.dart';
+// import 'package:mqtt_client/mqtt_client.dart';
+// import 'package:url_launcher/url_launcher.dart';
+// import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -84,7 +84,7 @@ getCurrentLocation() {
     print('loc');
     print(loc);
 
-    currentLocation = LatLng(loc.latitude, loc.longitude);
+    // currentLocation = LatLng(loc.latitude, loc.longitude);
   });
 }
 
@@ -118,102 +118,102 @@ var choosenLanguage = '';
 var languageDirection = '';
 bool hasSeenOnboarding = false;
 
-List languagesCode = [
-  {'name': 'Amharic', 'code': 'am'},
-  {'name': 'Arabic', 'code': 'ar'},
-  {'name': 'Basque', 'code': 'eu'},
-  {'name': 'Bengali', 'code': 'bn'},
-  {'name': 'English (UK)', 'code': 'en-GB'},
-  {'name': 'Portuguese (Brazil)', 'code': 'pt-BR'},
-  {'name': 'Bulgarian', 'code': 'bg'},
-  {'name': 'Catalan', 'code': 'ca'},
-  {'name': 'Cherokee', 'code': 'chr'},
-  {'name': 'Croatian', 'code': 'hr'},
-  {'name': 'Czech', 'code': 'cs'},
-  {'name': 'Danish', 'code': 'da'},
-  {'name': 'Dutch', 'code': 'nl'},
-  {'name': 'English (US)', 'code': 'en'},
-  {'name': 'Estonian', 'code': 'et'},
-  {'name': 'Filipino', 'code': 'fil'},
-  {'name': 'Finnish', 'code': 'fi'},
-  {'name': 'French', 'code': 'fr'},
-  {'name': 'German', 'code': 'de'},
-  {'name': 'Greek', 'code': 'el'},
-  {'name': 'Gujarati', 'code': 'gu'},
-  {'name': 'Hebrew', 'code': 'iw'},
-  {'name': 'Hindi', 'code': 'hi'},
-  {'name': 'Hungarian', 'code': 'hu'},
-  {'name': 'Icelandic', 'code': 'is'},
-  {'name': 'Indonesian', 'code': 'id'},
-  {'name': 'Italian', 'code': 'it'},
-  {'name': 'Japanese', 'code': 'ja'},
-  {'name': 'Kannada', 'code': 'kn'},
-  {'name': 'Korean', 'code': 'ko'},
-  {'name': 'Latvian', 'code': 'lv'},
-  {'name': 'Lithuanian', 'code': 'lt'},
-  {'name': 'Malay', 'code': 'ms'},
-  {'name': 'Malayalam', 'code': 'ml'},
-  {'name': 'Marathi', 'code': 'mr'},
-  {'name': 'Norwegian', 'code': 'no'},
-  {'name': 'Polish', 'code': 'pl'},
-  {
-    'name': 'Portuguese (Portugal)',
-    'code': 'pt' //pt-PT
-  },
-  {'name': 'Romanian', 'code': 'ro'},
-  {'name': 'Russian', 'code': 'ru'},
-  {'name': 'Serbian', 'code': 'sr'},
-  {
-    'name': 'Chinese (PRC)',
-    'code': 'zh' //zh-CN
-  },
-  {'name': 'Slovak', 'code': 'sk'},
-  {'name': 'Slovenian', 'code': 'sl'},
-  {'name': 'Spanish', 'code': 'es'},
-  {'name': 'Swahili', 'code': 'sw'},
-  {'name': 'Swedish', 'code': 'sv'},
-  {'name': 'Tamil', 'code': 'ta'},
-  {'name': 'Telugu', 'code': 'te'},
-  {'name': 'Thai', 'code': 'th'},
-  {'name': 'Chinese (Taiwan)', 'code': 'zh-TW'},
-  {'name': 'Turkish', 'code': 'tr'},
-  {'name': 'Urdu', 'code': 'ur'},
-  {'name': 'Ukrainian', 'code': 'uk'},
-  {'name': 'Vietnamese', 'code': 'vi'},
-  {'name': 'Welsh', 'code': 'cy'},
-];
+// List languagesCode = [
+//   {'name': 'Amharic', 'code': 'am'},
+//   {'name': 'Arabic', 'code': 'ar'},
+//   {'name': 'Basque', 'code': 'eu'},
+//   {'name': 'Bengali', 'code': 'bn'},
+//   {'name': 'English (UK)', 'code': 'en-GB'},
+//   {'name': 'Portuguese (Brazil)', 'code': 'pt-BR'},
+//   {'name': 'Bulgarian', 'code': 'bg'},
+//   {'name': 'Catalan', 'code': 'ca'},
+//   {'name': 'Cherokee', 'code': 'chr'},
+//   {'name': 'Croatian', 'code': 'hr'},
+//   {'name': 'Czech', 'code': 'cs'},
+//   {'name': 'Danish', 'code': 'da'},
+//   {'name': 'Dutch', 'code': 'nl'},
+//   {'name': 'English (US)', 'code': 'en'},
+//   {'name': 'Estonian', 'code': 'et'},
+//   {'name': 'Filipino', 'code': 'fil'},
+//   {'name': 'Finnish', 'code': 'fi'},
+//   {'name': 'French', 'code': 'fr'},
+//   {'name': 'German', 'code': 'de'},
+//   {'name': 'Greek', 'code': 'el'},
+//   {'name': 'Gujarati', 'code': 'gu'},
+//   {'name': 'Hebrew', 'code': 'iw'},
+//   {'name': 'Hindi', 'code': 'hi'},
+//   {'name': 'Hungarian', 'code': 'hu'},
+//   {'name': 'Icelandic', 'code': 'is'},
+//   {'name': 'Indonesian', 'code': 'id'},
+//   {'name': 'Italian', 'code': 'it'},
+//   {'name': 'Japanese', 'code': 'ja'},
+//   {'name': 'Kannada', 'code': 'kn'},
+//   {'name': 'Korean', 'code': 'ko'},
+//   {'name': 'Latvian', 'code': 'lv'},
+//   {'name': 'Lithuanian', 'code': 'lt'},
+//   {'name': 'Malay', 'code': 'ms'},
+//   {'name': 'Malayalam', 'code': 'ml'},
+//   {'name': 'Marathi', 'code': 'mr'},
+//   {'name': 'Norwegian', 'code': 'no'},
+//   {'name': 'Polish', 'code': 'pl'},
+//   {
+//     'name': 'Portuguese (Portugal)',
+//     'code': 'pt' //pt-PT
+//   },
+//   {'name': 'Romanian', 'code': 'ro'},
+//   {'name': 'Russian', 'code': 'ru'},
+//   {'name': 'Serbian', 'code': 'sr'},
+//   {
+//     'name': 'Chinese (PRC)',
+//     'code': 'zh' //zh-CN
+//   },
+//   {'name': 'Slovak', 'code': 'sk'},
+//   {'name': 'Slovenian', 'code': 'sl'},
+//   {'name': 'Spanish', 'code': 'es'},
+//   {'name': 'Swahili', 'code': 'sw'},
+//   {'name': 'Swedish', 'code': 'sv'},
+//   {'name': 'Tamil', 'code': 'ta'},
+//   {'name': 'Telugu', 'code': 'te'},
+//   {'name': 'Thai', 'code': 'th'},
+//   {'name': 'Chinese (Taiwan)', 'code': 'zh-TW'},
+//   {'name': 'Turkish', 'code': 'tr'},
+//   {'name': 'Urdu', 'code': 'ur'},
+//   {'name': 'Ukrainian', 'code': 'uk'},
+//   {'name': 'Vietnamese', 'code': 'vi'},
+//   {'name': 'Welsh', 'code': 'cy'},
+// ];
 
 //getting country code
 
-List countries = [];
-getCountryCode() async {
-  dynamic result;
-  try {
-    final response = await http.get(Uri.parse('${url}api/v1/countries'));
-    print(response);
-    if (response.statusCode == 200) {
-      countries = jsonDecode(response.body)['data'];
-      phcode = (countries
-              .where((element) =>
-                  element['code'] ==
-                  WidgetsBinding.instance!.window.locale.countryCode)
-              .isNotEmpty)
-          ? countries.indexWhere((element) =>
-              element['code'] ==
-              WidgetsBinding.instance!.window.locale.countryCode)
-          : 0;
-      result = 'success';
-    } else {
-      result = 'error';
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-      result = 'no internet';
-    }
-  }
-  return result;
-}
+// List countries = [];
+// getCountryCode() async {
+//   dynamic result;
+//   try {
+//     final response = await http.get(Uri.parse('${url}api/v1/countries'));
+//     print(response);
+//     if (response.statusCode == 200) {
+//       countries = jsonDecode(response.body)['data'];
+//       phcode = (countries
+//               .where((element) =>
+//                   element['code'] ==
+//                   WidgetsBinding.instance!.window.locale.countryCode)
+//               .isNotEmpty)
+//           ? countries.indexWhere((element) =>
+//               element['code'] ==
+//               WidgetsBinding.instance!.window.locale.countryCode)
+//           : 0;
+//       result = 'success';
+//     } else {
+//       result = 'error';
+//     }
+//   } catch (e) {
+//     if (e is SocketException) {
+//       internet = false;
+//       result = 'no internet';
+//     }
+//   }
+//   return result;
+// }
 
 //login firebase
 
@@ -252,52 +252,52 @@ dynamic credentials;
 
 //get local bearer token
 
-getLocalData() async {
-  dynamic result;
-  bearerToken.clear;
-  var connectivityResult = await (Connectivity().checkConnectivity());
-  if (connectivityResult == ConnectivityResult.none) {
-    internet = false;
-  } else {
-    internet = true;
-  }
-  try {
-    if (pref.containsKey('hasSeenOnboarding')) {
-      choosenLanguage = pref.getString('choosenLanguage');
-      hasSeenOnboarding = pref.getBool('hasSeenOnboarding') ?? false;
-      languageDirection = pref.getString('languageDirection');
-      if (hasSeenOnboarding) {
-        if (pref.containsKey('Bearer')) {
-          var tokens = pref.getString('Bearer');
-          if (tokens != null) {
-            bearerToken.add(BearerClass(type: 'Bearer', token: tokens));
+// getLocalData() async {
+//   dynamic result;
+//   bearerToken.clear;
+//   var connectivityResult = await (Connectivity().checkConnectivity());
+//   if (connectivityResult == ConnectivityResult.none) {
+//     internet = false;
+//   } else {
+//     internet = true;
+//   }
+//   try {
+//     if (pref.containsKey('hasSeenOnboarding')) {
+//       choosenLanguage = pref.getString('choosenLanguage');
+//       hasSeenOnboarding = pref.getBool('hasSeenOnboarding') ?? false;
+//       languageDirection = pref.getString('languageDirection');
+//       if (hasSeenOnboarding) {
+//         if (pref.containsKey('Bearer')) {
+//           var tokens = pref.getString('Bearer');
+//           if (tokens != null) {
+//             bearerToken.add(BearerClass(type: 'Bearer', token: tokens));
 
-            var responce = await getUserDetails();
-            if (responce == true) {
-              result = '3';
-            } else if (responce == false) {
-              result = '2';
-            }
-          } else {
-            result = '2';
-          }
-        } else {
-          result = '2';
-        }
-      } else {
-        result = '1';
-      }
-    } else {
-      result = '1';
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      result = 'no internet';
-      internet = false;
-    }
-  }
-  return result;
-}
+//             var responce = await getUserDetails();
+//             if (responce == true) {
+//               result = '3';
+//             } else if (responce == false) {
+//               result = '2';
+//             }
+//           } else {
+//             result = '2';
+//           }
+//         } else {
+//           result = '2';
+//         }
+//       } else {
+//         result = '1';
+//       }
+//     } else {
+//       result = '1';
+//     }
+//   } catch (e) {
+//     if (e is SocketException) {
+//       result = 'no internet';
+//       internet = false;
+//     }
+//   }
+//   return result;
+// }
 
 //register user
 
@@ -456,71 +456,71 @@ Map<String, dynamic> userDetails = {};
 List favAddress = [];
 
 //user current state
-getUserDetails() async {
-  dynamic result;
-  try {
-    var response = await http.get(
-      Uri.parse('${url}api/v1/user'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${bearerToken[0].token}'
-      },
-    );
-    if (response.statusCode == 200) {
-      userDetails =
-          Map<String, dynamic>.from(jsonDecode(response.body)['data']);
-      favAddress = userDetails['favouriteLocations']['data'];
-      sosData = userDetails['sos']['data'];
-      if (userDetails['onTripRequest'] != null) {
-        userRequestData = userDetails['onTripRequest']['data'];
-        if (userRequestData['accepted_at'] != null) {
-          getCurrentMessages();
-        }
-        if (client.connectionStatus == null) {
-          mqttForUser();
-        }
-        valueNotifierHome.incrementNotifier();
-        valueNotifierBook.incrementNotifier();
-      } else if (userDetails['metaRequest'] != null) {
-        userRequestData = userDetails['metaRequest']['data'];
-        addressList.add(
-          AddressList(
-              id: 'pickup',
-              address: userRequestData['pick_address'],
-              latlng: LatLng(
-                  userRequestData['pick_lat'], userRequestData['pick_lng'])),
-        );
-        addressList.add(
-          AddressList(
-              id: 'drop',
-              address: userRequestData['drop_address'],
-              latlng: LatLng(
-                  userRequestData['drop_lat'], userRequestData['drop_lng'])),
-        );
+// getUserDetails() async {
+//   dynamic result;
+//   try {
+//     var response = await http.get(
+//       Uri.parse('${url}api/v1/user'),
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': 'Bearer ${bearerToken[0].token}'
+//       },
+//     );
+//     if (response.statusCode == 200) {
+//       userDetails =
+//           Map<String, dynamic>.from(jsonDecode(response.body)['data']);
+//       favAddress = userDetails['favouriteLocations']['data'];
+//       sosData = userDetails['sos']['data'];
+//       if (userDetails['onTripRequest'] != null) {
+//         userRequestData = userDetails['onTripRequest']['data'];
+//         if (userRequestData['accepted_at'] != null) {
+//           getCurrentMessages();
+//         }
+//         if (client.connectionStatus == null) {
+//           mqttForUser();
+//         }
+//         valueNotifierHome.incrementNotifier();
+//         valueNotifierBook.incrementNotifier();
+//       } else if (userDetails['metaRequest'] != null) {
+//         userRequestData = userDetails['metaRequest']['data'];
+//         addressList.add(
+//           AddressList(
+//               id: 'pickup',
+//               address: userRequestData['pick_address'],
+//               latlng: LatLng(
+//                   userRequestData['pick_lat'], userRequestData['pick_lng'])),
+//         );
+//         addressList.add(
+//           AddressList(
+//               id: 'drop',
+//               address: userRequestData['drop_address'],
+//               latlng: LatLng(
+//                   userRequestData['drop_lat'], userRequestData['drop_lng'])),
+//         );
 
-        if (client.connectionStatus == null) {
-          mqttForUser();
-        }
-        valueNotifierBook.incrementNotifier();
-      } else {
-        userRequestData = {};
-      }
-      if (userDetails['active'] == false) {
-        isActive = 'false';
-      } else {
-        isActive = 'true';
-      }
-      result = true;
-    } else {
-      result = false;
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
-  }
-  return result;
-}
+//         if (client.connectionStatus == null) {
+//           mqttForUser();
+//         }
+//         valueNotifierBook.incrementNotifier();
+//       } else {
+//         userRequestData = {};
+//       }
+//       if (userDetails['active'] == false) {
+//         isActive = 'false';
+//       } else {
+//         isActive = 'true';
+//       }
+//       result = true;
+//     } else {
+//       result = false;
+//     }
+//   } catch (e) {
+//     if (e is SocketException) {
+//       internet = false;
+//     }
+//   }
+//   return result;
+// }
 
 class BearerClass {
   final String type;
@@ -535,72 +535,72 @@ class BearerClass {
 }
 
 Map<String, dynamic> driverReq = {};
-var client = MqttServerClient.withPort(mqttUrl, '', mqttPort);
+// var client = MqttServerClient.withPort(mqttUrl, '', mqttPort);
 
 //mqtt for documents approvals
-mqttForUser() async {
-  client.setProtocolV311();
-  client.logging(on: true);
-  client.keepAlivePeriod = 60000;
-  client.autoReconnect = true;
+// mqttForUser() async {
+//   client.setProtocolV311();
+//   client.logging(on: true);
+//   client.keepAlivePeriod = 60000;
+//   client.autoReconnect = true;
 
-  try {
-    await client.connect();
-  } on NoConnectionException catch (e) {
-    debugPrint(e.toString());
-    client.connect();
-  }
+//   try {
+//     await client.connect();
+//   } on NoConnectionException catch (e) {
+//     debugPrint(e.toString());
+//     client.connect();
+//   }
 
-  if (client.connectionStatus!.state == MqttConnectionState.connected) {
-    debugPrint('connected');
-  } else {
-    client.connect();
-  }
+//   if (client.connectionStatus!.state == MqttConnectionState.connected) {
+//     debugPrint('connected');
+//   } else {
+//     client.connect();
+//   }
 
-  void onconnected() {
-    debugPrint('connected');
-  }
+//   void onconnected() {
+//     debugPrint('connected');
+//   }
 
-  client.subscribe('trip_status_${userDetails['id']}', MqttQos.atLeastOnce);
-  client.subscribe('new_message_${userDetails['id']}', MqttQos.atLeastOnce);
+//   client.subscribe('trip_status_${userDetails['id']}', MqttQos.atLeastOnce);
+//   client.subscribe('new_message_${userDetails['id']}', MqttQos.atLeastOnce);
 
-  client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
-    final MqttPublishMessage recMess = c![0].payload as MqttPublishMessage;
+//   client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
+//     final MqttPublishMessage recMess = c![0].payload as MqttPublishMessage;
 
-    final pt =
-        MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+//     final pt =
+//         MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
 
-    if (c[0].topic == 'trip_status_${userDetails['id']}') {
-      if (jsonDecode(pt)["success_message"] == "no_driver_found") {
-        noDriverFound = true;
-        userRequestData = {};
-        audioPlayer.play(DeviceFileSource(audio));
-        valueNotifierBook.incrementNotifier();
-        client.disconnect();
-      } else if (jsonDecode(pt)['success_message'] ==
-          'request_cancelled_by_driver') {
-        requestCancelledByDriver = true;
-        audioPlayer.play(DeviceFileSource(audio));
-        userRequestData = {};
-        valueNotifierBook.incrementNotifier();
-        client.disconnect();
-      } else {
-        audioPlayer.play(DeviceFileSource(audio));
-        getUserDetails();
-      }
-    } else if (c[0].topic == 'new_message_${userDetails['id']}') {
-      if (jsonDecode(pt)["success_message"] == "new_message") {
-        chatList = jsonDecode(pt)['data'];
-        audioPlayer.play(DeviceFileSource(audio));
-        valueNotifierBook.incrementNotifier();
-      } else {
-        audioPlayer.play(DeviceFileSource(audio));
-      }
-    }
-  });
+//     if (c[0].topic == 'trip_status_${userDetails['id']}') {
+//       if (jsonDecode(pt)["success_message"] == "no_driver_found") {
+//         noDriverFound = true;
+//         userRequestData = {};
+//         audioPlayer.play(DeviceFileSource(audio));
+//         valueNotifierBook.incrementNotifier();
+//         client.disconnect();
+//       } else if (jsonDecode(pt)['success_message'] ==
+//           'request_cancelled_by_driver') {
+//         requestCancelledByDriver = true;
+//         audioPlayer.play(DeviceFileSource(audio));
+//         userRequestData = {};
+//         valueNotifierBook.incrementNotifier();
+//         client.disconnect();
+//       } else {
+//         audioPlayer.play(DeviceFileSource(audio));
+//         getUserDetails();
+//       }
+//     } else if (c[0].topic == 'new_message_${userDetails['id']}') {
+//       if (jsonDecode(pt)["success_message"] == "new_message") {
+//         chatList = jsonDecode(pt)['data'];
+//         audioPlayer.play(DeviceFileSource(audio));
+//         valueNotifierBook.incrementNotifier();
+//       } else {
+//         audioPlayer.play(DeviceFileSource(audio));
+//       }
+//     }
+//   });
 
-  client.onConnected = onconnected;
-}
+//   client.onConnected = onconnected;
+// }
 
 class ValueNotifying {
   ValueNotifier value = ValueNotifier(0);
@@ -637,8 +637,8 @@ ValueNotifyingBook valueNotifierBook = ValueNotifyingBook();
 userRequest() async {}
 
 //sound
-AudioCache audioPlayers = AudioCache();
-AudioPlayer audioPlayer = AudioPlayer();
+// AudioCache audioPlayers = AudioCache();
+// AudioPlayer audioPlayer = AudioPlayer();
 
 //get reverse geo coding
 
@@ -698,21 +698,21 @@ getAutoAddress(input, sessionToken, lat, lng) async {
 //geocodeing location
 
 geoCodingForLatLng(placeid) async {
-  try {
-    var response = await http.get(Uri.parse(
-        'https://maps.googleapis.com/maps/api/place/details/json?placeid=$placeid&key=$mapkey'));
+  // try {
+  //   var response = await http.get(Uri.parse(
+  //       'https://maps.googleapis.com/maps/api/place/details/json?placeid=$placeid&key=$mapkey'));
 
-    if (response.statusCode == 200) {
-      var val = jsonDecode(response.body)['result']['geometry']['location'];
-      center = LatLng(val['lat'], val['lng']);
-      // valueNotifierHome.incrementNotifier();
-    }
-    return center;
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     var val = jsonDecode(response.body)['result']['geometry']['location'];
+  //     center = LatLng(val['lat'], val['lng']);
+  //     // valueNotifierHome.incrementNotifier();
+  //   }
+  //   return center;
+  // } catch (e) {
+  //   if (e is SocketException) {
+  //     internet = false;
+  //   }
+  // }
 }
 
 //pickup drop address list
@@ -735,33 +735,33 @@ getPolylines() async {
   String pickLng = '';
   String dropLat = '';
   String dropLng = '';
-  if (userRequestData.isEmpty) {
-    pickLat = addressList
-        .firstWhere((element) => element.id == 'pickup')
-        .latlng
-        .latitude
-        .toString();
-    pickLng = addressList
-        .firstWhere((element) => element.id == 'pickup')
-        .latlng
-        .longitude
-        .toString();
-    dropLat = addressList
-        .firstWhere((element) => element.id == 'drop')
-        .latlng
-        .latitude
-        .toString();
-    dropLng = addressList
-        .firstWhere((element) => element.id == 'drop')
-        .latlng
-        .longitude
-        .toString();
-  } else {
-    pickLat = userRequestData['pick_lat'].toString();
-    pickLng = userRequestData['pick_lng'].toString();
-    dropLat = userRequestData['drop_lat'].toString();
-    dropLng = userRequestData['drop_lng'].toString();
-  }
+  // if (userRequestData.isEmpty) {
+  //   pickLat = addressList
+  //       .firstWhere((element) => element.id == 'pickup')
+  //       .latlng
+  //       .latitude
+  //       .toString();
+  //   pickLng = addressList
+  //       .firstWhere((element) => element.id == 'pickup')
+  //       .latlng
+  //       .longitude
+  //       .toString();
+  //   dropLat = addressList
+  //       .firstWhere((element) => element.id == 'drop')
+  //       .latlng
+  //       .latitude
+  //       .toString();
+  //   dropLng = addressList
+  //       .firstWhere((element) => element.id == 'drop')
+  //       .latlng
+  //       .longitude
+  //       .toString();
+  // } else {
+  //   pickLat = userRequestData['pick_lat'].toString();
+  //   pickLng = userRequestData['pick_lng'].toString();
+  //   dropLat = userRequestData['drop_lat'].toString();
+  //   dropLng = userRequestData['drop_lng'].toString();
+  // }
 
   try {
     var response = await http.get(Uri.parse(
@@ -855,49 +855,49 @@ List etaDetails = [];
 //eta request
 
 etaRequest() async {
-  dynamic result;
-  try {
-    var response = await http.post(Uri.parse('${url}api/v1/request/eta'),
-        headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'pick_lat': (userRequestData.isNotEmpty)
-              ? userRequestData['pick_lat']
-              : addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
-          'pick_lng': (userRequestData.isNotEmpty)
-              ? userRequestData['pick_lng']
-              : addressList
-                  .firstWhere((e) => e.id == 'pickup')
-                  .latlng
-                  .longitude,
-          'drop_lat': (userRequestData.isNotEmpty)
-              ? userRequestData['drop_lat']
-              : addressList.firstWhere((e) => e.id == 'drop').latlng.latitude,
-          'drop_lng': (userRequestData.isNotEmpty)
-              ? userRequestData['drop_lng']
-              : addressList.firstWhere((e) => e.id == 'drop').latlng.longitude,
-          'ride_type': 1
-        }));
+  // dynamic result;
+  // try {
+    // var response = await http.post(Uri.parse('${url}api/v1/request/eta'),
+    //     headers: {
+    //       'Authorization': 'Bearer ${bearerToken[0].token}',
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: jsonEncode({
+    //       'pick_lat': (userRequestData.isNotEmpty)
+    //           ? userRequestData['pick_lat']
+    //           : addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
+    //       'pick_lng': (userRequestData.isNotEmpty)
+    //           ? userRequestData['pick_lng']
+    //           : addressList
+    //               .firstWhere((e) => e.id == 'pickup')
+    //               .latlng
+    //               .longitude,
+    //       'drop_lat': (userRequestData.isNotEmpty)
+    //           ? userRequestData['drop_lat']
+    //           : addressList.firstWhere((e) => e.id == 'drop').latlng.latitude,
+    //       'drop_lng': (userRequestData.isNotEmpty)
+    //           ? userRequestData['drop_lng']
+    //           : addressList.firstWhere((e) => e.id == 'drop').latlng.longitude,
+    //       'ride_type': 1
+    //     }));
 
-    if (response.statusCode == 200) {
-      etaDetails = jsonDecode(response.body)['data'];
-      result = true;
-      valueNotifierBook.incrementNotifier();
-    } else {
-      if (jsonDecode(response.body)['message'] ==
-          "service not available with this location") {
-        serviceNotAvailable = true;
-      }
-      result = false;
-    }
-    return result;
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     etaDetails = jsonDecode(response.body)['data'];
+  //     result = true;
+  //     valueNotifierBook.incrementNotifier();
+  //   } else {
+  //     if (jsonDecode(response.body)['message'] ==
+  //         "service not available with this location") {
+  //       serviceNotAvailable = true;
+  //     }
+  //     result = false;
+  //   }
+  //   return result;
+  // } catch (e) {
+  //   if (e is SocketException) {
+  //     internet = false;
+  //   }
+  // }
 }
 
 // etaRequestWithPromo() async {
@@ -1254,78 +1254,78 @@ class RequestCreate {
 //user cancel request
 
 cancelRequest() async {
-  try {
-    var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
-        headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({'request_id': userRequestData['id']}));
-    if (response.statusCode == 200) {
-      userRequestData = {};
-      client.disconnect();
-      valueNotifierBook.incrementNotifier();
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
-  }
+  // try {
+  //   var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
+  //       headers: {
+  //         'Authorization': 'Bearer ${bearerToken[0].token}',
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: jsonEncode({'request_id': userRequestData['id']}));
+  //   if (response.statusCode == 200) {
+  //     userRequestData = {};
+  //     client.disconnect();
+  //     valueNotifierBook.incrementNotifier();
+  //   }
+  // } catch (e) {
+  //   if (e is SocketException) {
+  //     internet = false;
+  //   }
+  // }
 }
 
 cancelLaterRequest(val) async {
-  try {
-    var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
-        headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({'request_id': val}));
-    if (response.statusCode == 200) {
-      userRequestData = {};
-      client.disconnect();
-      valueNotifierBook.incrementNotifier();
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
-  }
+  // try {
+  //   var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
+  //       headers: {
+  //         'Authorization': 'Bearer ${bearerToken[0].token}',
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: jsonEncode({'request_id': val}));
+  //   if (response.statusCode == 200) {
+  //     userRequestData = {};
+  //     client.disconnect();
+  //     valueNotifierBook.incrementNotifier();
+  //   }
+  // } catch (e) {
+  //   if (e is SocketException) {
+  //     internet = false;
+  //   }
+  // }
 }
 
 //user cancel request with reason
 
 cancelRequestWithReason(reason) async {
-  try {
-    var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
-        headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(
-            {'request_id': userRequestData['id'], 'reason': reason}));
-    if (response.statusCode == 200) {
-      cancelRequestByUser = true;
-      userRequestData = {};
-      client.disconnect();
-      valueNotifierBook.incrementNotifier();
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
-  }
+  // try {
+  //   var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
+  //       headers: {
+  //         'Authorization': 'Bearer ${bearerToken[0].token}',
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: jsonEncode(
+  //           {'request_id': userRequestData['id'], 'reason': reason}));
+  //   if (response.statusCode == 200) {
+  //     cancelRequestByUser = true;
+  //     userRequestData = {};
+  //     client.disconnect();
+  //     valueNotifierBook.incrementNotifier();
+  //   }
+  // } catch (e) {
+  //   if (e is SocketException) {
+  //     internet = false;
+  //   }
+  // }
 }
 
 //making call to user
 
 makingPhoneCall(phnumber) async {
-  var mobileCall = 'tel:' + phnumber;
-  if (await canLaunch(mobileCall)) {
-    await launch(mobileCall);
-  } else {
-    throw 'Could not launch $mobileCall';
-  }
+  // var mobileCall = 'tel:' + phnumber;
+  // if (await canLaunch(mobileCall)) {
+  //   await launch(mobileCall);
+  // } else {
+  //   throw 'Could not launch $mobileCall';
+  // }
 }
 
 //cancellation reason
@@ -1429,33 +1429,33 @@ class NearByDriver {
 //add favourites location
 
 addFavLocation(lat, lng, add, name) async {
-  dynamic result;
-  try {
-    var response = await http.post(
-        Uri.parse('${url}api/v1/user/add-favourite-location'),
-        headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
-          'Content-Type': 'application/json'
-        },
-        body: jsonEncode({
-          'pick_lat': lat,
-          'pick_lng': lng,
-          'pick_address': add,
-          'address_name': name
-        }));
-    if (response.statusCode == 200) {
-      result = true;
-      await getUserDetails();
-      valueNotifierHome.incrementNotifier();
-    } else {
-      result = false;
-    }
-    return result;
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
-  }
+  // dynamic result;
+  // try {
+  //   var response = await http.post(
+  //       Uri.parse('${url}api/v1/user/add-favourite-location'),
+  //       headers: {
+  //         'Authorization': 'Bearer ${bearerToken[0].token}',
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: jsonEncode({
+  //         'pick_lat': lat,
+  //         'pick_lng': lng,
+  //         'pick_address': add,
+  //         'address_name': name
+  //       }));
+  //   if (response.statusCode == 200) {
+  //     result = true;
+  //     await getUserDetails();
+  //     valueNotifierHome.incrementNotifier();
+  //   } else {
+  //     result = false;
+  //   }
+  //   return result;
+  // } catch (e) {
+  //   if (e is SocketException) {
+  //     internet = false;
+  //   }
+  // }
 }
 
 //sos data
@@ -1574,63 +1574,63 @@ messageSeen() async {
 //add sos
 
 addSos(name, number) async {
-  dynamic result;
-  try {
-    var response = await http.post(Uri.parse('${url}api/v1/common/sos/store'),
-        headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
-          'Content-Type': 'application/json'
-        },
-        body: jsonEncode({'name': name, 'number': number}));
+  // dynamic result;
+  // try {
+  //   var response = await http.post(Uri.parse('${url}api/v1/common/sos/store'),
+  //       headers: {
+  //         'Authorization': 'Bearer ${bearerToken[0].token}',
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: jsonEncode({'name': name, 'number': number}));
 
-    if (response.statusCode == 200) {
-      await getUserDetails();
-      result = 'success';
-    } else {
-      result = 'failure';
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-      result = 'no internet';
-    }
-  }
-  return result;
+  //   if (response.statusCode == 200) {
+  //     await getUserDetails();
+  //     result = 'success';
+  //   } else {
+  //     result = 'failure';
+  //   }
+  // } catch (e) {
+  //   if (e is SocketException) {
+  //     internet = false;
+  //     result = 'no internet';
+  //   }
+  // }
+  // return result;
 }
 
 //remove sos
 
 deleteSos(id) async {
-  dynamic result;
-  try {
-    var response = await http
-        .post(Uri.parse('${url}api/v1/common/sos/delete/' + id), headers: {
-      'Authorization': 'Bearer ${bearerToken[0].token}',
-      'Content-Type': 'application/json'
-    });
-    if (response.statusCode == 200) {
-      await getUserDetails();
-      result = 'success';
-    } else {
-      result = 'failure';
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-      result = 'no internet';
-    }
-  }
-  return result;
+  // dynamic result;
+  // try {
+  //   var response = await http
+  //       .post(Uri.parse('${url}api/v1/common/sos/delete/' + id), headers: {
+  //     'Authorization': 'Bearer ${bearerToken[0].token}',
+  //     'Content-Type': 'application/json'
+  //   });
+  //   if (response.statusCode == 200) {
+  //     await getUserDetails();
+  //     result = 'success';
+  //   } else {
+  //     result = 'failure';
+  //   }
+  // } catch (e) {
+  //   if (e is SocketException) {
+  //     internet = false;
+  //     result = 'no internet';
+  //   }
+  // }
+  // return result;
 }
 
 //open url in browser
 
 openBrowser(browseUrl) async {
-  if (await canLaunch(browseUrl)) {
-    await launch(browseUrl);
-  } else {
-    throw 'Could not launch $browseUrl';
-  }
+  // if (await canLaunch(browseUrl)) {
+  //   await launch(browseUrl);
+  // } else {
+  //   throw 'Could not launch $browseUrl';
+  // }
 }
 
 //get faq
@@ -1663,27 +1663,27 @@ getFaqData(lat, lng) async {
 //remove fav address
 
 removeFavAddress(id) async {
-  dynamic result;
-  try {
-    var response = await http.get(
-        Uri.parse('${url}api/v1/user/delete-favourite-location/$id'),
-        headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
-          'Content-Type': 'application/json'
-        });
-    if (response.statusCode == 200) {
-      await getUserDetails();
-      result = 'success';
-    } else {
-      result = 'failure';
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      result = 'no internet';
-      internet = false;
-    }
-  }
-  return result;
+  // dynamic result;
+  // try {
+  //   var response = await http.get(
+  //       Uri.parse('${url}api/v1/user/delete-favourite-location/$id'),
+  //       headers: {
+  //         'Authorization': 'Bearer ${bearerToken[0].token}',
+  //         'Content-Type': 'application/json'
+  //       });
+  //   if (response.statusCode == 200) {
+  //     await getUserDetails();
+  //     result = 'success';
+  //   } else {
+  //     result = 'failure';
+  //   }
+  // } catch (e) {
+  //   if (e is SocketException) {
+  //     result = 'no internet';
+  //     internet = false;
+  //   }
+  // }
+  // return result;
 }
 
 //get user referral
@@ -2091,42 +2091,42 @@ getCfToken(money, currency) async {
 Map<String, dynamic> cfSuccessList = {};
 
 cashFreePaymentSuccess() async {
-  dynamic result;
-  try {
-    var response = await http.post(
-        Uri.parse('${url}api/v1/payment/cashfree/add-money-to-wallet-webhooks'),
-        headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
-          'Content-Type': 'application/json'
-        },
-        body: jsonEncode({
-          'orderId': cfSuccessList['orderId'],
-          'orderAmount': cfSuccessList['orderAmount'],
-          'referenceId': cfSuccessList['referenceId'],
-          'txStatus': cfSuccessList['txStatus'],
-          'paymentMode': cfSuccessList['paymentMode'],
-          'txMsg': cfSuccessList['txMsg'],
-          'txTime': cfSuccessList['txTime'],
-          'signature': cfSuccessList['signature']
-        }));
-    if (response.statusCode == 200) {
-      if (jsonDecode(response.body)['success'] == true) {
-        result = 'success';
-        await getWalletHistory();
-        await getUserDetails();
-      } else {
-        result = 'failure';
-      }
-    } else {
-      result = 'failure';
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-      result = 'no internet';
-    }
-  }
-  return result;
+  // dynamic result;
+  // try {
+  //   var response = await http.post(
+  //       Uri.parse('${url}api/v1/payment/cashfree/add-money-to-wallet-webhooks'),
+  //       headers: {
+  //         'Authorization': 'Bearer ${bearerToken[0].token}',
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: jsonEncode({
+  //         'orderId': cfSuccessList['orderId'],
+  //         'orderAmount': cfSuccessList['orderAmount'],
+  //         'referenceId': cfSuccessList['referenceId'],
+  //         'txStatus': cfSuccessList['txStatus'],
+  //         'paymentMode': cfSuccessList['paymentMode'],
+  //         'txMsg': cfSuccessList['txMsg'],
+  //         'txTime': cfSuccessList['txTime'],
+  //         'signature': cfSuccessList['signature']
+  //       }));
+  //   if (response.statusCode == 200) {
+  //     if (jsonDecode(response.body)['success'] == true) {
+  //       result = 'success';
+  //       await getWalletHistory();
+  //       await getUserDetails();
+  //     } else {
+  //       result = 'failure';
+  //     }
+  //   } else {
+  //     result = 'failure';
+  //   }
+  // } catch (e) {
+  //   if (e is SocketException) {
+  //     internet = false;
+  //     result = 'no internet';
+  //   }
+  // }
+  // return result;
 }
 
 //edit user profile
@@ -2164,33 +2164,33 @@ cashFreePaymentSuccess() async {
 // }
 
 updateProfileWithoutImage(name, email) async {
-  dynamic result;
-  try {
-    var response = http.MultipartRequest(
-      'POST',
-      Uri.parse('${url}api/v1/user/driver-profile'),
-    );
-    response.headers
-        .addAll({'Authorization': 'Bearer ${bearerToken[0].token}'});
-    response.fields['email'] = email;
-    response.fields['name'] = name;
-    var request = await response.send();
-    var respon = await http.Response.fromStream(request);
-    final val = jsonDecode(respon.body);
-    if (request.statusCode == 200) {
-      result = 'success';
-      if (val['success'] == true) {
-        await getUserDetails();
-      }
-    } else {
-      result = 'failure';
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      result = 'no internet';
-    }
-  }
-  return result;
+  // dynamic result;
+  // try {
+  //   var response = http.MultipartRequest(
+  //     'POST',
+  //     Uri.parse('${url}api/v1/user/driver-profile'),
+  //   );
+  //   response.headers
+  //       .addAll({'Authorization': 'Bearer ${bearerToken[0].token}'});
+  //   response.fields['email'] = email;
+  //   response.fields['name'] = name;
+  //   var request = await response.send();
+  //   var respon = await http.Response.fromStream(request);
+  //   final val = jsonDecode(respon.body);
+  //   if (request.statusCode == 200) {
+  //     result = 'success';
+  //     if (val['success'] == true) {
+  //       await getUserDetails();
+  //     }
+  //   } else {
+  //     result = 'failure';
+  //   }
+  // } catch (e) {
+  //   if (e is SocketException) {
+  //     result = 'no internet';
+  //   }
+  // }
+  // return result;
 }
 
 //internet true
