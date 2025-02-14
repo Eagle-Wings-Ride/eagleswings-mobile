@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                             context: context,
                             builder: (BuildContext context) {
                               return FractionallySizedBox(
-                                heightFactor: 0.5,
+                                heightFactor: 0.6,
                                 child: Card(
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(

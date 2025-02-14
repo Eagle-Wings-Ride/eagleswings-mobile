@@ -25,6 +25,7 @@ import '../../../domain/usecases/login_user.dart';
 import '../../../navigation_page.dart';
 import '../../../widgets/widgets.dart';
 import '../../screens/auth/verify_email.dart';
+import '../../screens/home/home.dart';
 import '../../screens/ride/widget/custom_loader.dart';
 
 class AuthController extends GetxController {
@@ -48,7 +49,7 @@ class AuthController extends GetxController {
 
   var isSignIn = false.obs;
 
-   var rates = Rxn<Map<String, dynamic>>(); // Use Rxn (nullable observable)
+  var rates = Rxn<Map<String, dynamic>>(); // Use Rxn (nullable observable)
   final String hiveBoxName = 'pricingBox';
 
   // @override
@@ -621,6 +622,7 @@ class AuthController extends GetxController {
         ),
       );
       EasyLoading.dismiss();
+      Get.to(const HomePage());
       // Get.to(
       //   VerifyEmail(
       //     email: requestBody['email'],
