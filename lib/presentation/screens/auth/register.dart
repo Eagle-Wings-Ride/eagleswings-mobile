@@ -639,9 +639,9 @@ class _RegisterState extends State<Register> {
             //           });
             //         }))
                 // : Container(),
-            (_isLoading == true)
-                ? const Positioned(top: 0, child: Loading())
-                : Container()
+            // (_isLoading == true)
+            //     ? const Positioned(top: 0, child: Loading())
+            //     : Container()
           ],
         ),
       ),
