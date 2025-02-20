@@ -122,6 +122,7 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
   Future<bool> eagleridesAuthIsSignIn() async {
     var box = await Hive.openBox('authBox');
     final token = box.get('auth_token');
+    print('Checking token');
     print(token);
     if (token != null) {
       // final response = await apiClient.get('/api/verify_token', params: {'token': token});
@@ -233,6 +234,31 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
     }
   }
 
+  // @override
+  // Future<List<Map<String, dynamic>>> fetchChildren(String userId) async {
+  //   const baseUri = '/users/children';
+  //   final uri = '$baseUri/$userId';
+
+  //   try {
+  //     print('Fetching children for userId: $userId');
+
+  //     // Ensure we are calling a function that returns decoded JSON, not Response
+  //     final data = await _client.get(uri);
+
+  //     print('Fetched data: $data');
+
+  //     if (data is List) {
+  //       return List<Map<String, dynamic>>.from(data);
+  //     } else {
+  //       throw Exception(
+  //           'Unexpected response format: Expected List, got ${data.runtimeType}');
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching children: $e');
+  //     rethrow;
+  //   }
+  // }
+
   @override
   Future<List<Map<String, dynamic>>> fetchChildren(String userId) async {
     const baseUri = '/users/children';
@@ -241,20 +267,21 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
     try {
       print('Fetching children for userId: $userId');
 
-      // Ensure we are calling a function that returns decoded JSON, not Response
       final data = await _client.get(uri);
-
       print('Fetched data: $data');
 
       if (data is List) {
         return List<Map<String, dynamic>>.from(data);
+      } else if (data is Map<String, dynamic> && data.containsKey('message')) {
+        print('No children found: ${data['message']}');
+        return []; // Return an empty list instead of throwing an error
       } else {
         throw Exception(
             'Unexpected response format: Expected List, got ${data.runtimeType}');
       }
     } catch (e) {
       print('Error fetching children: $e');
-      rethrow;
+      return []; // Ensure an empty list is returned on error
     }
   }
 
@@ -312,6 +339,8 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
   Future<void> eagleridesAuthSignOut() async {
     try {
       final box = await Hive.openBox('authBox');
+      final rateBox = await Hive.openBox('rateBox');
+      final childrenBox = await Hive.openBox('childrenBox');
 
       // Logout API call (optional)
       final response = await _client.post(
@@ -321,6 +350,8 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
       // Clear the token from storage
       await box.delete('auth_token');
       await box.clear();
+      await rateBox.clear();
+      await childrenBox.clear();
       // // Clear the token in GetIt
       // sl.unregister<ApiClient>(); // Unregister ApiClient
       // sl.registerLazySingleton<ApiClient>(() {

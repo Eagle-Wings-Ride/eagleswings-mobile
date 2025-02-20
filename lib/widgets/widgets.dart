@@ -319,7 +319,6 @@ void customSuccessDialog(BuildContext context) async {
                     ),
                   ],
                 ),
-                
                 const SizedBox(
                   height: 29,
                 ),
@@ -339,8 +338,9 @@ void customSuccessDialog(BuildContext context) async {
                     ),
                     onPressed: () {
                       FocusScope.of(context).unfocus();
-                   
-                      Get.to(const Login());
+
+                      Get.offAll(() => const Login());
+                      // Get.to(const Login());
                     },
                     child: Text(
                       'Go to Login',

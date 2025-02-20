@@ -29,7 +29,7 @@ class _LoadingPageState extends State<LoadingPage> {
   void initState() {
     _netWorkStatusChecker.updateConnectionStatus();
     _authController.checkIsSignIn();
-    Timer(const Duration(seconds: 3), () async {
+    Timer(const Duration(seconds: 2), () async {
       if (_authController.isSignIn.value) {
         // print(_authController.isSignIn.value);
         if (await _authController.checkUserStatus()) {

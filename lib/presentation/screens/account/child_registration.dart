@@ -408,7 +408,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                             ),
                             CustomTextFieldWidget(
                               controller: _gradeController,
-                              keyboardType: TextInputType.text,
+                              keyboardType: TextInputType.number,
                               obscureText: false,
                               filled: false,
                               readOnly: false,
