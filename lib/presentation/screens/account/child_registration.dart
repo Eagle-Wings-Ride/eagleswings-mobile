@@ -34,7 +34,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
   double _textFieldOffset = 0; // Position of the TextField
   final registerChildFormKey = GlobalKey<FormState>();
   // bool _isLoading = true;
-  List<String> genderList = ['Male', 'Female', 'Other'];
+  List<String> genderList = ['Male', 'Female'];
   bool idSelected = false;
   bool terms = false;
 
@@ -63,7 +63,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
     }
 
     final String url =
-        "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&key=$apiKey";
+        "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&key=$apiKey&components=country:ca";
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
@@ -138,7 +138,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
           context: context,
           builder: (BuildContext context) {
             return FractionallySizedBox(
-              heightFactor: 0.6,
+              heightFactor: 0.5,
               child: Container(
                 // height: 350,
                 padding:
@@ -540,7 +540,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                       'By signing up, you accept our ',
                                       style: TextStyle(
                                         color: textColor,
-                                        fontSize: 10,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.w400,
                                       ),
                                     ),
@@ -550,7 +550,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                         'Terms ',
                                         style: TextStyle(
                                           color: backgroundColor,
-                                          fontSize: 10,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -558,7 +558,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                     Text('and ',
                                         style: TextStyle(
                                           color: textColor,
-                                          fontSize: 10,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.w400,
                                         )),
                                     GestureDetector(
@@ -567,7 +567,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                         'Privacy Policy ',
                                         style: TextStyle(
                                           color: backgroundColor,
-                                          fontSize: 10,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),

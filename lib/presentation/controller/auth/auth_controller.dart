@@ -23,6 +23,7 @@ import '../../../data/models/child_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../../domain/usecases/login_user.dart';
 import '../../../navigation_page.dart';
+import '../../../widgets/global_loader.dart';
 import '../../../widgets/widgets.dart';
 import '../../screens/auth/verify_email.dart';
 import '../../screens/home/home.dart';
@@ -104,16 +105,18 @@ class AuthController extends GetxController {
     user.value = null;
     user.refresh();
     try {
-      EasyLoading.show(
-        indicator: const CustomLoader(),
-        maskType: EasyLoadingMaskType.black,
-        dismissOnTap: false,
-      );
+      GlobalLoader().show();
+      // EasyLoading.show(
+      //   indicator: const CustomLoader(),
+      //   maskType: EasyLoadingMaskType.clear,
+      //   dismissOnTap: false,
+      // );
       final token = await eagleRidesLoginUserUseCase.call(email, password);
       print(token);
       await loadUser();
       // Save token or navigate to another page
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
       // showTopSnackBar(
       //   Overlay.of(context),
       //   const CustomSnackBar.success(
@@ -122,7 +125,8 @@ class AuthController extends GetxController {
       // );
       Get.offAll(const NavigationPage());
     } catch (e) {
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
       print(e);
       showTopSnackBar(
         Overlay.of(context),
@@ -136,11 +140,12 @@ class AuthController extends GetxController {
 
   logout(context) async {
     try {
-      EasyLoading.show(
-        indicator: const CustomLoader(),
-        maskType: EasyLoadingMaskType.black,
-        dismissOnTap: false,
-      );
+      GlobalLoader().show();
+      // EasyLoading.show(
+      //   indicator: const CustomLoader(),
+      //   maskType: EasyLoadingMaskType.clear,
+      //   dismissOnTap: false,
+      // );
       await eagleRidesAuthSignOutUseCase.call();
       final box = await Hive.openBox('authBox');
       final rateBox = await Hive.openBox('rateBox');
@@ -157,11 +162,13 @@ class AuthController extends GetxController {
       print('User state after logout: ${user.value}');
       print('Token after logout: ${box.get("auth_token")}');
 
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
       Get.offAll(const Login());
     } catch (e) {
       // print(e);
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
       // print(e);
       showTopSnackBar(
         Overlay.of(context),
@@ -177,11 +184,12 @@ class AuthController extends GetxController {
     print('requestBody');
     print(requestBody);
     try {
-      EasyLoading.show(
-        indicator: const CustomLoader(),
-        maskType: EasyLoadingMaskType.black,
-        dismissOnTap: false,
-      );
+      GlobalLoader().show();
+      // EasyLoading.show(
+      //   indicator: const CustomLoader(),
+      //   maskType: EasyLoadingMaskType.clear,
+      //   dismissOnTap: false,
+      // );
       final response = await eagleRidesRegisterUseCase.call(requestBody);
       debugPrint(response);
       showTopSnackBar(
@@ -190,7 +198,8 @@ class AuthController extends GetxController {
           message: 'Registration Successful',
         ),
       );
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
       Get.to(
         VerifyEmail(
           email: requestBody['email'],
@@ -198,7 +207,8 @@ class AuthController extends GetxController {
       );
     } catch (e) {
       print(e);
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
       showTopSnackBar(
         Overlay.of(context),
         CustomSnackBar.error(
@@ -213,24 +223,28 @@ class AuthController extends GetxController {
     print('requestBody');
     print(requestBody);
     try {
-      EasyLoading.show(
-        indicator: const CustomLoader(),
-        maskType: EasyLoadingMaskType.black,
-        dismissOnTap: false,
-      );
-      final response = await addChildUseCase.call(requestBody);
-      debugPrint(response);
+      GlobalLoader().show();
+      // EasyLoading.show(
+      //   indicator: const CustomLoader(),
+      //   maskType: EasyLoadingMaskType.clear,
+      //   dismissOnTap: false,
+      // );
+      await addChildUseCase.call(requestBody);
+      await refreshChildren();
+      // debugPrint(response);
       showTopSnackBar(
         Overlay.of(context),
         const CustomSnackBar.success(
           message: 'Child Registration Successful',
         ),
       );
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
       Get.back();
     } catch (e) {
       print(e);
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
       showTopSnackBar(
         Overlay.of(context),
         CustomSnackBar.error(
@@ -242,11 +256,12 @@ class AuthController extends GetxController {
 
   verifyOtp(String email, String otp, context) async {
     try {
-      EasyLoading.show(
-        indicator: const CustomLoader(),
-        maskType: EasyLoadingMaskType.black,
-        dismissOnTap: false,
-      );
+      GlobalLoader().show();
+      // EasyLoading.show(
+      //   indicator: const CustomLoader(),
+      //   maskType: EasyLoadingMaskType.clear,
+      //   dismissOnTap: false,
+      // );
       // final token = await eagleRidesAuthOtpVerificationUseCase.call(email, otp);
       // print(token);
 
@@ -260,13 +275,15 @@ class AuthController extends GetxController {
           message: 'OTP Verification Successful',
         ),
       );
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
 
       customSuccessDialog(context);
       // Get.to(const NavigationPage());
     } catch (e) {
       print(e);
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
       showTopSnackBar(
         Overlay.of(context),
         CustomSnackBar.error(
@@ -348,18 +365,21 @@ class AuthController extends GetxController {
 
   getUser(context) async {
     try {
-      EasyLoading.show(
-        indicator: const CustomLoader(),
-        maskType: EasyLoadingMaskType.black,
-        dismissOnTap: false,
-      );
+      GlobalLoader().show();
+      // EasyLoading.show(
+      //   indicator: const CustomLoader(),
+      //   maskType: EasyLoadingMaskType.clear,
+      //   dismissOnTap: false,
+      // );
       final userInfo = await getUserUsecase.call();
       print(userInfo);
       UserModel userModel = UserModel.fromJson(userInfo);
       setUser(userModel);
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
     } catch (e) {
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
       print(e);
       showTopSnackBar(
         Overlay.of(context),
@@ -398,83 +418,148 @@ class AuthController extends GetxController {
     }
   }
 
-
   Future<void> fetchChildren() async {
     var box = await Hive.openBox('authBox');
     String? token = box.get('auth_token');
     var childrenBox = await Hive.openBox('childrenBox');
 
     if (token != null) {
-      // Token exists, attempt to load user data from storage
-      var childrenInfo = childrenBox.get('children');
-      // print('childrenInfo from storage');
-      // print(childrenInfo);
+      var cachedChildren = childrenBox.get('children');
 
-      if (childrenInfo != null) {
-        // Ensure childrenInfo is a list of maps (dynamic type issue)
-        if (childrenInfo is List) {
-          // Map the childrenInfo to List<Child>
-          List<Child> childrenList = childrenInfo
-              .map<Child>((childJson) =>
-                  Child.fromJson(Map<String, dynamic>.from(childJson)))
-              .toList();
-          // print(childrenList);
+      if (cachedChildren != null && cachedChildren is List) {
+        // Load cached children for instant UI update
+        List<Child> cachedList = cachedChildren
+            .map<Child>((childJson) =>
+                Child.fromJson(Map<String, dynamic>.from(childJson)))
+            .toList();
 
-          // Update the reactive list with the deserialized data
-          children.assignAll(childrenList);
-          update();
-        } else {
-          // Handle unexpected structure of the childrenInfo
-          print(
-              'Error: The stored children data is not in the expected format.');
-        }
+        children.assignAll(cachedList);
+        update();
       } else {
-        // If no children data found, fetch from API
-        try {
-          EasyLoading.show(
-            indicator: const CustomLoader(),
-            maskType: EasyLoadingMaskType.black,
-            dismissOnTap: false,
-          );
-
-          final userId =
-              user.value?.id; // Get the user ID (check if it's available)
-          if (userId == null) {
-            throw Exception('User ID not found');
-          }
-
-          // Fetch children from the API
-          final fetchedChildren = await fetchChildrenUseCase.call(userId);
-
-          // Map the API response to a list of Child objects
-          List<Child> childrenList = fetchedChildren
-              .map<Child>((childJson) => Child.fromJson(childJson))
-              .toList();
-
-          // Save the children to local storage
-          childrenBox.put('children', fetchedChildren);
-
-          // Update the reactive list with the fetched children
-          children.assignAll(childrenList);
-          // setChildren(childrenList); // If necessary, use this method to set the children
-        } catch (e) {
-          print("Error fetching children: $e");
-          Get.snackbar(
-            'Error',
-            e.toString(),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-          );
-        } finally {
-          EasyLoading.dismiss();
-        }
+        // If no cached data, fetch from API immediately
+        await refreshChildren();
       }
     } else {
-      // No token found, user is not logged in, redirect to login screen
       Get.offAll(const Login());
     }
   }
+
+// 🔹 Call this after creating a new child to refresh the list
+  Future<void> refreshChildren() async {
+    try {
+      GlobalLoader().show();
+      // EasyLoading.show(
+      //   indicator: const CustomLoader(),
+      //   maskType: EasyLoadingMaskType.clear,
+      //   dismissOnTap: false,
+      // );
+
+      await Hive.deleteBoxFromDisk('childrenBox'); // Clear outdated local data
+      var childrenBox = await Hive.openBox('childrenBox');
+      final userId = user.value?.id;
+      if (userId == null) throw Exception('User ID not found');
+
+      // Fetch new children from API
+      final fetchedChildren = await fetchChildrenUseCase.call(userId);
+      List<Child> newChildrenList = fetchedChildren
+          .map<Child>((childJson) => Child.fromJson(childJson))
+          .toList();
+
+      // Save the updated children list to Hive
+      await childrenBox.put('children', fetchedChildren);
+
+      // Update UI with the new data
+      children.assignAll(newChildrenList);
+      update();
+    } catch (e) {
+      print("Error refreshing children: $e");
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
+    }
+  }
+
+  // Future<void> fetchChildren() async {
+  //   var box = await Hive.openBox('authBox');
+  //   String? token = box.get('auth_token');
+  //   var childrenBox = await Hive.openBox('childrenBox');
+
+  //   if (token != null) {
+  //     // Token exists, attempt to load user data from storage
+  //     var childrenInfo = childrenBox.get('children');
+
+  //     if (childrenInfo != null) {
+  //       // Ensure childrenInfo is a list of maps (dynamic type issue)
+  //       if (childrenInfo is List) {
+  //         // Map the childrenInfo to List<Child>
+  //         List<Child> childrenList = childrenInfo
+  //             .map<Child>((childJson) =>
+  //                 Child.fromJson(Map<String, dynamic>.from(childJson)))
+  //             .toList();
+  //         // print(childrenList);
+
+  //         // Update the reactive list with the deserialized data
+  //         children.assignAll(childrenList);
+  //         update();
+  //       } else {
+  //         // Handle unexpected structure of the childrenInfo
+  //         print(
+  //             'Error: The stored children data is not in the expected format.');
+  //       }
+  //     } else {
+  //       // If no children data found, fetch from API
+  //       try {
+  //         EasyLoading.show(
+  //           indicator: const CustomLoader(),
+  //           maskType: EasyLoadingMaskType.clear,
+  //           dismissOnTap: false,
+  //         );
+
+  //         final userId =
+  //             user.value?.id; // Get the user ID (check if it's available)
+  //         if (userId == null) {
+  //           throw Exception('User ID not found');
+  //         }
+
+  //         // Fetch children from the API
+  //         final fetchedChildren = await fetchChildrenUseCase.call(userId);
+
+  //         // Map the API response to a list of Child objects
+  //         List<Child> childrenList = fetchedChildren
+  //             .map<Child>((childJson) => Child.fromJson(childJson))
+  //             .toList();
+
+  //         // Save the children to local storage
+  //         childrenBox.put('children', fetchedChildren);
+
+  //         // Update the reactive list with the fetched children
+  //         children.assignAll(childrenList);
+  //         // setChildren(childrenList); // If necessary, use this method to set the children
+  //       } catch (e) {
+  //         print("Error fetching children: $e");
+  //         Get.snackbar(
+  //           'Error',
+  //           e.toString(),
+  //           snackPosition: SnackPosition.BOTTOM,
+  //           backgroundColor: Colors.red,
+  //           colorText: Colors.white,
+  //         );
+  //       } finally {
+  //         EasyLoading.dismiss();
+  //       }
+  //     }
+  //   } else {
+  //     // No token found, user is not logged in, redirect to login screen
+  //     Get.offAll(const Login());
+  //   }
+  // }
 
   Future<void> fetchRecentRides(String childId) async {
     // var rideBox = await Hive.openBox('ridesBox');
@@ -483,11 +568,12 @@ class AuthController extends GetxController {
 
     if (token != null) {
       try {
-        EasyLoading.show(
-          indicator: const CustomLoader(),
-          maskType: EasyLoadingMaskType.black,
-          dismissOnTap: false,
-        );
+        // EasyLoading.show(
+        //   indicator: const CustomLoader(),
+        //   maskType: EasyLoadingMaskType.none,
+        //   dismissOnTap: false,
+        // );
+        GlobalLoader().show();
 
         List<Booking> recentBookings = [];
 
@@ -513,7 +599,8 @@ class AuthController extends GetxController {
           colorText: Colors.white,
         );
       } finally {
-        EasyLoading.dismiss();
+        GlobalLoader().hide();
+        // EasyLoading.dismiss();
       }
     } else {
       Get.offAll(const Login());
@@ -525,11 +612,12 @@ class AuthController extends GetxController {
     print(requestBody);
     print(childId);
     try {
-      EasyLoading.show(
-        indicator: const CustomLoader(),
-        maskType: EasyLoadingMaskType.black,
-        dismissOnTap: false,
-      );
+      GlobalLoader().show();
+      // EasyLoading.show(
+      //   indicator: const CustomLoader(),
+      //   maskType: EasyLoadingMaskType.clear,
+      //   dismissOnTap: false,
+      // );
       final response = await bookRideUseCase.call(requestBody, childId);
       debugPrint(response);
       showTopSnackBar(
@@ -538,8 +626,9 @@ class AuthController extends GetxController {
           message: 'Booking Successful',
         ),
       );
-      EasyLoading.dismiss();
-      Get.to(const HomePage());
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
+      Get.to(const NavigationPage());
       // Get.to(
       //   VerifyEmail(
       //     email: requestBody['email'],
@@ -547,7 +636,8 @@ class AuthController extends GetxController {
       // );
     } catch (e) {
       print(e);
-      EasyLoading.dismiss();
+      GlobalLoader().hide();
+      // EasyLoading.dismiss();
       showTopSnackBar(
         Overlay.of(context),
         CustomSnackBar.error(

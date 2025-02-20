@@ -46,10 +46,8 @@ class _RegisterState extends State<Register> {
 
   @override
   void initState() {
-
     super.initState();
   }
-
 
   @override
   void dispose() {
@@ -383,7 +381,6 @@ class _RegisterState extends State<Register> {
                               SizedBox(
                                 height: 10.h,
                               ),
-                           
                               Center(
                                 child: Container(
                                   width: double.maxFinite,
@@ -432,7 +429,7 @@ class _RegisterState extends State<Register> {
                                         'By signing up, you accept our ',
                                         style: TextStyle(
                                           color: textColor,
-                                          fontSize: 10,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.w400,
                                         ),
                                       ),
@@ -442,7 +439,7 @@ class _RegisterState extends State<Register> {
                                           'Terms ',
                                           style: TextStyle(
                                             color: backgroundColor,
-                                            fontSize: 10,
+                                            fontSize: 12,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -450,7 +447,7 @@ class _RegisterState extends State<Register> {
                                       Text('and ',
                                           style: TextStyle(
                                             color: textColor,
-                                            fontSize: 10,
+                                            fontSize: 12,
                                             fontWeight: FontWeight.w400,
                                           )),
                                       GestureDetector(
@@ -459,7 +456,7 @@ class _RegisterState extends State<Register> {
                                           'Privacy Policy ',
                                           style: TextStyle(
                                             color: backgroundColor,
-                                            fontSize: 10,
+                                            fontSize: 12,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -503,12 +500,18 @@ class _RegisterState extends State<Register> {
                                         //   ),
                                         // );
                                         _authController.register({
-                                          'fullname': _fullNameController.text.trim(),
-                                          'email': _emailController.text.trim().toLowerCase(),
-                                          'password':_passwordController.text.trim(),
-                                          'phone_number':
-                                              _phoneNumberController.text.toString(),
-                                          'address': _addressController.text.toString()
+                                          'fullname':
+                                              _fullNameController.text.trim(),
+                                          'email': _emailController.text
+                                              .trim()
+                                              .toLowerCase(),
+                                          'password':
+                                              _passwordController.text.trim(),
+                                          'phone_number': _phoneNumberController
+                                              .text
+                                              .toString(),
+                                          'address':
+                                              _addressController.text.toString()
                                         }, context);
                                       } else {
                                         showTopSnackBar(
@@ -635,10 +638,10 @@ class _RegisterState extends State<Register> {
             //           setState(() {
             //             _isLoading = true;
             //             internet = true;
-                       
+
             //           });
             //         }))
-                // : Container(),
+            // : Container(),
             // (_isLoading == true)
             //     ? const Positioned(top: 0, child: Loading())
             //     : Container()

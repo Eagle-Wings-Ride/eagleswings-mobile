@@ -96,7 +96,7 @@ class _VerificationConfirmationScreenState
                                 Text(
                                   'This would take just a minute',
                                   style: GoogleFonts.poppins(
-                                    fontSize: 10,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),

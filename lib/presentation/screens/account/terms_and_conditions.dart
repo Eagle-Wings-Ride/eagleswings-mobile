@@ -13,7 +13,7 @@ class _TermsAndConditionsViewState extends State<TermsAndConditionsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,

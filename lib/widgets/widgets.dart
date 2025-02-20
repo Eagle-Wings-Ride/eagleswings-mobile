@@ -326,8 +326,10 @@ void customSuccessDialog(BuildContext context) async {
                   alignment: Alignment.bottomCenter,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      minimumSize:
-                          Size(MediaQuery.of(context).size.width - 50, 50),
+                      minimumSize: Size(
+                        MediaQuery.of(context).size.width - 50,
+                        50,
+                      ),
                       backgroundColor: textColor,
                       elevation: 0,
                       shape: RoundedRectangleBorder(

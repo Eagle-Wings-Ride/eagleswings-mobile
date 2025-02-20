@@ -396,7 +396,7 @@ class _RidesScreenState extends State<RidesScreen> {
                                           const ChildRegistration()); // Navigate to create child page
                                     },
                                     child: Text(
-                                      ' No child selected.',
+                                      ' No child available.',
                                       style: GoogleFonts.poppins(
                                         color: backgroundColor,
                                         fontSize: 12,
@@ -425,14 +425,15 @@ class _RidesScreenState extends State<RidesScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Text(
-                    'Hello $selectedChildName',
-                    style: GoogleFonts.poppins(
-                      color: backgroundColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  if (selectedChildName != null)
+                    Text(
+                      'Hello $selectedChildName',
+                      style: GoogleFonts.poppins(
+                        color: backgroundColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
                   SizedBox(
                     height: 30.h,
                   ),
@@ -605,7 +606,7 @@ class _RidesScreenState extends State<RidesScreen> {
                   //                                 Text(
                   //                                   'Arrives in ${ongoing['time']}',
                   //                                   style: GoogleFonts.poppins(
-                  //                                     fontSize: 10,
+                  //                                     fontSize: 12,
                   //                                     fontWeight:
                   //                                         FontWeight.w500,
                   //                                     color: textColor,
@@ -644,7 +645,7 @@ class _RidesScreenState extends State<RidesScreen> {
                   //                         ongoing[
                   //                             'driverName']!, // Replace with dynamic text if needed
                   //                         style: GoogleFonts.poppins(
-                  //                           fontSize: 10,
+                  //                           fontSize: 12,
                   //                           fontWeight: FontWeight.bold,
                   //                           color:
                   //                               backgroundColor, // Style as desired
@@ -662,7 +663,7 @@ class _RidesScreenState extends State<RidesScreen> {
                   //     );
                   //   }).toList(),
                   // ),
-                 
+
                   // SizedBox(
                   //   height: 20.h,
                   // ),

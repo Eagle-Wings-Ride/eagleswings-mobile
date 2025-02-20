@@ -45,7 +45,7 @@ class _RegisteredChildrenState extends State<RegisteredChildren> {
           itemBuilder: (context, index) {
             final child = _authController.children[index];
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -83,10 +83,7 @@ class _RegisteredChildrenState extends State<RegisteredChildren> {
                     ],
                   ),
                   trailing: Text(child.relationship ?? 'N/A'),
-                  onTap: () {
-                    // Handle tap, e.g., navigate to a child details screen
-                    // Get.to(() => ChildDetailsScreen(child: child));
-                  },
+                  
                 ),
               ),
             );
@@ -94,7 +91,7 @@ class _RegisteredChildrenState extends State<RegisteredChildren> {
         );
       }),
       floatingActionButton: FloatingActionButton(
-        onPressed: _authController.fetchChildren,
+        onPressed: _authController.refreshChildren,
         child: const Icon(Icons.refresh),
       ),
     );

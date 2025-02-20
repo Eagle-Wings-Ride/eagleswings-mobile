@@ -13,16 +13,19 @@ class PlacesService {
   })  : _apiKey = apiKey,
         _dio = dio ?? Dio();
 
-  Future<List<Placeprediction>> searchPlaces(String query) async {
+  Future<List<Placeprediction>> searchPlaces(
+      String query, String sessionToken) async {
     try {
       final response = await _dio.get(
         'https://maps.googleapis.com/maps/api/place/autocomplete/json',
         queryParameters: {
           'input': query,
           'key': _apiKey,
-          'types': 'address',
+          // 'types': 'address',
+          'types': 'geocode|establishment', // Allows named places like schools
           // Add your country restriction if needed
-          'components': 'country:ca'
+          'components': 'country:ca',
+          'sessiontoken': sessionToken, // Pass the session token
         },
       );
 
@@ -31,21 +34,25 @@ class PlacesService {
             .map((prediction) => Placeprediction.fromJson(prediction))
             .toList();
       }
+      return [];
 
-      throw Exception('Place search failed: ${response.data['error_message']}');
+      // throw Exception('Place search failed: ${response.data['error_message']}');
     } catch (e) {
       throw Exception('Failed to search places: $e');
     }
   }
 
-  Future<LocationOnboardingData> getPlaceDetails(String placeId) async {
+  Future<LocationOnboardingData> getPlaceDetails(
+      String placeId, String sessionToken) async {
     try {
       final response = await _dio.get(
         'https://maps.googleapis.com/maps/api/place/details/json',
         queryParameters: {
           'place_id': placeId,
           'key': _apiKey,
-          'fields': 'address_component,geometry,formatted_address'
+          'fields': 'name,address_component,geometry,formatted_address,types',
+          'sessiontoken': sessionToken, // Use the same session token
+          // 'fields': 'address_component,geometry,formatted_address'
         },
       );
 
@@ -71,9 +78,18 @@ class PlacesService {
         print('Parsed Location Data: $locationData'); // Debug print
         return locationData;
       }
+      return LocationOnboardingData(
+        address: '',
+        city: '',
+        state: '',
+        country: '',
+        postalCode: '',
+        latitude: 0.0,
+        longitude: 0.0,
+      );
 
-      throw Exception(
-          'Place details failed: ${response.data['error_message']}');
+      // throw Exception(
+      //     'Place details failed: ${response.data['error_message']}');
     } catch (e) {
       print('Error in getPlaceDetails: $e'); // Debug print
       throw Exception('Failed to get place details: $e');

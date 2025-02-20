@@ -223,9 +223,9 @@ class _HomePageState extends State<HomePage> {
                       quickButtons('track_rides', 'Track rides'),
                       GestureDetector(
                           onTap: () {
-                            Get.to(const RidesScreen());
+                            Get.to(const ChildRegistration());
                           },
-                          child: quickButtons('history', 'History')),
+                          child: quickButtons('history', 'Create Child')),
                     ],
                   ),
                   SizedBox(

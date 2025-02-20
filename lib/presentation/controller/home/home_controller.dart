@@ -1,12 +1,15 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:location/location.dart';
 
 import '../../../domain/usecases/get_address_use_case.dart';
 import '../../../domain/usecases/get_user_current_location_usecase.dart';
+import '../../../styles/styles.dart';
 
 class HomeController extends GetxController {
   final GetUserCurrentLocationUsecase getUserCurrentLocationUsecase;
@@ -37,29 +40,67 @@ class HomeController extends GetxController {
     startLocationUpdates();
   }
 
-  getUserCurrentLocation() async {
-    animateCamera();
-    LocationPermission permission;
-    await Geolocator.requestPermission();
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
+  // getUserCurrentLocation() async {
+  //   animateCamera();
+  //   LocationPermission permission;
+  //   await Geolocator.requestPermission();
+  //   permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       Get.snackbar(
+  //         "Alert",
+  //         "Location permissions are denied",
+  //         snackPosition: SnackPosition.BOTTOM,
+  //       );
+  //     }
+  //   } else if (permission == LocationPermission.deniedForever) {
+  //     Get.snackbar(
+  //       "Alert",
+  //       "Location permissions are permanently denied,please enable it from app setting",
+  //       snackPosition: SnackPosition.BOTTOM,
+  //     );
+  //   } else {
+  //     animateCamera();
+  //   }
+  // }
+
+  Future<void> getUserCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    // If permission is denied, keep requesting until granted
+    while (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        Get.snackbar(
-          "Alert",
-          "Location permissions are denied",
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } else if (permission == LocationPermission.deniedForever) {
-      Get.snackbar(
-        "Alert",
-        "Location permissions are permanently denied,please enable it from app setting",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } else {
-      animateCamera();
     }
+
+    // If permanently denied, guide user to enable it
+    if (permission == LocationPermission.deniedForever) {
+      Get.snackbar(
+        isDismissible: false,
+        "Alert",
+        "Location permissions are permanently denied. Please enable it in app settings.",
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 5),
+        mainButton: TextButton(
+          onPressed: () {
+            Geolocator.openAppSettings();
+          },
+          child: Text(
+            "Open Settings",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: buttonText,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    // Once permission is granted, proceed
+    animateCamera();
   }
 
   animateCamera() async {
@@ -99,9 +140,6 @@ class HomeController extends GetxController {
         (oldPosition.longitude - newPosition.longitude).abs();
     return latDifference > threshold || lngDifference > threshold;
   }
-
-
-
 
   @override
   void onClose() {

@@ -272,7 +272,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                           child: Text(
                             'Please allow for up to 5mins to assign a driver to you',
                             style: GoogleFonts.poppins(
-                              fontSize: 10,
+                              fontSize: 12,
                               color: Colors.white,
                             ),
                           ),
@@ -451,16 +451,16 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        '${widget.pickUpLocation} To ${widget.dropOffLocation}',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
+                                      // Text(
+                                      //   '${widget.pickUpLocation} To ${widget.dropOffLocation}',
+                                      //   style: GoogleFonts.poppins(
+                                      //     fontSize: 14,
+                                      //     fontWeight: FontWeight.w600,
+                                      //   ),
+                                      // ),
+                                      // const SizedBox(
+                                      //   height: 10,
+                                      // ),
                                       Row(
                                         children: [
                                           Container(
@@ -480,7 +480,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                                   ? 'In-house driver'
                                                   : 'Freelance Driver',
                                               style: GoogleFonts.poppins(
-                                                fontSize: 10,
+                                                fontSize: 12,
                                                 color: getRideTypeColor(
                                                     widget.rideType),
                                                 fontWeight: FontWeight.bold,
@@ -506,7 +506,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                                   ? 'One Way Trip'
                                                   : 'Return Trip',
                                               style: GoogleFonts.poppins(
-                                                fontSize: 10,
+                                                fontSize: 12,
                                                 color: const Color(0xff133BB7),
                                                 fontWeight: FontWeight.bold,
                                               ),
@@ -530,7 +530,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                           Text(
                                             widget.schedule,
                                             style: GoogleFonts.poppins(
-                                              fontSize: 10,
+                                              fontSize: 12,
                                               fontWeight: FontWeight.w600,
                                               color: Colors.black,
                                             ),
@@ -549,7 +549,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                           Text(
                                             widget.childName,
                                             style: GoogleFonts.poppins(
-                                              fontSize: 10,
+                                              fontSize: 12,
                                               fontWeight: FontWeight.w600,
                                               color: Colors.black,
                                             ),
@@ -577,7 +577,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                             'Pick Up time: ${widget.pickUpTime}',
                                             style: GoogleFonts.poppins(
                                               color: Colors.black,
-                                              fontSize: 10,
+                                              fontSize: 12,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -596,7 +596,7 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                             'Arrival time: ${widget.returnTime}',
                                             style: GoogleFonts.poppins(
                                               color: Colors.black,
-                                              fontSize: 10,
+                                              fontSize: 12,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),

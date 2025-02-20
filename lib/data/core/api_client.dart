@@ -46,10 +46,12 @@ class ApiClient {
     // print(token);
 
     try {
-      final response = await _client.get(
-        getPath(path, params),
-        headers: _buildHeaders(token),
-      ); // 10 seconds timeout
+      final response = await _client
+          .get(
+            getPath(path, params),
+            headers: _buildHeaders(token),
+          )
+          .timeout(const Duration(seconds: 15)); // 10 seconds timeout
 
       // print(response.body);
       // print(response.statusCode);
@@ -80,7 +82,7 @@ class ApiClient {
         // Log the response before redirecting
         print('Unauthorized access, redirecting to login');
         Get.offAll(const Login());
-        throw 'Unauthorized access, redirecting to login';
+        // throw 'Unauthorized access, redirecting to login';
         // return;
       } else {
         print('Error response: ${response.reasonPhrase}');
@@ -89,7 +91,11 @@ class ApiClient {
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      if (e is TimeoutException) {
+        throw Exception("Request timed out. Please try again.");
+      } else {
+        rethrow;
+      }
     }
   }
 
@@ -98,11 +104,13 @@ class ApiClient {
     final token = box.get('auth_token');
     try {
       print(path);
-      final response = await _client.post(
-        getPath(path, null),
-        body: jsonEncode(params),
-        headers: _buildHeaders(token),
-      );
+      final response = await _client
+          .post(
+            getPath(path, null),
+            body: jsonEncode(params),
+            headers: _buildHeaders(token),
+          )
+          .timeout(const Duration(seconds: 15));
 
       // final errorResponse = json.decode(response.body);
       // debugPrint('errorResponse');
@@ -137,8 +145,12 @@ class ApiClient {
       throw UnauthorisedException();
     } catch (e) {
       // Handle other exceptions
-
-      rethrow;
+      // print('Exception caught: $e');
+      if (e is TimeoutException) {
+        throw Exception("Request timed out. Please try again.");
+      } else {
+        rethrow;
+      }
     }
   }
 

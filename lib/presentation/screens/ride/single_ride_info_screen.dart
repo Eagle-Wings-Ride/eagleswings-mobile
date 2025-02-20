@@ -339,7 +339,7 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: GoogleFonts.poppins(
-                                            fontSize: 10,
+                                            fontSize: 12,
                                             color: Colors.black,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -358,7 +358,7 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: GoogleFonts.poppins(
-                                            fontSize: 10,
+                                            fontSize: 12,
                                             fontWeight: FontWeight.w600,
                                             color: Colors.black,
                                           ),
@@ -427,85 +427,40 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  '${ride!.pickUpLocation} To ${ride!.dropOffLocation}',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                // Row(
-                                //   children: [
-                                //     Container(
-                                //       padding: EdgeInsets.symmetric(
-                                //         horizontal: 8.h,
-                                //         vertical: 5.h,
-                                //       ),
-                                //       decoration: BoxDecoration(
-                                //         borderRadius: BorderRadius.circular(15),
-                                //         color: getRideTypeColor(ride!.rideType)
-                                //             .withOpacity(0.14),
-                                //       ),
-                                //       child: Text(
-                                //         (ride!.rideType == 'inhouse')
-                                //             ? 'In-house driver'
-                                //             : 'Freelance Driver',
-                                //         style: GoogleFonts.poppins(
-                                //           fontSize: 10,
-                                //           color:
-                                //               getRideTypeColor(ride!.rideType),
-                                //           fontWeight: FontWeight.bold,
-                                //         ),
-                                //       ),
-                                //     ),
-                                //     SizedBox(
-                                //       width: 10.w,
-                                //     ),
-                                //     Container(
-                                //       padding: EdgeInsets.symmetric(
-                                //         horizontal: 8.h,
-                                //         vertical: 5.h,
-                                //       ),
-                                //       decoration: BoxDecoration(
-                                //         borderRadius: BorderRadius.circular(15),
-                                //         color: const Color.fromRGBO(
-                                //             19, 59, 183, .14),
-                                //       ),
-                                //       child: Text(
-                                //         (ride!.tripType == 'oneway')
-                                //             ? 'One Way Trip'
-                                //             : 'Return Trip',
-                                //         style: GoogleFonts.poppins(
-                                //           fontSize: 10,
-                                //           color: const Color(0xff133BB7),
-                                //           fontWeight: FontWeight.bold,
-                                //         ),
-                                //       ),
-                                //     ),
-                                //   ],
+                                // Text(
+                                //   '${ride!.pickUpLocation} To ${ride!.dropOffLocation}',
+                                //   style: GoogleFonts.poppins(
+                                //     fontSize: 14,
+                                //     fontWeight: FontWeight.w700,
+                                //   ),
                                 // ),
                                 // const SizedBox(
                                 //   height: 10,
                                 // ),
                                 Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Image.asset(
-                                      'assets/images/arrow_location.png',
-                                      width: 15,
-                                      height: 15,
+                                    Flexible(
+                                      flex: 1,
+                                      child: Image.asset(
+                                        'assets/images/arrow_location.png',
+                                        width: 15,
+                                        height: 15,
+                                      ),
                                     ),
                                     SizedBox(
                                       width: 3.w,
                                     ),
-                                    Text(
-                                      'From: ${ride!.pickUpLocation}',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black,
+                                    Flexible(
+                                      flex: 9,
+                                      child: Text(
+                                        'From: ${ride!.pickUpLocation}',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -513,6 +468,94 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
                                 const SizedBox(
                                   height: 10,
                                 ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Flexible(
+                                      flex: 1,
+                                      child: Transform.flip(
+                                        flipX: true,
+                                        child: Image.asset(
+                                          'assets/images/arrow_location.png',
+                                          width: 15,
+                                          height: 15,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 3.w,
+                                    ),
+                                    Flexible(
+                                      flex: 9,
+                                      child: Text(
+                                        'To: ${ride!.dropOffLocation}',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Wrap(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8.h,
+                                        vertical: 5.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15),
+                                        color: getRideTypeColor(ride!.rideType)
+                                            .withOpacity(0.14),
+                                      ),
+                                      child: Text(
+                                        (ride!.rideType == 'inhouse')
+                                            ? 'In-house driver'
+                                            : 'Freelance Driver',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color:
+                                              getRideTypeColor(ride!.rideType),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 10.w,
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8.h,
+                                        vertical: 5.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15),
+                                        color: const Color.fromRGBO(
+                                            19, 59, 183, .14),
+                                      ),
+                                      child: Text(
+                                        (ride!.tripType == 'oneway')
+                                            ? 'One Way Trip'
+                                            : 'Return Trip',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: const Color(0xff133BB7),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+
                                 Wrap(
                                   runAlignment: WrapAlignment.center,
                                   alignment: WrapAlignment.center,
@@ -530,7 +573,7 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
                                       'Pick Up time:  ${ride!.pickUpTime}',
                                       style: GoogleFonts.poppins(
                                         color: Colors.black,
-                                        fontSize: 10,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -549,7 +592,7 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
                                       'Arrival time: ${ride!.dropOffTime}',
                                       style: GoogleFonts.poppins(
                                         color: Colors.black,
-                                        fontSize: 10,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -580,7 +623,7 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
                                                         ? 'Ride in Progress'
                                                         : 'Status will be updated soon ...',
                                         style: GoogleFonts.poppins(
-                                          fontSize: 10,
+                                          fontSize: 12,
                                           color: getStatusColor(ride!.status),
                                           fontWeight: FontWeight.bold,
                                         ),

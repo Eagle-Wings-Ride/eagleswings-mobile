@@ -14,6 +14,13 @@ class FAQ extends StatefulWidget {
 
 class _FAQState extends State<FAQ> {
   @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

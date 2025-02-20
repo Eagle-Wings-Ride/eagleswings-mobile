@@ -4,19 +4,19 @@ import 'package:flutter/material.dart';
 // import 'package:rcdit_user/functions/notifications.dart';
 // import 'pages/loadingPage/loadingpage.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'constants/component_constants.dart';
-import 'functions/function.dart';
 import 'pages/loadingPage/loading_page.dart';
 import 'injection_container.dart' as di;
 // import 'firebase_options.dart';
 
+// Global navigator key
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  configLoading();
+  // configLoading();
   await Hive.initFlutter();
   await Hive.openBox('authBox');
   await di.init();
@@ -33,23 +33,20 @@ void main() async {
   runApp(const MyApp());
 }
 
-void configLoading() {
-  EasyLoading.instance
-    ..displayDuration = const Duration(milliseconds: 2000)
-    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
-    ..loadingStyle = EasyLoadingStyle.dark
-    ..indicatorSize = 25.0
-    ..radius = 10.0
-    ..progressColor = Colors.yellow
-    ..backgroundColor = Colors.green
-    ..indicatorColor = Colors.yellow
-    ..textColor = Colors.yellow
-    ..maskColor = Colors.blue.withOpacity(0.5)
-    ..userInteractions = true
-    ..dismissOnTap = false;
-
-  // ..customAnimation = CustomAnimation();
-}
+// void configLoading() {
+//   EasyLoading.instance
+//     ..displayDuration = const Duration(milliseconds: 2000)
+//     ..loadingStyle = EasyLoadingStyle.custom // Use custom styling
+//     ..indicatorSize = 25.0
+//     ..radius = 10.0
+//     ..progressColor = Colors.yellow
+//     ..backgroundColor = Colors.transparent // Remove background color
+//     ..indicatorColor = Colors.yellow
+//     ..textColor = Colors.yellow
+//     ..maskColor = Colors.transparent // Remove overlay mask color
+//     ..userInteractions = true
+//     ..dismissOnTap = false;
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -71,6 +68,7 @@ class MyApp extends StatelessWidget {
         data: MediaQuery.of(context)
             .copyWith(textScaler: const TextScaler.linear(1)),
         child: GetMaterialApp(
+          navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'EaglesRides',
           theme: ThemeData(
@@ -82,7 +80,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
           home: const LoadingPage(),
-          builder: EasyLoading.init(),
+          // builder: EasyLoading.init(),
         ),
       ),
     );

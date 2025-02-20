@@ -42,11 +42,19 @@ class _BookRideState extends State<BookRide> {
   double? startLatitude;
   double? endLongitude;
   double? endLatitude;
+  var user = Get.find<AuthController>().user.value;
   @override
   void dispose() {
     sourceController.dispose();
     destinationController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    sourceController.text = user!.address;
+    super.initState();
   }
 
   @override
@@ -737,7 +745,6 @@ class _BookRideState extends State<BookRide> {
                       SizedBox(
                         height: 20.h,
                       ),
-
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -858,6 +865,9 @@ class _BookRideState extends State<BookRide> {
                           ),
                         ],
                       ),
+                      SizedBox(
+                        height: 20.h,
+                      ),
                       Text(
                         'Schedule',
                         style: GoogleFonts.poppins(
@@ -866,79 +876,10 @@ class _BookRideState extends State<BookRide> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      // SizedBox(
-                      //   height: 10.h,
-                      // ),
-                      // Column(
-                      //   children: [
-                      //     Padding(
-                      //       padding: EdgeInsets.only(
-                      //         bottom: 10.h,
-                      //       ),
-                      //       child: Wrap(
-                      //         crossAxisAlignment: WrapCrossAlignment.center,
-                      //         children: [
-                      //           Container(
-                      //             padding: EdgeInsets.symmetric(
-                      //               horizontal: 8.h,
-                      //               vertical: 5.h,
-                      //             ),
-                      //             decoration: BoxDecoration(
-                      //               borderRadius: BorderRadius.circular(15),
-                      //               color:
-                      //                   const Color.fromRGBO(19, 59, 183, .14),
-                      //             ),
-                      //             child: Text(
-                      //               'Two Weeks',
-                      //               style: GoogleFonts.poppins(
-                      //                 fontSize: 10,
-                      //                 color: const Color(0xff133BB7),
-                      //                 fontWeight: FontWeight.bold,
-                      //               ),
-                      //             ),
-                      //           ),
-                      //           SizedBox(
-                      //             width: 20.w,
-                      //           ),
-                      //           Container(
-                      //             padding: EdgeInsets.symmetric(
-                      //               horizontal: 8.h,
-                      //               vertical: 5.h,
-                      //             ),
-                      //             decoration: BoxDecoration(
-                      //               borderRadius: BorderRadius.circular(15),
-                      //               color:
-                      //                   const Color.fromRGBO(19, 59, 183, .14),
-                      //             ),
-                      //             child: Text(
-                      //               'One Month',
-                      //               style: GoogleFonts.poppins(
-                      //                 fontSize: 10,
-                      //                 color: const Color(0xff133BB7),
-                      //                 fontWeight: FontWeight.bold,
-                      //               ),
-                      //             ),
-                      //           ),
-                      //           SizedBox(
-                      //             width: 20.w,
-                      //           ),
-                      //           Text(
-                      //             'Enter Manually',
-                      //             style: GoogleFonts.poppins(
-                      //               fontSize: 10,
-                      //               color: const Color(0xff133BB7),
-                      //               fontWeight: FontWeight.bold,
-                      //             ),
-                      //           ),
-                      //         ],
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
                     ],
                   ),
                   SizedBox(
-                    height: 20.h,
+                    height: 10.h,
                   ),
                   Column(
                     children: [
@@ -964,7 +905,7 @@ class _BookRideState extends State<BookRide> {
                                 DateTime? pickedDate = await showDatePicker(
                                   context: context,
                                   initialDate: DateTime.now(),
-                                  firstDate: DateTime(2020),
+                                  firstDate: DateTime.now(),
                                   lastDate: DateTime(2100),
                                 );
                                 if (pickedDate != null) {

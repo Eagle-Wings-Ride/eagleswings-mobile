@@ -1,5 +1,6 @@
 import 'package:eaglerides/config/map_api_key.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../core/utils/debouncer.dart';
 import '../../../data/core/places_service.dart';
@@ -25,19 +26,21 @@ class _AddressSearchScreenState extends State<AddressSearchScreen> {
   final _debouncer = Debouncer(milliseconds: 500);
   List<Placeprediction> _predictions = [];
   bool _isLoading = false;
+  final sessionToken = Uuid().v4(); // Generate once per search session
 
   Future<void> _searchPlaces(String query) async {
     if (query.length < 3) return;
     setState(() => _isLoading = true);
 
     try {
-      final predictions = await _placesService.searchPlaces(query);
+      final predictions =
+          await _placesService.searchPlaces(query, sessionToken);
       ;
       setState(() => _predictions = predictions);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error searching for places: $e')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Error searching for places: $e')),
+      // );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -47,8 +50,8 @@ class _AddressSearchScreenState extends State<AddressSearchScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final placeDetails =
-          await _placesService.getPlaceDetails(prediction.placeId);
+      final placeDetails = await _placesService.getPlaceDetails(
+          prediction.placeId, sessionToken);
 
       Navigator.pop(context, placeDetails);
 
@@ -59,12 +62,12 @@ class _AddressSearchScreenState extends State<AddressSearchScreen> {
       setState(() => _predictions = []);
     } catch (e) {
       print('Error in _selectPlace: $e'); // Debug print
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error getting place details'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text('Error getting place details'),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -139,32 +142,6 @@ class _AddressSearchScreenState extends State<AddressSearchScreen> {
               },
             ),
             const SizedBox(height: 8),
-            // Row(
-            //   children: [
-            //     Icon(
-            //       Icons.near_me_rounded,
-            //       color: hintColor,
-            //     ),
-            //     const SizedBox(
-            //       width: 10,
-            //     ),
-            //     Text(
-            //       'Use my current location',
-            //       style: TextStyle(
-            //         fontSize: 12,
-            //         fontWeight: FontWeight.w500,
-            //         letterSpacing: -.5,
-            //         color: hintColor,
-            //         decoration: TextDecoration.underline,
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            // ElevatedButton.icon(
-            //   onPressed: _useCurrentLocation,
-            //   icon: const Icon(Icons.my_location),
-            //   label: const Text("Use Current Location"),
-            // ),
             Expanded(
               child: _isLoading
                   ? const Center(child: CustomLoader())
@@ -199,7 +176,7 @@ class _AddressSearchScreenState extends State<AddressSearchScreen> {
                           subtitle: Text(
                             prediction.secondaryText,
                             style: const TextStyle(
-                              fontSize: 10,
+                              fontSize: 12,
                               fontWeight: FontWeight.w500,
                               letterSpacing: -.5,
                               color: Colors.black,

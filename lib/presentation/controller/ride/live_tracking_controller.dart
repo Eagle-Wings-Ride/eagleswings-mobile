@@ -4,11 +4,15 @@ import 'dart:ui' as ui;
 import 'package:eaglerides/domain/entities/ride_map_direction_entity.dart';
 import 'package:eaglerides/domain/usecases/direction_usecase.dart';
 import 'package:eaglerides/domain/usecases/trip_payment_usecase.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../../../styles/styles.dart';
 
 class LiveTrackingController extends GetxController {
   var liveLocLatitude = 0.0.obs;
@@ -40,8 +44,8 @@ class LiveTrackingController extends GetxController {
   getDirectionData(int index) async {
     // checkTripCompletionStatus(index);
     LocationPermission permission;
-    await Geolocator.requestPermission();
     permission = await Geolocator.checkPermission();
+    // await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
@@ -53,9 +57,25 @@ class LiveTrackingController extends GetxController {
       }
     } else if (permission == LocationPermission.deniedForever) {
       Get.snackbar(
+        isDismissible: false,
         "Alert",
-        "Location permissions are permanently denied,please enable it from app setting",
+        "Location permissions are permanently denied. Please enable it in app settings.",
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 5),
+        mainButton: TextButton(
+          onPressed: () {
+            Geolocator.openAppSettings();
+          },
+          child: Text(
+            "Open Settings",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: buttonText,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
       );
     } else {
       if (liveLocLatitude.value == 0.0) {

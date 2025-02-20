@@ -138,41 +138,40 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ],
                     ),
                   ),
-                    Center(
-                          child: Container(
-                            width: double.maxFinite,
-                            margin: EdgeInsets.symmetric(vertical: 30.h),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10.w, vertical: 0.h),
-                            alignment: Alignment.bottomCenter,
-                            child: Wrap(
-                              children: [
-                                Text(
-                                  'Dont\'t have an account? ',
-                                  style: GoogleFonts.poppins(
-                                    color: textColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Get.to(const Register());
-                                  },
-                                  child: Text(
-                                    'Sign Up',
-                                    style: GoogleFonts.poppins(
-                                      color: backgroundColor,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                  Center(
+                    child: Container(
+                      width: double.maxFinite,
+                      margin: EdgeInsets.symmetric(vertical: 30.h),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 0.h),
+                      alignment: Alignment.bottomCenter,
+                      child: Wrap(
+                        children: [
+                          Text(
+                            'Dont\'t have an account? ',
+                            style: GoogleFonts.poppins(
+                              color: textColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                        ),
-                      
+                          GestureDetector(
+                            onTap: () {
+                              Get.to(const Register());
+                            },
+                            child: Text(
+                              'Sign Up',
+                              style: GoogleFonts.poppins(
+                                color: backgroundColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

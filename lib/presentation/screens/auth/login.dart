@@ -48,8 +48,9 @@ class _LoginState extends State<Login> {
     _authController.checkIsSignIn();
     // Ensure nothing is focused on the first load
     WidgetsBinding.instance.addPostFrameCallback((_) {
-          FocusScope.of(context).unfocus();  // This removes focus from any focused widget
-    SystemChannels.textInput.invokeMethod('TextInput.hide'); 
+      FocusScope.of(context)
+          .unfocus(); // This removes focus from any focused widget
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
       FocusScopeNode currentFocus = FocusScope.of(context);
 
       if (!currentFocus.hasPrimaryFocus) {
@@ -122,7 +123,7 @@ class _LoginState extends State<Login> {
                                     // foc
                                     controller: _emailController,
                                     keyboardType: TextInputType.emailAddress,
-                                    
+
                                     obscureText: false,
                                     filled: false,
                                     readOnly: false,

@@ -276,8 +276,9 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
         print('No children found: ${data['message']}');
         return []; // Return an empty list instead of throwing an error
       } else {
-        throw Exception(
-            'Unexpected response format: Expected List, got ${data.runtimeType}');
+        return [];
+        // throw Exception(
+        //     'Unexpected response format: Expected List, got ${data.runtimeType}');
       }
     } catch (e) {
       print('Error fetching children: $e');
@@ -319,7 +320,8 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
       // }
     } catch (e) {
       print("Error fetching recent rides: $e");
-      rethrow; // Re-throw error to be handled elsewhere
+      // rethrow; // Re-throw error to be handled elsewhere
+      return [];
     }
   }
 
