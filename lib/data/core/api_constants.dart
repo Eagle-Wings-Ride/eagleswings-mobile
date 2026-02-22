@@ -2,5 +2,5 @@ class ApiConstants {
   ApiConstants._();
 
   static const String baseUrl =
-      "https://eagleswings-backend-teal.vercel.app/api/v1";
+      "https://eagleswings-backend-production.up.railway.app/api/v1";
 }
