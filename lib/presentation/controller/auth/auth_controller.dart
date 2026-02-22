@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:eaglerides/domain/usecases/add_child_usecase.dart';
 import 'package:eaglerides/domain/usecases/book_ride_usecase.dart';
 import 'package:eaglerides/domain/usecases/eagle_rides_auth_check_user_usecase.dart';
@@ -7,27 +9,31 @@ import 'package:eaglerides/domain/usecases/eagle_rides_auth_sign_out_usecase.dar
 import 'package:eaglerides/domain/usecases/fetch_children_usecase.dart';
 import 'package:eaglerides/domain/usecases/fetch_rates_usecase.dart';
 import 'package:eaglerides/domain/usecases/fetch_recent_rides_usecase.dart';
+import 'package:eaglerides/domain/usecases/delete_user_usecase.dart';
 import 'package:eaglerides/domain/usecases/getUserUseCase.dart';
 import 'package:eaglerides/domain/usecases/register.dart';
 import 'package:eaglerides/presentation/screens/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
+import '../../../data/datasource/auth_remote_data_source.dart';
 import '../../../data/models/book_rides_model.dart';
 import '../../../data/models/child_model.dart';
+import '../../../data/models/child_upsert_request.dart';
+import '../../../data/models/payment_models.dart';
 import '../../../data/models/user_model.dart';
+import '../../../domain/usecases/fetch_all_rides_usecase.dart';
 import '../../../domain/usecases/login_user.dart';
 import '../../../navigation_page.dart';
 import '../../../widgets/global_loader.dart';
 import '../../../widgets/widgets.dart';
 import '../../screens/auth/verify_email.dart';
-import '../../screens/home/home.dart';
-import '../../screens/ride/widget/custom_loader.dart';
+import '../../screens/ride/payment_screen.dart';
 
 class AuthController extends GetxController {
   final EagleRidesAuthIsSignInUseCase eagleRidesAuthIsSignInUseCase;
@@ -43,6 +49,9 @@ class AuthController extends GetxController {
   final FetchRecentRidesUseCase fetchRecentRidesUseCase;
   final BookRideUseCase bookRideUseCase;
   final FetchRatesUsecase fetchRatesUsecase;
+  final FetchAllRidesUseCase fetchAllRidesUseCase;
+  final DeleteUserUseCase deleteUserUseCase;
+  // final CancelRideUseCase cancelRideUseCase;
 
   var user = Rx<UserModel?>(null);
   RxList<Child> children = <Child>[].obs;
@@ -51,13 +60,6 @@ class AuthController extends GetxController {
   var isSignIn = false.obs;
 
   var rates = Rxn<Map<String, dynamic>>(); // Use Rxn (nullable observable)
-  // final String hiveBoxName = 'pricingBox';
-
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   // loadUser(); // Load user data when the controller is initialized
-  // }
 
   AuthController({
     required this.eagleRidesAuthIsSignInUseCase,
@@ -72,8 +74,13 @@ class AuthController extends GetxController {
     required this.fetchRecentRidesUseCase,
     required this.bookRideUseCase,
     required this.fetchRatesUsecase,
+    required this.fetchAllRidesUseCase,
+    required this.deleteUserUseCase,
+    // required this.cancelRideUseCase,
     // required this.eagleRidesAuthGetUserUidUseCase,
   });
+
+  final RxBool isLoadingRides = false.obs;
 
   Future<String?> getToken() async {
     final box = await Hive.openBox('authBox');
@@ -86,15 +93,42 @@ class AuthController extends GetxController {
   }
 
   Future<bool> checkUserStatus() async {
-    var box = await Hive.openBox('authBox');
-    final userId = box.get('user_id');
-    if (userId != null) {
-      return await eagleRidesAuthCheckUserUseCase(userId);
+    try {
+      var box = await Hive.openBox('authBox');
+      final token = box.get('auth_token');
+
+      // If no token, user is not logged in
+      if (token == null) {
+        print('No auth token found, user not signed in.');
+        return false;
+      }
+
+      // Token exists, try to fetch user data to validate it
+      final userResponse = await getUserUsecase.call();
+      if (userResponse != null) {
+        // User data fetched successfully, token is valid
+        final userInfo = UserModel.fromMap(userResponse);
+        user.value = userInfo;
+
+        // Store user info in local storage for future use
+        await box.put('user_info', userResponse);
+
+        update();
+        print('User status valid: ${userInfo.name}');
+        return true;
+      } else {
+        print('Could not fetch user data, clearing auth.');
+        await box.delete('auth_token');
+        return false;
+      }
+    } catch (e) {
+      print('Error checking user status: $e');
+      // If token is invalid, the API will throw and we should log out
+      var box = await Hive.openBox('authBox');
+      await box.delete('auth_token');
+      return false;
     }
-    return false;
   }
-  // String riderId = await eagleRidesAuthGetUserUidUseCase.call();
-  // return eagleRidesAuthCheckUserUseCase.call(riderId);
 
   loginUser(String email, String password, context) async {
     final box = await Hive.openBox('authBox');
@@ -106,23 +140,13 @@ class AuthController extends GetxController {
     user.refresh();
     try {
       GlobalLoader().show();
-      // EasyLoading.show(
-      //   indicator: const CustomLoader(),
-      //   maskType: EasyLoadingMaskType.clear,
-      //   dismissOnTap: false,
-      // );
+
       final token = await eagleRidesLoginUserUseCase.call(email, password);
       print(token);
       await loadUser();
       // Save token or navigate to another page
       GlobalLoader().hide();
-      // EasyLoading.dismiss();
-      // showTopSnackBar(
-      //   Overlay.of(context),
-      //   const CustomSnackBar.success(
-      //     message: 'Login Successful',
-      //   ),
-      // );
+
       Get.offAll(const NavigationPage());
     } catch (e) {
       GlobalLoader().hide();
@@ -141,11 +165,7 @@ class AuthController extends GetxController {
   logout(context) async {
     try {
       GlobalLoader().show();
-      // EasyLoading.show(
-      //   indicator: const CustomLoader(),
-      //   maskType: EasyLoadingMaskType.clear,
-      //   dismissOnTap: false,
-      // );
+
       await eagleRidesAuthSignOutUseCase.call();
       final box = await Hive.openBox('authBox');
       final rateBox = await Hive.openBox('rateBox');
@@ -185,11 +205,7 @@ class AuthController extends GetxController {
     print(requestBody);
     try {
       GlobalLoader().show();
-      // EasyLoading.show(
-      //   indicator: const CustomLoader(),
-      //   maskType: EasyLoadingMaskType.clear,
-      //   dismissOnTap: false,
-      // );
+
       final response = await eagleRidesRegisterUseCase.call(requestBody);
       debugPrint(response);
       showTopSnackBar(
@@ -219,16 +235,12 @@ class AuthController extends GetxController {
     }
   }
 
-  addChild(Map<String, dynamic> requestBody, context) async {
+  Future<void> addChild(ChildUpsertRequest requestBody, BuildContext context) async {
     print('requestBody');
     print(requestBody);
     try {
       GlobalLoader().show();
-      // EasyLoading.show(
-      //   indicator: const CustomLoader(),
-      //   maskType: EasyLoadingMaskType.clear,
-      //   dismissOnTap: false,
-      // );
+
       await addChildUseCase.call(requestBody);
       await refreshChildren();
       // debugPrint(response);
@@ -448,24 +460,17 @@ class AuthController extends GetxController {
   Future<void> refreshChildren() async {
     try {
       GlobalLoader().show();
-      // EasyLoading.show(
-      //   indicator: const CustomLoader(),
-      //   maskType: EasyLoadingMaskType.clear,
-      //   dismissOnTap: false,
-      // );
 
       await Hive.deleteBoxFromDisk('childrenBox'); // Clear outdated local data
       var childrenBox = await Hive.openBox('childrenBox');
-      final userId = user.value?.id;
-      if (userId == null) throw Exception('User ID not found');
 
       // Fetch new children from API
-      final fetchedChildren = await fetchChildrenUseCase.call(userId);
+      final fetchedChildren = await fetchChildrenUseCase.call();
       List<Child> newChildrenList = fetchedChildren
           .map<Child>((childJson) => Child.fromJson(childJson))
           .toList();
 
-      // Save the updated children list to Hive
+      // Save the updated children list to Hivexx
       await childrenBox.put('children', fetchedChildren);
 
       // Update UI with the new data
@@ -486,81 +491,6 @@ class AuthController extends GetxController {
     }
   }
 
-  // Future<void> fetchChildren() async {
-  //   var box = await Hive.openBox('authBox');
-  //   String? token = box.get('auth_token');
-  //   var childrenBox = await Hive.openBox('childrenBox');
-
-  //   if (token != null) {
-  //     // Token exists, attempt to load user data from storage
-  //     var childrenInfo = childrenBox.get('children');
-
-  //     if (childrenInfo != null) {
-  //       // Ensure childrenInfo is a list of maps (dynamic type issue)
-  //       if (childrenInfo is List) {
-  //         // Map the childrenInfo to List<Child>
-  //         List<Child> childrenList = childrenInfo
-  //             .map<Child>((childJson) =>
-  //                 Child.fromJson(Map<String, dynamic>.from(childJson)))
-  //             .toList();
-  //         // print(childrenList);
-
-  //         // Update the reactive list with the deserialized data
-  //         children.assignAll(childrenList);
-  //         update();
-  //       } else {
-  //         // Handle unexpected structure of the childrenInfo
-  //         print(
-  //             'Error: The stored children data is not in the expected format.');
-  //       }
-  //     } else {
-  //       // If no children data found, fetch from API
-  //       try {
-  //         EasyLoading.show(
-  //           indicator: const CustomLoader(),
-  //           maskType: EasyLoadingMaskType.clear,
-  //           dismissOnTap: false,
-  //         );
-
-  //         final userId =
-  //             user.value?.id; // Get the user ID (check if it's available)
-  //         if (userId == null) {
-  //           throw Exception('User ID not found');
-  //         }
-
-  //         // Fetch children from the API
-  //         final fetchedChildren = await fetchChildrenUseCase.call(userId);
-
-  //         // Map the API response to a list of Child objects
-  //         List<Child> childrenList = fetchedChildren
-  //             .map<Child>((childJson) => Child.fromJson(childJson))
-  //             .toList();
-
-  //         // Save the children to local storage
-  //         childrenBox.put('children', fetchedChildren);
-
-  //         // Update the reactive list with the fetched children
-  //         children.assignAll(childrenList);
-  //         // setChildren(childrenList); // If necessary, use this method to set the children
-  //       } catch (e) {
-  //         print("Error fetching children: $e");
-  //         Get.snackbar(
-  //           'Error',
-  //           e.toString(),
-  //           snackPosition: SnackPosition.BOTTOM,
-  //           backgroundColor: Colors.red,
-  //           colorText: Colors.white,
-  //         );
-  //       } finally {
-  //         EasyLoading.dismiss();
-  //       }
-  //     }
-  //   } else {
-  //     // No token found, user is not logged in, redirect to login screen
-  //     Get.offAll(const Login());
-  //   }
-  // }
-
   Future<void> fetchRecentRides(String childId) async {
     // var rideBox = await Hive.openBox('ridesBox');
     var box = await Hive.openBox('authBox');
@@ -568,11 +498,6 @@ class AuthController extends GetxController {
 
     if (token != null) {
       try {
-        // EasyLoading.show(
-        //   indicator: const CustomLoader(),
-        //   maskType: EasyLoadingMaskType.none,
-        //   dismissOnTap: false,
-        // );
         GlobalLoader().show();
 
         List<Booking> recentBookings = [];
@@ -607,44 +532,516 @@ class AuthController extends GetxController {
     }
   }
 
+// REPLACE YOUR bookRide METHOD WITH THIS IN auth_controller.dart
+
   bookRide(Map<String, dynamic> requestBody, String childId, context) async {
     print('requestBody');
     print(requestBody);
     print(childId);
     try {
       GlobalLoader().show();
-      // EasyLoading.show(
-      //   indicator: const CustomLoader(),
-      //   maskType: EasyLoadingMaskType.clear,
-      //   dismissOnTap: false,
-      // );
+
       final response = await bookRideUseCase.call(requestBody, childId);
       debugPrint(response);
+
+      // ⭐ Parse the response
+      final responseData = json.decode(response);
+
+      GlobalLoader().hide();
+
       showTopSnackBar(
         Overlay.of(context),
         const CustomSnackBar.success(
           message: 'Booking Successful',
         ),
       );
-      GlobalLoader().hide();
-      // EasyLoading.dismiss();
-      Get.to(const NavigationPage());
-      // Get.to(
-      //   VerifyEmail(
-      //     email: requestBody['email'],
-      //   ),
-      // );
+
+      // ⭐ Extract booking data
+      final booking = responseData['booking'] as Map<String, dynamic>;
+      final bookingId = booking['_id']?.toString() ?? '';
+      if (bookingId.isEmpty) {
+        throw Exception('Booking was created but no booking ID was returned.');
+      }
+      final childValue = booking['child'];
+      final childName = childValue is Map<String, dynamic>
+          ? (childValue['fullname']?.toString() ?? 'N/A')
+          : childValue?.toString() ?? 'N/A';
+
+      // ⭐ Calculate amount from rates
+      final amount = _calculateAmount(
+        booking['ride_type']?.toString() ?? '',
+        booking['trip_type']?.toString() ?? '',
+        booking['schedule_type']?.toString() ?? '',
+      );
+
+      // ⭐ Navigate to payment screen
+      Get.to(() => PaymentScreen(
+            amount: amount,
+            bookingId: bookingId,
+            bookingDetails: {
+              'childName': childName,
+              'tripType': booking['trip_type']?.toString() ?? 'N/A',
+              'schedule': booking['schedule_type']?.toString() ?? 'N/A',
+              'startDate': booking['start_date']?.toString() ?? 'N/A',
+            },
+          ));
     } catch (e) {
       print(e);
       GlobalLoader().hide();
-      // EasyLoading.dismiss();
-      showTopSnackBar(
-        Overlay.of(context),
-        CustomSnackBar.error(
-          message: e.toString(),
+
+      final errorMessage = e.toString().toLowerCase();
+
+      // Check if it's a pending booking conflict
+      if (errorMessage.contains('pending booking already exists')) {
+        // Show dialog with options
+        Get.dialog(
+          AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Row(
+              children: [
+                Icon(Icons.warning_amber_rounded,
+                    color: const Color(0xffFF5500), size: 28),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Pending Booking Found',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: const Text(
+              'You already have a pending booking for this child. Would you like to view it or cancel it to create a new one?',
+              style: TextStyle(fontSize: 14),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text(
+                  'Close',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Get.back(); // Close dialog
+                  Get.back(); // Go back from confirm booking
+                  Get.back(); // Go back from book ride
+                  // Navigate to rides tab (index 1) using the new initialTab parameter
+                  Get.offAll(() => const NavigationPage(initialTab: 1));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xffFF5500),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Text(
+                  'View Pending',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+          barrierDismissible: false,
+        );
+      } else {
+        // Show regular error snackbar
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.error(
+            message: e.toString().replaceAll('Exception: ', ''),
+          ),
+        );
+      }
+    }
+  }
+
+  // ⭐ ADD THIS NEW HELPER METHOD
+  double _calculateAmount(
+      String rideType, String tripType, String scheduleType) {
+    try {
+      final ratesData = rates.value;
+
+      if (ratesData == null) {
+        return 0.0;
+      }
+
+      String driverKey =
+          rideType == 'inhouse' ? 'in_house_drivers' : 'freelance_drivers';
+
+      String scheduleKey = scheduleType == '2 weeks'
+          ? 'bi_weekly'
+          : scheduleType == '1 month'
+              ? 'monthly'
+              : 'daily';
+
+      String tripKey = tripType == 'return' ? 'return' : 'one_way';
+
+      final price = ratesData[driverKey]?[scheduleKey]?[tripKey];
+
+      return price?.toDouble() ?? 0.0;
+    } catch (e) {
+      print('Error calculating amount: $e');
+      return 0.0;
+    }
+  }
+
+  Future<void> fetchRidesByUser() async {
+    try {
+      isLoadingRides.value = true;
+
+      final fetchedRides = await fetchAllRidesUseCase.call();
+
+      List<Booking> bookings =
+          fetchedRides.map((rideJson) => Booking.fromJson(rideJson)).toList();
+
+      // Sort by date (newest first)
+      bookings.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      recentRides.assignAll(bookings);
+      update();
+
+      print('✅ Fetched ${bookings.length} rides');
+    } catch (e) {
+      print('Error fetching rides: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to refresh rides',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoadingRides.value = false;
+    }
+  }
+
+  // ============================================
+  // NEW: Payment Methods
+  // ============================================
+
+  Future<PaymentResponseModel> makePayment({
+    required String bookingId,
+    required String currency,
+  }) async {
+    try {
+      final dataSource = GetIt.instance<EagleRidesAuthDataSource>();
+      return await dataSource.makePayment(
+        PaymentRequestModel(
+          bookingId: bookingId,
+          currency: currency,
         ),
       );
-      // Get.snackbar('Registration Failed', e.toString());
+    } catch (e) {
+      print('Error making payment: $e');
+      rethrow;
     }
+  }
+
+  Future<PaymentResponseModel> renewPayment({
+    required String bookingId,
+    required String currency,
+  }) async {
+    try {
+      final dataSource = GetIt.instance<EagleRidesAuthDataSource>();
+      return await dataSource.renewPayment(
+        PaymentRequestModel(
+          bookingId: bookingId,
+          currency: currency,
+        ),
+      );
+    } catch (e) {
+      print('Error renewing payment: $e');
+      rethrow;
+    }
+  }
+
+  Future<PaymentStatusResult> refreshPaymentStatus(String bookingId) async {
+    await fetchRidesByUser();
+    final matchingRide = recentRides.firstWhereOrNull((r) => r.id == bookingId);
+    return PaymentStatusResult(
+      bookingId: bookingId,
+      status: matchingRide?.status,
+    );
+  }
+
+  // ============================================
+  // NEW: Password Reset Methods
+  // ============================================
+
+  Future<String> forgotPassword({
+    required String email,
+    String? oldPassword,
+    String? newPassword,
+  }) async {
+    try {
+      GlobalLoader().show();
+      final dataSource = GetIt.instance<EagleRidesAuthDataSource>();
+      final result = await dataSource.forgotPassword(
+        email: email,
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+      GlobalLoader().hide();
+
+      Get.snackbar(
+        'Success',
+        result,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+
+      return result;
+    } catch (e) {
+      GlobalLoader().hide();
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+      rethrow;
+    }
+  }
+
+  Future<String> verifyPasswordResetOtp({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      GlobalLoader().show();
+      final dataSource = GetIt.instance<EagleRidesAuthDataSource>();
+      final result = await dataSource.eagleridesAuthOtpVerification(email, otp);
+      GlobalLoader().hide();
+
+      Get.snackbar(
+        'Success',
+        result,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+      return result;
+    } catch (e) {
+      GlobalLoader().hide();
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+      rethrow;
+    }
+  }
+
+  Future<String> setForgotPassword({
+    required String email,
+    required String newPassword,
+  }) async {
+    return forgotPassword(
+      email: email,
+      newPassword: newPassword,
+    );
+  }
+
+  Future<String> resendOtp(String email) async {
+    try {
+      GlobalLoader().show();
+      final dataSource = GetIt.instance<EagleRidesAuthDataSource>();
+      final result = await dataSource.resendOtp(email);
+      GlobalLoader().hide();
+
+      Get.snackbar(
+        'OTP Sent',
+        result,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+
+      return result;
+    } catch (e) {
+      GlobalLoader().hide();
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+      rethrow;
+    }
+  }
+
+  // ============================================
+  // NEW: User Profile Methods
+  // ============================================
+
+  Future<Map<String, dynamic>?> updateUserProfile(
+      Map<String, dynamic> updates) async {
+    try {
+      GlobalLoader().show();
+      final dataSource = GetIt.instance<EagleRidesAuthDataSource>();
+      final userId = _resolveUserIdOrThrow();
+      final result = await dataSource.updateUserProfile(userId, updates);
+
+      // Refresh user data
+      await loadUser();
+
+      GlobalLoader().hide();
+      Get.snackbar(
+        'Success',
+        'Profile updated successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+
+      return result;
+    } catch (e) {
+      GlobalLoader().hide();
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+      rethrow;
+    }
+  }
+
+  // ============================================
+  // NEW: Child Management Methods
+  // ============================================
+
+  Future<Map<String, dynamic>?> updateChild(
+      String childId, ChildUpsertRequest updates) async {
+    try {
+      GlobalLoader().show();
+      final dataSource = GetIt.instance<EagleRidesAuthDataSource>();
+      final result = await dataSource.updateChild(childId, updates);
+
+      // Refresh children list
+      await fetchChildren();
+
+      GlobalLoader().hide();
+      Get.snackbar(
+        'Success',
+        'Child updated successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+
+      return result;
+    } catch (e) {
+      GlobalLoader().hide();
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> deleteChild(String childId) async {
+    try {
+      GlobalLoader().show();
+      final dataSource = GetIt.instance<EagleRidesAuthDataSource>();
+      await dataSource.deleteChild(childId);
+
+      // Refresh children list
+      await fetchChildren();
+
+      GlobalLoader().hide();
+      Get.snackbar(
+        'Success',
+        'Child deleted successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      GlobalLoader().hide();
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    try {
+      final userId = _resolveUserIdOrThrow();
+
+      GlobalLoader().show();
+
+      // 1. Call API to delete user
+      await deleteUserUseCase.call(userId);
+
+      // 2. Clear all local storage
+      var authBox = await Hive.openBox('authBox');
+      var childrenBox = await Hive.openBox('childrenBox');
+      var ratesBox = await Hive.openBox('ratesBox');
+
+      await authBox.clear();
+      await childrenBox.clear();
+      await ratesBox.clear();
+
+      // 3. Reset local state
+      user.value = null;
+      children.clear();
+      recentRides.clear();
+      isSignIn.value = false;
+
+      GlobalLoader().hide();
+
+      Get.snackbar(
+        'Success',
+        'Your account has been deleted successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xffFF5500),
+        colorText: Colors.white,
+      );
+
+      // 4. Redirect to login
+      Get.offAll(const Login());
+    } catch (e) {
+      GlobalLoader().hide();
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  String _resolveUserIdOrThrow() {
+    final userId = user.value?.id.trim() ?? '';
+    if (userId.isEmpty) {
+      throw Exception(
+        'Unable to resolve your user ID. Please sign out and sign in again.',
+      );
+    }
+    return userId;
   }
 }
