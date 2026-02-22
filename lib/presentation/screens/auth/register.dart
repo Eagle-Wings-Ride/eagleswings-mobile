@@ -11,8 +11,6 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../../config/map_api_key.dart';
 import '../../../widgets/widgets.dart';
-import '../../../pages/loadingPage/loading.dart';
-import '../../../pages/noInternet/no_internet.dart';
 import 'package:http/http.dart' as http;
 import '../../controller/auth/auth_controller.dart';
 import 'login.dart';

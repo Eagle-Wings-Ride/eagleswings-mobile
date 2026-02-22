@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../styles/styles.dart';
 import '../../../widgets/widgets.dart';
+import '../../controller/auth/auth_controller.dart';
 import 'register.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -109,15 +110,41 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                           ),
                                         ),
                                       ),
-                                      onPressed: () {
+                                      onPressed: () async {
                                         FocusScope.of(context).unfocus();
-                                        // await verificationSuccessful();
-                                        // Get.offAll(NavigationPage());
-                                        Get.to(
-                                          ForgotPassOtpScreen(
-                                              email:
-                                                  _forgotPassController.text),
-                                        );
+
+                                        final email =
+                                            _forgotPassController.text.trim();
+
+                                        // Validate email
+                                        if (email.isEmpty ||
+                                            !GetUtils.isEmail(email)) {
+                                          Get.snackbar(
+                                            'Invalid Email',
+                                            'Please enter a valid email address',
+                                            snackPosition: SnackPosition.BOTTOM,
+                                            backgroundColor:
+                                                const Color(0xffFF5500),
+                                            colorText: Colors.white,
+                                          );
+                                          return;
+                                        }
+
+                                        // Call the forgot password API
+                                        try {
+                                          final authController =
+                                              Get.find<AuthController>();
+                                          await authController
+                                              .forgotPassword(email);
+
+                                          // Only navigate if API call was successful
+                                          Get.to(
+                                            ForgotPassOtpScreen(email: email),
+                                          );
+                                        } catch (e) {
+                                          // Error is already shown by the controller
+                                          print('Forgot password error: $e');
+                                        }
                                       },
                                       child: Text(
                                         'Continue',

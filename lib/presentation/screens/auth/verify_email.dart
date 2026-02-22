@@ -197,6 +197,29 @@ class _VerifyEmailState extends State<VerifyEmail> {
                                       ),
                                     ),
                                   ),
+                                  SizedBox(height: 20.h),
+                                  // Resend OTP Button
+                                  Center(
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        try {
+                                          await _authController
+                                              .resendOtp(widget.email);
+                                        } catch (e) {
+                                          print('Resend OTP error: $e');
+                                        }
+                                      },
+                                      child: Text(
+                                        'Didn\'t receive code? Resend OTP',
+                                        style: GoogleFonts.poppins(
+                                          color: backgroundColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
