@@ -21,6 +21,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../pages/onTripPage/booking_confirmation.dart';
 import '../pages/onTripPage/map_page.dart';
+import '../config/map_api_key.dart';
 
 //languages code
 dynamic phcode;
@@ -36,7 +37,7 @@ bool internet = true;
 String url = 'base url ';
 String mqttUrl = 'mqtt url';
 int mqttPort = 1883;
-String mapkey = 'AIzaSyBY1bi0lfZ6rqeY2SYh4uuCR6773YMpdjI';
+String mapkey = apiKey;
 
 //check internet connection
 
@@ -857,29 +858,29 @@ List etaDetails = [];
 etaRequest() async {
   // dynamic result;
   // try {
-    // var response = await http.post(Uri.parse('${url}api/v1/request/eta'),
-    //     headers: {
-    //       'Authorization': 'Bearer ${bearerToken[0].token}',
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: jsonEncode({
-    //       'pick_lat': (userRequestData.isNotEmpty)
-    //           ? userRequestData['pick_lat']
-    //           : addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
-    //       'pick_lng': (userRequestData.isNotEmpty)
-    //           ? userRequestData['pick_lng']
-    //           : addressList
-    //               .firstWhere((e) => e.id == 'pickup')
-    //               .latlng
-    //               .longitude,
-    //       'drop_lat': (userRequestData.isNotEmpty)
-    //           ? userRequestData['drop_lat']
-    //           : addressList.firstWhere((e) => e.id == 'drop').latlng.latitude,
-    //       'drop_lng': (userRequestData.isNotEmpty)
-    //           ? userRequestData['drop_lng']
-    //           : addressList.firstWhere((e) => e.id == 'drop').latlng.longitude,
-    //       'ride_type': 1
-    //     }));
+  // var response = await http.post(Uri.parse('${url}api/v1/request/eta'),
+  //     headers: {
+  //       'Authorization': 'Bearer ${bearerToken[0].token}',
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: jsonEncode({
+  //       'pick_lat': (userRequestData.isNotEmpty)
+  //           ? userRequestData['pick_lat']
+  //           : addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
+  //       'pick_lng': (userRequestData.isNotEmpty)
+  //           ? userRequestData['pick_lng']
+  //           : addressList
+  //               .firstWhere((e) => e.id == 'pickup')
+  //               .latlng
+  //               .longitude,
+  //       'drop_lat': (userRequestData.isNotEmpty)
+  //           ? userRequestData['drop_lat']
+  //           : addressList.firstWhere((e) => e.id == 'drop').latlng.latitude,
+  //       'drop_lng': (userRequestData.isNotEmpty)
+  //           ? userRequestData['drop_lng']
+  //           : addressList.firstWhere((e) => e.id == 'drop').latlng.longitude,
+  //       'ride_type': 1
+  //     }));
 
   //   if (response.statusCode == 200) {
   //     etaDetails = jsonDecode(response.body)['data'];
