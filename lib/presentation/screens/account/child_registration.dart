@@ -1,20 +1,25 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../../config/map_api_key.dart';
+import '../../../data/models/child_upsert_request.dart';
 import '../../../styles/styles.dart';
 import '../../../widgets/widgets.dart';
 import '../../controller/auth/auth_controller.dart';
 
 class ChildRegistration extends StatefulWidget {
-  const ChildRegistration({super.key});
+  final dynamic editChild;
+
+  const ChildRegistration({super.key, this.editChild});
 
   @override
   State<ChildRegistration> createState() => _ChildRegistrationState();
@@ -27,8 +32,13 @@ class _ChildRegistrationState extends State<ChildRegistration> {
   final TextEditingController _gradeController = TextEditingController();
   final TextEditingController _genderController = TextEditingController();
   final TextEditingController _relationshipController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _homeAddressController = TextEditingController();
+  final TextEditingController _schoolAddressController =
+      TextEditingController();
+  final TextEditingController _daycareAddressController =
+      TextEditingController();
   final TextEditingController _schoolController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
   bool _showDropdown = false;
   final GlobalKey _textFieldKey = GlobalKey();
   double _textFieldOffset = 0; // Position of the TextField
@@ -37,6 +47,30 @@ class _ChildRegistrationState extends State<ChildRegistration> {
   List<String> genderList = ['Male', 'Female'];
   bool idSelected = false;
   bool terms = false;
+  File? _selectedImage;
+
+  bool get isEditMode => widget.editChild != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (isEditMode) {
+      _prefillFormForEdit();
+    }
+  }
+
+  void _prefillFormForEdit() {
+    final child = widget.editChild;
+    _fullNameController.text = child.fullname ?? '';
+    _ageController.text = child.age?.toString() ?? '';
+    _gradeController.text = child.grade?.toString() ?? '';
+    _relationshipController.text = child.relationship ?? '';
+    _schoolController.text = child.school ?? '';
+    _homeAddressController.text = child.homeAddress ?? '';
+    _schoolAddressController.text = child.schoolAddress ?? '';
+    _daycareAddressController.text = child.daycareAddress ?? '';
+    terms = true; // Already agreed when first registered
+  }
 
   @override
   void dispose() {
@@ -45,7 +79,9 @@ class _ChildRegistrationState extends State<ChildRegistration> {
     _gradeController.dispose();
     _relationshipController.dispose();
     _genderController.dispose();
-    _addressController.dispose();
+    _homeAddressController.dispose();
+    _schoolAddressController.dispose();
+    _daycareAddressController.dispose();
     _schoolController.dispose();
     super.dispose();
   }
@@ -87,6 +123,26 @@ class _ChildRegistrationState extends State<ChildRegistration> {
     });
   }
 
+  Future<void> _pickImage() async {
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) {
+        return;
+      }
+
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    } catch (e) {
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'Unable to select image: $e',
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     validateFullName(fullName) {
@@ -124,10 +180,18 @@ class _ChildRegistrationState extends State<ChildRegistration> {
       return null;
     }
 
-    validateAddress(address) {
+    validateHomeAddress(address) {
       if (address == null || address.isEmpty) {
-        return 'Please enter a valid adress';
+        return 'Please enter a valid home address';
       }
+      return null;
+    }
+
+    validateSchoolAddress(address) {
+      if (address == null || address.isEmpty) {
+        return 'Please enter a valid school address';
+      }
+      return null;
     }
 
     final genderSelect = TextFormField(
@@ -440,7 +504,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                             ),
                             CustomTextFieldWidget(
                               key: _textFieldKey,
-                              controller: _addressController,
+                              controller: _homeAddressController,
                               keyboardType: TextInputType.streetAddress,
                               obscureText: false,
                               filled: false,
@@ -453,15 +517,15 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                 Icons.location_on_sharp,
                                 color: greyColor,
                               ),
-                              labelText: 'Address',
-                              hintText: 'Start typing your address',
+                              labelText: 'Home Address',
+                              hintText: 'Start typing home address',
                               autoValidateMode:
                                   AutovalidateMode.onUserInteraction,
                               maxLines: 1,
-                              validator: validateAddress,
+                              validator: validateHomeAddress,
                             ),
                             if (_showDropdown &&
-                                _addressController.text.isNotEmpty)
+                                _homeAddressController.text.isNotEmpty)
                               Material(
                                 elevation: 2,
                                 borderRadius: BorderRadius.circular(8),
@@ -478,7 +542,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                       return ListTile(
                                         title: Text(suggestion['description']),
                                         onTap: () {
-                                          _addressController.text =
+                                          _homeAddressController.text =
                                               suggestion['description'];
                                           setState(() {
                                             _suggestions.clear();
@@ -490,6 +554,76 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                   ),
                                 ),
                               ),
+                            SizedBox(
+                              height: 10.h,
+                            ),
+                            CustomTextFieldWidget(
+                              controller: _schoolAddressController,
+                              keyboardType: TextInputType.streetAddress,
+                              obscureText: false,
+                              filled: false,
+                              readOnly: false,
+                              labelText: 'School Address',
+                              hintText: 'Enter school address',
+                              autoValidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              maxLines: 1,
+                              validator: validateSchoolAddress,
+                            ),
+                            SizedBox(
+                              height: 10.h,
+                            ),
+                            CustomTextFieldWidget(
+                              controller: _daycareAddressController,
+                              keyboardType: TextInputType.streetAddress,
+                              obscureText: false,
+                              filled: false,
+                              readOnly: false,
+                              labelText: 'Daycare Address (Optional)',
+                              hintText: 'Enter daycare address',
+                              autoValidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              maxLines: 1,
+                            ),
+                            SizedBox(
+                              height: 12.h,
+                            ),
+                            Row(
+                              children: [
+                                OutlinedButton.icon(
+                                  onPressed: _pickImage,
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: backgroundColor,
+                                    side: BorderSide(color: backgroundColor),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.image_outlined),
+                                  label: Text(
+                                    _selectedImage == null
+                                        ? 'Upload Image (Optional)'
+                                        : 'Change Image',
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                if (_selectedImage != null) ...[
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      _selectedImage!.path.split('/').last,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        color: textColor.withOpacity(0.7),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
                             SizedBox(
                               height: 10.h,
                             ),
@@ -596,20 +730,40 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                   if (registerChildFormKey.currentState!
                                       .validate()) {
                                     if (terms == true) {
-                                      _authController.addChild({
-                                        'fullname':
+                                      final childData = ChildUpsertRequest(
+                                        fullname:
                                             _fullNameController.text.trim(),
-                                        'age': _ageController.text.toString(),
-                                        'grade':
-                                            _gradeController.text.toString(),
-                                        'school':
-                                            _schoolController.text.toString(),
-                                        'address':
-                                            _addressController.text.toString(),
-                                        'relationship': _relationshipController
+                                        age: _ageController.text.trim(),
+                                        grade: _gradeController.text.trim(),
+                                        school: _schoolController.text.trim(),
+                                        relationship: _relationshipController
                                             .text
-                                            .toString(),
-                                      }, context);
+                                            .trim(),
+                                        homeAddress:
+                                            _homeAddressController.text.trim(),
+                                        schoolAddress:
+                                            _schoolAddressController.text.trim(),
+                                        daycareAddress: _daycareAddressController
+                                            .text
+                                            .trim(),
+                                        imageFile: _selectedImage,
+                                      );
+
+                                      if (isEditMode) {
+                                        // Update existing child
+                                        _authController
+                                            .updateChild(
+                                          widget.editChild.id,
+                                          childData,
+                                        )
+                                            .then((_) {
+                                          Get.back();
+                                        });
+                                      } else {
+                                        // Add new child
+                                        _authController.addChild(
+                                            childData, context);
+                                      }
                                     } else {
                                       showTopSnackBar(
                                         Overlay.of(context),

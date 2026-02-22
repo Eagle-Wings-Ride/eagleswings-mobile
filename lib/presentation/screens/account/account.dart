@@ -4,11 +4,15 @@ import 'package:eaglerides/presentation/screens/account/faq.dart';
 import 'package:eaglerides/presentation/screens/account/my_information.dart';
 import 'package:eaglerides/presentation/screens/account/terms_and_conditions.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../../styles/styles.dart';
 import '../../controller/auth/auth_controller.dart';
+import 'settings.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -19,6 +23,7 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   final AuthController _authController = Get.find();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,199 +38,54 @@ class _AccountScreenState extends State<AccountScreen> {
                 children: [
                   _buildTiles(
                     'My Information',
-                    Icons.person_outline,
+                    Iconsax.user,
                     const MyInformation(),
                   ),
                   _buildTiles(
                     'Child Registration',
-                    Icons.person_outline,
+                    Iconsax.user_add,
                     const ChildRegistration(),
                   ),
                   _buildTiles(
+                    'Settings',
+                    Iconsax.setting_2,
+                    const SettingsScreen(),
+                  ),
+                  _buildTiles(
                     'About Us',
-                    Icons.lightbulb_outline_sharp,
+                    Iconsax.info_circle,
                     const AboutUsView(),
                   ),
                   _buildTiles(
                     'Terms & Conditions',
-                    Icons.shield_outlined,
+                    Iconsax.document_text,
                     const TermsAndConditionsView(),
                   ),
                   _buildTiles(
                     'FAQ',
-                    Icons.help_outline_outlined,
+                    Iconsax.message_question,
                     const FAQ(),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    child: ListTile(
-                      minLeadingWidth: 0,
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(
-                        Icons.logout,
-                        color: Colors.black,
-                      ),
-                      title: Text(
-                        'Logout',
-                        style: GoogleFonts.poppins(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      onTap: () async {
-                        showDialog(
-                            context: context,
-                            barrierDismissible: true,
-                            builder: (BuildContext context) {
-                              return Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  AlertDialog(
-                                    contentPadding: const EdgeInsets.fromLTRB(
-                                        30, 10, 30, 20),
-                                    elevation: 0,
-                                    alignment: Alignment.bottomCenter,
-                                    insetPadding: const EdgeInsets.all(0),
-                                    scrollable: true,
-                                    title: null,
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(30),
-                                        topRight: Radius.circular(30),
-                                      ),
-                                    ),
-                                    content: SizedBox(
-                                      child: SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        child: Column(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                              child: Column(
-                                                children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        vertical: 15),
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.topCenter,
-                                                      child: Text(
-                                                        'Confirm Log Out',
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style:
-                                                            GoogleFonts.nunito(
-                                                          color: Colors.black,
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        vertical: 10),
-                                                    child: Column(
-                                                      children: [
-                                                        ElevatedButton(
-                                                          style: ElevatedButton
-                                                              .styleFrom(
-                                                            minimumSize:
-                                                                const Size(
-                                                                    400, 50),
-                                                            backgroundColor:
-                                                                backgroundColor,
-                                                            elevation: 0,
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                88,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          onPressed: () async {
-                                                            // await GlobalService
-                                                            //     .sharedPreferencesManager
-                                                            //     .logOut(
-                                                            //         context);
-                                                            _authController
-                                                                .logout(
-                                                                    context);
-                                                          },
-                                                          child: Text(
-                                                            'Confirm',
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: GoogleFonts
-                                                                .poppins(
-                                                                    color: Colors
-                                                                        .white),
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  vertical: 30),
-                                                          child:
-                                                              GestureDetector(
-                                                            onTap: () {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                            },
-                                                            child: Text(
-                                                              'Cancel',
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              style: GoogleFonts
-                                                                  .nunito(
-                                                                color:
-                                                                    backgroundColor,
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              );
-                            });
-                        // SystemNavigator.pop();
-                        // await GlobalService.sharedPreferencesManager
-                        //     .logOut(context);
-                        // Navigator.pushNamed(context, RouteList.profile);
-                      },
-                      trailing: const Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.grey,
-                        size: 20,
-                      ),
-                    ),
+
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  const SizedBox(height: 10),
+
+                  // ⭐ LOGOUT TILE
+                  _buildDangerTile(
+                    'Logout',
+                    Iconsax.logout,
+                    () => _showLogoutDialog(context),
+                    isGrey: true,
                   ),
+
+                  // ⭐ DELETE ACCOUNT TILE
+                  _buildDangerTile(
+                    'Delete Account',
+                    Iconsax.trash,
+                    () => _showDeleteAccountDialog(context),
+                  ),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -235,32 +95,255 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Padding _buildTiles(String text, IconData icon, Widget widget) {
+  // ⭐ UPDATED LOGOUT DIALOG (cleaner version)
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'Confirm Log Out',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to logout?',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.poppins(
+                  color: backgroundColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: backgroundColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _authController.logout(context);
+              },
+              child: Text(
+                'Confirm',
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ⭐ NEW: DELETE ACCOUNT DIALOG
+  void _showDeleteAccountDialog(BuildContext context) {
+    final passwordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Column(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.red,
+                size: 50,
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Delete Account?',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'This action is permanent and cannot be undone. All your data will be deleted.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Enter Password to Confirm',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: Icon(Icons.lock_outline),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.poppins(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () async {
+                if (passwordController.text.isEmpty) {
+                  showTopSnackBar(
+                    Overlay.of(context),
+                    const CustomSnackBar.error(
+                      message: 'Please enter your password',
+                    ),
+                  );
+                  return;
+                }
+
+                Navigator.of(context).pop();
+                await _authController.deleteAccount();
+              },
+              child: Text(
+                'Delete Account',
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDangerTile(String text, IconData icon, VoidCallback onTap,
+      {bool isGrey = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: ListTile(
-        minLeadingWidth: 0,
-        contentPadding: EdgeInsets.zero,
-        leading: Icon(
-          icon,
-          color: Colors.black,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isGrey
+              ? Colors.grey.withOpacity(0.05)
+              : Colors.red.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(16),
         ),
-        title: Text(
-          text,
-          style: GoogleFonts.poppins(
-            color: Colors.black,
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
+        child: ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isGrey
+                  ? Colors.grey.withOpacity(0.1)
+                  : Colors.red.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: isGrey ? Colors.black87 : Colors.red,
+              size: 20,
+            ),
+          ),
+          title: Text(
+            text,
+            style: GoogleFonts.poppins(
+              color: isGrey ? Colors.black87 : Colors.red,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onTap: onTap,
+          trailing: Icon(
+            Icons.arrow_forward_ios,
+            color: isGrey ? Colors.grey : Colors.red.withOpacity(0.5),
+            size: 14,
           ),
         ),
-        onTap: () {
-          Get.to(widget);
-          // Navigator.pushNamed(context, my_information);
-        },
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          color: Colors.grey,
-          size: 16,
+      ),
+    );
+  }
+
+  Widget _buildTiles(String text, IconData icon, Widget widget) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: backgroundColor.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: backgroundColor,
+              size: 20,
+            ),
+          ),
+          title: Text(
+            text,
+            style: GoogleFonts.poppins(
+              color: textColor,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onTap: () => Get.to(widget),
+          trailing: const Icon(
+            Icons.arrow_forward_ios,
+            color: Colors.grey,
+            size: 14,
+          ),
         ),
       ),
     );
@@ -270,67 +353,98 @@ class _AccountScreenState extends State<AccountScreen> {
     return Container(
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(20.0),
-          bottomRight: Radius.circular(20.0),
-        ),
         color: backgroundColor,
-      ),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 22),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 32,
-                ),
-                Image.asset(
-                  'assets/images/app_name_white.png',
-                  height: 12,
-                  width: 48,
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 15),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Text(
-                      'Help',
-                      style: GoogleFonts.poppins(color: Colors.black),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                Obx(() {
-                  var user = Get.find<AuthController>().user.value;
-                  return Text(
-                    (user != null) ? 'Hello, ${user.name}' : 'Loading...',
-                    textAlign: TextAlign.start,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  );
-                }),
-                const SizedBox(
-                  height: 30,
-                ),
-              ],
-            ),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            backgroundColor,
+            backgroundColor.withBlue(50).withOpacity(0.9),
+          ],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32.0),
+          bottomRight: Radius.circular(32.0),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: backgroundColor.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Image.asset(
+                    'assets/images/app_name_white.png',
+                    height: 18,
+                    fit: BoxFit.contain,
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Iconsax.message_question,
+                            color: Colors.white, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Help',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
+              Obx(() {
+                var user = Get.find<AuthController>().user.value;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Account',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 14,
+                        letterSpacing: 1.2,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      (user != null) ? user.name : 'Welcome Guest',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                );
+              }),
+            ],
+          ),
+        ),
       ),
     );
   }
