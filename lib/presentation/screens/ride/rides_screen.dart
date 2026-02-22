@@ -1,6 +1,3 @@
-import 'package:eaglerides/presentation/screens/ride/book_ride.dart';
-import 'package:eaglerides/presentation/screens/ride/single_ride_info_screen.dart';
-import 'package:eaglerides/styles/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -10,8 +7,10 @@ import 'package:iconsax/iconsax.dart';
 import '../../../core/utils/format_date.dart';
 import '../../../core/utils/get_status.dart';
 import '../../../data/models/book_rides_model.dart';
+import '../../../styles/styles.dart';
 import '../../controller/auth/auth_controller.dart';
-import '../account/child_registration.dart';
+import '../ride/book_ride.dart';
+import '../ride/single_ride_info_screen.dart';
 
 class RidesScreen extends StatefulWidget {
   const RidesScreen({super.key});
@@ -21,1161 +20,679 @@ class RidesScreen extends StatefulWidget {
 }
 
 class _RidesScreenState extends State<RidesScreen> {
-  List<Booking> childrenList = []; // List of Child objects
-  String? selectedChildId; // To store the selected child's ID
-  String? selectedChildName; // To store the selected child's name
-  bool isLoading = true;
-  bool idSelected = false;
   final AuthController _authController = Get.find();
-  List<Map<String, String>> ongoingRides = [
-    {
-      'title': 'Toronto to Alberta Trip',
-      'time': '4 minutes',
-      'driverName': 'Sergio',
-      'rideType': 'In-House',
-      'status': 'Upcoming',
-    },
-  ];
-  List<Map<String, String>> recentRides = [
-    {
-      'title': 'New York to Boston Trip',
-      'time': '12 minutes ago',
-      'rideType': 'In-House',
-      'status': 'Upcoming',
-    },
-    {
-      'title': 'Toronto to Alberta Trip',
-      'time': '34 minutes ago',
-      'rideType': 'Freelance',
-      'status': 'Completed',
-    },
-    {
-      'title': 'Chicago to Detroit Trip',
-      'time': '1 hour ago',
-      'rideType': 'In-House',
-      'status': 'In Progress',
-    },
-    {
-      'title': 'Los Angeles to San Francisco Trip',
-      'time': '2 hours ago',
-      'rideType': 'Freelance',
-      'status': 'Cancelled',
-    },
-    {
-      'title': 'Miami to Orlando Trip',
-      'time': '3 hours ago',
-      'rideType': 'In-House',
-      'status': 'Completed',
-    },
-    {
-      'title': 'Houston to Austin Trip',
-      'time': '5 hours ago',
-      'rideType': 'Freelance',
-      'status': 'Upcoming',
-    },
-    {
-      'title': 'Seattle to Portland Trip',
-      'time': '8 hours ago',
-      'rideType': 'In-House',
-      'status': 'In Progress',
-    },
-    {
-      'title': 'Atlanta to Charlotte Trip',
-      'time': '10 hours ago',
-      'rideType': 'Freelance',
-      'status': 'Completed',
-    },
-    {
-      'title': 'Las Vegas to Phoenix Trip',
-      'time': '1 day ago',
-      'rideType': 'In-House',
-      'status': 'Cancelled',
-    },
-    {
-      'title': 'Denver to Salt Lake City Trip',
-      'time': '2 days ago',
-      'rideType': 'Freelance',
-      'status': 'Upcoming',
-    },
-    {
-      'title': 'San Diego to Tijuana Trip',
-      'time': '3 days ago',
-      'rideType': 'In-House',
-      'status': 'Completed',
-    },
-    {
-      'title': 'Philadelphia to New Jersey Trip',
-      'time': '4 days ago',
-      'rideType': 'Freelance',
-      'status': 'In Progress',
-    },
-    {
-      'title': 'Dallas to Fort Worth Trip',
-      'time': '5 days ago',
-      'rideType': 'In-House',
-      'status': 'Cancelled',
-    },
-    {
-      'title': 'Washington D.C. to Baltimore Trip',
-      'time': '1 week ago',
-      'rideType': 'Freelance',
-      'status': 'Upcoming',
-    },
-    {
-      'title': 'Boston to Providence Trip',
-      'time': '2 weeks ago',
-      'rideType': 'In-House',
-      'status': 'Completed',
-    },
-    {
-      'title': 'Nashville to Memphis Trip',
-      'time': '3 weeks ago',
-      'rideType': 'Freelance',
-      'status': 'In Progress',
-    },
-    {
-      'title': 'Indianapolis to Cincinnati Trip',
-      'time': '4 weeks ago',
-      'rideType': 'In-House',
-      'status': 'Upcoming',
-    },
-    {
-      'title': 'Kansas City to St. Louis Trip',
-      'time': '1 month ago',
-      'rideType': 'Freelance',
-      'status': 'Cancelled',
-    },
-    {
-      'title': 'Portland to Eugene Trip',
-      'time': '1 month ago',
-      'rideType': 'In-House',
-      'status': 'Completed',
-    },
-    {
-      'title': 'Detroit to Cleveland Trip',
-      'time': '6 weeks ago',
-      'rideType': 'Freelance',
-      'status': 'In Progress',
-    },
+  final TextEditingController _searchController = TextEditingController();
+
+  String _selectedFilter = 'all';
+  String _searchQuery = '';
+  bool _isRefreshing = false;
+
+  final List<Map<String, dynamic>> _filterOptions = [
+    {'value': 'all', 'label': 'All', 'icon': Iconsax.archive},
+    {'value': 'booked', 'label': 'Booked', 'icon': Iconsax.calendar},
+    {'value': 'paid', 'label': 'Paid', 'icon': Iconsax.wallet},
+    {'value': 'assigned', 'label': 'Assigned', 'icon': Iconsax.user},
+    {'value': 'ongoing', 'label': 'Ongoing', 'icon': Iconsax.car},
+    {'value': 'completed', 'label': 'Completed', 'icon': Iconsax.tick_circle},
+    {'value': 'cancelled', 'label': 'Cancelled', 'icon': Iconsax.close_circle},
   ];
 
   @override
-  void initState() {
-    fetchChildrenData();
-    super.initState();
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
-  Future<void> fetchChildrenData() async {
-    try {
-      await _authController.fetchChildren();
+  List<Booking> get _filteredRides {
+    var rides = _authController.recentRides.toList();
 
-      setState(() {
-        if (_authController.children.isNotEmpty) {
-          selectedChildId = _authController.children.first.id;
-          selectedChildName = _authController.children.first.fullname;
-        } else {
-          selectedChildId = null;
-          selectedChildName = null;
-        }
-        isLoading = false;
-      });
-      await _authController.fetchRecentRides(selectedChildId!);
-      setState(() {
-        childrenList = _authController.recentRides;
-      });
-      // print('childrenList');
-      // print(childrenList);
+    // Filter by status
+    if (_selectedFilter != 'all') {
+      rides = rides
+          .where((ride) =>
+              ride.status.toLowerCase() == _selectedFilter.toLowerCase())
+          .toList();
+    }
+
+    // Filter by search query
+    if (_searchQuery.isNotEmpty) {
+      rides = rides.where((ride) {
+        final query = _searchQuery.toLowerCase();
+        return ride.child.fullname.toLowerCase().contains(query) ||
+            ride.mainPickupAddress.toLowerCase().contains(query) ||
+            ride.mainDropoffAddress.toLowerCase().contains(query) ||
+            ride.status.toLowerCase().contains(query);
+      }).toList();
+    }
+
+    // Sort by creation date (newest first)
+    rides.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    return rides;
+  }
+
+  Future<void> _handleRefresh() async {
+    setState(() => _isRefreshing = true);
+
+    try {
+      // Fetch fresh rides from API using the AuthController
+      await _authController.fetchRidesByUser();
+
+      Get.snackbar(
+        'Refreshed',
+        'Ride list updated successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+      );
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      // print('Error fetching children: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to refresh rides: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 3),
+      );
+    } finally {
+      setState(() => _isRefreshing = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 30.h, horizontal: 22.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: const Color(0xffFEFEFF),
+      appBar: _buildAppBar(),
+      body: Column(
+        children: [
+          _buildSearchBar(),
+          _buildFilterChips(),
+          Expanded(
+            child: Obx(() {
+              if (_authController.recentRides.isEmpty) {
+                return _buildEmptyState();
+              }
+
+              final filteredRides = _filteredRides;
+
+              if (filteredRides.isEmpty) {
+                return _buildNoResultsState();
+              }
+
+              return RefreshIndicator(
+                onRefresh: _handleRefresh,
+                color: backgroundColor,
+                child: ListView.builder(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+                  itemCount: filteredRides.length,
+                  itemBuilder: (context, index) {
+                    return _buildRideCard(filteredRides[index]);
+                  },
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: backgroundColor,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+        onPressed: () => Get.back(),
+      ),
+      title: Text(
+        'All Rides',
+        style: GoogleFonts.poppins(
+          fontSize: 18,
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      actions: [
+        IconButton(
+          icon: _isRefreshing
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+              : const Icon(Icons.refresh, color: Colors.white),
+          onPressed: _isRefreshing ? null : _handleRefresh,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+      color: backgroundColor,
+      child: TextField(
+        controller: _searchController,
+        style: GoogleFonts.poppins(color: Colors.white, fontSize: 14),
+        decoration: InputDecoration(
+          hintText: 'Search by child name or location...',
+          hintStyle: GoogleFonts.poppins(
+            color: Colors.white.withOpacity(0.6),
+            fontSize: 13,
+          ),
+          prefixIcon: const Icon(Iconsax.search_normal, color: Colors.white),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear, color: Colors.white),
+                  onPressed: () {
+                    setState(() {
+                      _searchController.clear();
+                      _searchQuery = '';
+                    });
+                  },
+                )
+              : null,
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.2),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 12,
+          ),
+        ),
+        onChanged: (value) {
+          setState(() => _searchQuery = value);
+        },
+      ),
+    );
+  }
+
+  Widget _buildFilterChips() {
+    return Container(
+      height: 60,
+      padding: EdgeInsets.symmetric(vertical: 10.h),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 15.w),
+        itemCount: _filterOptions.length,
+        itemBuilder: (context, index) {
+          final filter = _filterOptions[index];
+          final isSelected = _selectedFilter == filter['value'];
+
+          return Padding(
+            padding: EdgeInsets.only(right: 10.w),
+            child: FilterChip(
+              selected: isSelected,
+              label: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Icon(
+                    filter['icon'],
+                    size: 16,
+                    color: isSelected ? Colors.white : backgroundColor,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    filter['label'],
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: isSelected ? Colors.white : textColor,
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.grey[100],
+              selectedColor: backgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+                side: BorderSide(
+                  color: isSelected ? backgroundColor : Colors.grey[300]!,
+                  width: 1,
+                ),
+              ),
+              onSelected: (selected) {
+                setState(() {
+                  _selectedFilter = filter['value'];
+                });
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildRideCard(Booking ride) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: GestureDetector(
+        onTap: () {
+          Get.to(
+            () => const SingleRideInfoScreen(),
+            arguments: {'rideId': ride.id},
+          );
+        },
+        child: Container(
+          padding: EdgeInsets.all(16.sp),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header - Child and Status
+              Row(
+                children: [
+                  // Child Avatar
+                  Container(
+                    width: 45,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: backgroundColor.withOpacity(0.1),
+                      image: ride.child.image != null
+                          ? DecorationImage(
+                              image: NetworkImage(ride.child.image!),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: ride.child.image == null
+                        ? Center(
+                            child: Text(
+                              ride.child.fullname.isNotEmpty
+                                  ? ride.child.fullname[0].toUpperCase()
+                                  : 'C',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: backgroundColor,
+                              ),
+                            ),
+                          )
+                        : null,
+                  ),
+                  SizedBox(width: 12.w),
+                  // Child Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ride.child.fullname,
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
+                          ),
+                        ),
+                        Text(
+                          '${ride.child.age} years • Grade ${ride.child.grade}',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            color: textColor.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Status Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: getStatusColor(ride.status.toLowerCase())
+                          .withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Text(
+                      ride.status.capitalizeFirst!,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: getStatusColor(ride.status.toLowerCase()),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 15.h),
+
+              // Trip Route
+              Row(
+                children: [
+                  // Route Icons
+                  Column(
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (_authController.children.isEmpty) {
-                            // Redirect to create child page if no children are available
-                            Get.to(
-                                const ChildRegistration()); // Replace with your navigation route
-                          } else {
-                            showModalBottomSheet(
-                              isDismissible: true,
-                              showDragHandle: true,
-                              backgroundColor:
-                                  Theme.of(context).scaffoldBackgroundColor,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return FractionallySizedBox(
-                                  heightFactor: calculateHeightFactor(
-                                      _authController.children.length),
-                                  child: Card(
-                                    child: Container(
-                                      // height: 350,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 24, vertical: 10),
-                                      decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(19)),
-                                      child: ListView(
-                                        children: [
-                                          Text(
-                                            'Select Child',
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 20,
-                                                color: textColor,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  Theme.of(context).cardColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(20.0),
-                                            ),
-                                            child: ListView.builder(
-                                              physics:
-                                                  const BouncingScrollPhysics(),
-                                              shrinkWrap: true,
-                                              itemCount: _authController
-                                                  .children.length,
-                                              itemBuilder: (context, idx) {
-                                                return Column(
-                                                  children: [
-                                                    ListTileTheme(
-                                                      contentPadding:
-                                                          const EdgeInsets.only(
-                                                              left: 13.0,
-                                                              right: 13.0,
-                                                              top: 4,
-                                                              bottom: 4),
-                                                      selectedColor:
-                                                          Theme.of(context)
-                                                              .colorScheme
-                                                              .secondary,
-                                                      child: ListTile(
-                                                        title: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            const SizedBox(
-                                                              width: 8,
-                                                            ),
-                                                            SizedBox(
-                                                              width: MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .width *
-                                                                  0.4,
-                                                              child: Text(
-                                                                _authController
-                                                                    .children[
-                                                                        idx]
-                                                                    .fullname,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style:
-                                                                    GoogleFonts
-                                                                        .poppins(
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color:
-                                                                      textColor,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        onTap: () async {
-                                                          setState(() {
-                                                            // idSelected = true;
-                                                            selectedChildId =
-                                                                _authController
-                                                                    .children[
-                                                                        idx]
-                                                                    .id;
-                                                            selectedChildName =
-                                                                _authController
-                                                                    .children[
-                                                                        idx]
-                                                                    .fullname;
-                                                          });
-                                                          await _authController
-                                                              .fetchRecentRides(
-                                                                  _authController
-                                                                      .children[
-                                                                          idx]
-                                                                      .id);
-
-                                                          // _genderController.text =
-                                                          //     childrenList[idx];
-                                                          childrenList =
-                                                              _authController
-                                                                  .recentRides;
-                                                          Navigator.pop(
-                                                            context,
-                                                          );
-
-                                                          setState(() {});
-                                                        },
-                                                      ),
-                                                    ),
-                                                    (idx !=
-                                                            _authController
-                                                                    .children
-                                                                    .length -
-                                                                1)
-                                                        ? Divider(
-                                                            color: greyColor,
-                                                            height: 1,
-                                                            indent: 13,
-                                                            endIndent: 13,
-                                                          )
-                                                        : const SizedBox(),
-                                                  ],
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          }
-                        },
-                        child: Row(
-                          children: [
-                            Icon(
-                              Iconsax.profile_circle,
-                              color: backgroundColor,
-                              size: 16,
-                            ),
-                            selectedChildName != null
-                                ? Text(
-                                    selectedChildName!,
-                                    style: GoogleFonts.poppins(
-                                      color: backgroundColor,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  )
-                                : GestureDetector(
-                                    onTap: () {
-                                      Get.to(
-                                          const ChildRegistration()); // Navigate to create child page
-                                    },
-                                    child: Text(
-                                      ' No child available.',
-                                      style: GoogleFonts.poppins(
-                                        color: backgroundColor,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                            Icon(
-                              Icons.keyboard_arrow_down,
-                              size: 16,
-                              color: backgroundColor,
-                            ),
-                          ],
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.radio_button_checked,
+                          color: Colors.green,
+                          size: 12,
+                        ),
+                      ),
+                      ...List.generate(
+                        3,
+                        (index) => Container(
+                          width: 2,
+                          height: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 1),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.all(8),
-                        child: Icon(
-                          Icons.notifications,
-                          color: backgroundColor,
-                          size: 25,
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.location_on,
+                          color: Colors.red,
+                          size: 12,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  if (selectedChildName != null)
-                    Text(
-                      'Hello $selectedChildName',
-                      style: GoogleFonts.poppins(
-                        color: backgroundColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  SizedBox(
-                    height: 30.h,
-                  ),
-                  // Column(
-                  //   children: [
-                  //     Padding(
-                  //       padding: EdgeInsets.symmetric(horizontal: 10.w),
-                  //       child: Row(
-                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //         children: [
-                  //           Text(
-                  //             'Ongoing Rides',
-                  //             style: GoogleFonts.poppins(
-                  //               fontSize: 12,
-                  //               fontWeight: FontWeight.bold,
-                  //               color: textColor,
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  // SizedBox(
-                  //   height: 13.h,
-                  // ),
-                  // Column(
-                  //   children: ongoingRides.map((ongoing) {
-                  //     return Column(
-                  //       children: [
-                  //         GestureDetector(
-                  //           onTap: () {
-                  //             // Get.to(SingleRideInfoScreen());
-                  //           },
-                  //           child: Container(
-                  //             padding: EdgeInsets.symmetric(
-                  //               horizontal: 10.w,
-                  //               vertical: 5.h,
-                  //             ),
-                  //             decoration: BoxDecoration(
-                  //               borderRadius: BorderRadius.circular(15),
-                  //               color: page,
-                  //               boxShadow: const [
-                  //                 BoxShadow(
-                  //                   color: Color.fromRGBO(9, 39, 127, .15),
-                  //                   blurRadius: 30.0,
-                  //                   spreadRadius: -4.0,
-                  //                 ),
-                  //               ],
-                  //             ),
-                  //             child: Stack(
-                  //               children: [
-                  //                 Row(
-                  //                   crossAxisAlignment:
-                  //                       CrossAxisAlignment.start,
-                  //                   mainAxisAlignment:
-                  //                       MainAxisAlignment.spaceBetween,
-                  //                   children: [
-                  //                     Flexible(
-                  //                       flex: 9,
-                  //                       child: Row(
-                  //                         crossAxisAlignment:
-                  //                             CrossAxisAlignment.center,
-                  //                         children: [
-                  //                           Flexible(
-                  //                             flex: 2,
-                  //                             child: ClipOval(
-                  //                               child: Image.asset(
-                  //                                 'assets/images/rides_img.jpg',
-                  //                                 width: 45,
-                  //                                 height: 45,
-                  //                                 fit: BoxFit.fitWidth,
-                  //                               ),
-                  //                             ),
-                  //                           ),
-                  //                           SizedBox(width: 15.w),
-                  //                           Flexible(
-                  //                             flex: 8,
-                  //                             child: Column(
-                  //                               crossAxisAlignment:
-                  //                                   CrossAxisAlignment.start,
-                  //                               mainAxisAlignment:
-                  //                                   MainAxisAlignment
-                  //                                       .spaceBetween,
-                  //                               children: [
-                  //                                 Text(
-                  //                                   ongoing['title']!,
-                  //                                   maxLines: 1,
-                  //                                   overflow:
-                  //                                       TextOverflow.ellipsis,
-                  //                                   style: GoogleFonts.poppins(
-                  //                                     fontSize: 14,
-                  //                                     fontWeight:
-                  //                                         FontWeight.bold,
-                  //                                     color: textColor,
-                  //                                   ),
-                  //                                 ),
-                  //                                 SizedBox(height: 8.h),
-                  //                                 Row(
-                  //                                   children: [
-                  //                                     Container(
-                  //                                       padding:
-                  //                                           const EdgeInsets
-                  //                                               .symmetric(
-                  //                                               horizontal: 5,
-                  //                                               vertical: 3),
-                  //                                       decoration:
-                  //                                           BoxDecoration(
-                  //                                         color: (ongoing[
-                  //                                                     'rideType'] ==
-                  //                                                 'In-House')
-                  //                                             ? const Color
-                  //                                                 .fromRGBO(255,
-                  //                                                 85, 0, 0.14)
-                  //                                             : const Color
-                  //                                                 .fromRGBO(19,
-                  //                                                 59, 183, .14),
-                  //                                         borderRadius:
-                  //                                             BorderRadius
-                  //                                                 .circular(40),
-                  //                                       ),
-                  //                                       child: Text(
-                  //                                         '${ongoing['rideType']} Driver',
-                  //                                         style: GoogleFonts
-                  //                                             .poppins(
-                  //                                           color: (ongoing[
-                  //                                                       'rideType'] ==
-                  //                                                   'In-House')
-                  //                                               ? backgroundColor
-                  //                                               : const Color(
-                  //                                                   0xff133BB7),
-                  //                                           fontSize: 8,
-                  //                                           fontWeight:
-                  //                                               FontWeight.bold,
-                  //                                         ),
-                  //                                       ),
-                  //                                     ),
-                  //                                     SizedBox(width: 6.w),
-                  //                                     Container(
-                  //                                       padding:
-                  //                                           const EdgeInsets
-                  //                                               .symmetric(
-                  //                                               horizontal: 5,
-                  //                                               vertical: 3),
-                  //                                       decoration:
-                  //                                           BoxDecoration(
-                  //                                         color: getStatusColor(
-                  //                                             ongoing[
-                  //                                                 'status']),
-                  //                                         borderRadius:
-                  //                                             BorderRadius
-                  //                                                 .circular(40),
-                  //                                       ),
-                  //                                       child: Text(
-                  //                                         ongoing['status']!,
-                  //                                         style: GoogleFonts
-                  //                                             .poppins(
-                  //                                           color: getStatusTextColor(
-                  //                                               ongoing[
-                  //                                                   'status']),
-                  //                                           fontSize: 8,
-                  //                                           fontWeight:
-                  //                                               FontWeight.bold,
-                  //                                         ),
-                  //                                       ),
-                  //                                     ),
-                  //                                   ],
-                  //                                 ),
-                  //                                 SizedBox(height: 8.h),
-                  //                                 Text(
-                  //                                   'Arrives in ${ongoing['time']}',
-                  //                                   style: GoogleFonts.poppins(
-                  //                                     fontSize: 12,
-                  //                                     fontWeight:
-                  //                                         FontWeight.w500,
-                  //                                     color: textColor,
-                  //                                   ),
-                  //                                 ),
-                  //                               ],
-                  //                             ),
-                  //                           ),
-                  //                         ],
-                  //                       ),
-                  //                     ),
-                  //                     const Flexible(
-                  //                       flex: 2,
-                  //                       child: Icon(
-                  //                         Icons.more_horiz,
-                  //                       ),
-                  //                     ),
-                  //                   ],
-                  //                 ),
-                  //                 // Add text at the bottom-right
-                  //                 Positioned(
-                  //                   bottom: 5, // Adjust based on spacing
-                  //                   right:
-                  //                       5, // Align to the bottom-right corner
-                  //                   child: Row(
-                  //                     children: [
-                  //                       Image.asset(
-                  //                         'assets/images/driver_ongoing_icon.png',
-                  //                         width: 15,
-                  //                         height: 15,
-                  //                       ),
-                  //                       const SizedBox(
-                  //                         width: 5,
-                  //                       ),
-                  //                       Text(
-                  //                         ongoing[
-                  //                             'driverName']!, // Replace with dynamic text if needed
-                  //                         style: GoogleFonts.poppins(
-                  //                           fontSize: 12,
-                  //                           fontWeight: FontWeight.bold,
-                  //                           color:
-                  //                               backgroundColor, // Style as desired
-                  //                         ),
-                  //                       ),
-                  //                     ],
-                  //                   ),
-                  //                 ),
-                  //               ],
-                  //             ),
-                  //           ),
-                  //         ),
-                  //         SizedBox(height: 12.h),
-                  //       ],
-                  //     );
-                  //   }).toList(),
-                  // ),
-
-                  // SizedBox(
-                  //   height: 20.h,
-                  // ),
-                  Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Recent Rides',
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 13.h,
-                  ),
-                  _authController.children.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'No children found. Please create a child to view recent rides.',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              const SizedBox(height: 20),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  minimumSize: Size(
-                                      MediaQuery.of(context).size.width - 100,
-                                      50),
-                                  backgroundColor: backgroundColor,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      50,
-                                    ),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  // Navigate to create child screen
-                                  Get.to(const ChildRegistration());
-                                },
-                                child: Text(
-                                  'Create Child',
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.poppins(
-                                    color: buttonText,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ],
+                  SizedBox(width: 12.w),
+                  // Addresses
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ride.mainPickupAddress,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: textColor,
                           ),
-                        )
-                      : selectedChildId == null
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Text(
-                                    'Please select a child to see recent rides.',
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  DropdownButton<String>(
-                                    value: selectedChildId,
-                                    onChanged: (newChildId) {
-                                      setState(() {
-                                        selectedChildId = newChildId;
-                                      });
-                                      _authController
-                                          .fetchRecentRides(newChildId!);
-                                    },
-                                    items: _authController.children
-                                        .map(
-                                            (child) => DropdownMenuItem<String>(
-                                                  value: child.id,
-                                                  child: Text(child.fullname),
-                                                ))
-                                        .toList(),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : (childrenList.isEmpty)
-                              ? Center(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const SizedBox(
-                                        height: 40,
-                                      ),
-                                      Text(
-                                        'No Recent activities yet',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  itemCount: childrenList.length,
-                                  itemBuilder: (context, index) {
-                                    final ride = childrenList[index];
-                                    // print('ride');
-                                    // print(ride);
-                                    return Column(
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            Get.to(const SingleRideInfoScreen(),
-                                                arguments: {'rideId': ride.id});
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 10.w,
-                                                vertical: 5.h),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              color: page,
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Color.fromRGBO(
-                                                      9, 39, 127, .15),
-                                                  blurRadius: 30.0,
-                                                  spreadRadius: -4.0,
-                                                ),
-                                              ],
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Flexible(
-                                                  flex: 9,
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    // main
-                                                    children: [
-                                                      Flexible(
-                                                        flex: 2,
-                                                        child: ClipOval(
-                                                          child: Image.asset(
-                                                            'assets/images/rides_img.jpg',
-                                                            width: 45,
-                                                            height: 45,
-                                                            fit:
-                                                                BoxFit.fitWidth,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      SizedBox(width: 15.w),
-                                                      Flexible(
-                                                        flex: 8,
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Text(
-                                                              '${ride.pickUpLocation} to ${ride.dropOffLocation}',
-                                                              maxLines: 1,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              style: GoogleFonts
-                                                                  .poppins(
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color:
-                                                                    textColor,
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              height: 8.h,
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                Container(
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          5,
-                                                                      vertical:
-                                                                          3),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: getRideTypeColor(ride
-                                                                            .rideType)
-                                                                        .withOpacity(
-                                                                            0.14),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            40),
-                                                                  ),
-                                                                  child: Text(
-                                                                    ride.rideType
-                                                                        .capitalizeFirst!,
-                                                                    style: GoogleFonts.poppins(
-                                                                        color: getRideTypeColor(ride
-                                                                            .rideType),
-                                                                        fontSize:
-                                                                            8,
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                  width: 6.w,
-                                                                ),
-                                                                Container(
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          5,
-                                                                      vertical:
-                                                                          3),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: getStatusColor(ride
-                                                                            .status
-                                                                            .toLowerCase())
-                                                                        .withOpacity(
-                                                                            0.15),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            40),
-                                                                  ),
-                                                                  child: Text(
-                                                                    ride.status,
-                                                                    style: GoogleFonts.poppins(
-                                                                        color: getStatusColor(ride
-                                                                            .status
-                                                                            .toLowerCase()),
-                                                                        fontSize:
-                                                                            8,
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            SizedBox(
-                                                              height: 8.h,
-                                                            ),
-                                                            Text(
-                                                              formatDate(ride
-                                                                  .createdAt),
-                                                              style: GoogleFonts
-                                                                  .poppins(
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                color:
-                                                                    textColor,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                // const Flexible(
-                                                //   flex: 2,
-                                                //   child: Icon(
-                                                //     Icons.more_horiz,
-                                                //   ),
-                                                // ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 12.h,
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-
-                  // Column(
-                  //   children: recentRides.map((recent) {
-                  //     return Column(
-                  //       children: [
-                  //         Container(
-                  //           padding: EdgeInsets.symmetric(
-                  //               horizontal: 10.w, vertical: 5.h),
-                  //           decoration: BoxDecoration(
-                  //             borderRadius: BorderRadius.circular(15),
-                  //             color: page,
-                  //             boxShadow: const [
-                  //               BoxShadow(
-                  //                 color: Color.fromRGBO(9, 39, 127, .15),
-                  //                 blurRadius: 30.0,
-                  //                 spreadRadius: -4.0,
-                  //               ),
-                  //             ],
-                  //           ),
-                  //           child: Stack(
-                  //             children: [
-                  //               Row(
-                  //                 crossAxisAlignment: CrossAxisAlignment.start,
-                  //                 mainAxisAlignment:
-                  //                     MainAxisAlignment.spaceBetween,
-                  //                 children: [
-                  //                   Flexible(
-                  //                     flex: 9,
-                  //                     child: Row(
-                  //                       crossAxisAlignment:
-                  //                           CrossAxisAlignment.center,
-                  //                       children: [
-                  //                         Flexible(
-                  //                           flex: 2,
-                  //                           child: ClipOval(
-                  //                             child: Image.asset(
-                  //                               'assets/images/rides_img.jpg',
-                  //                               width: 45,
-                  //                               height: 45,
-                  //                               fit: BoxFit.fitWidth,
-                  //                             ),
-                  //                           ),
-                  //                         ),
-                  //                         SizedBox(width: 15.w),
-                  //                         Flexible(
-                  //                           flex: 8,
-                  //                           child: Column(
-                  //                             crossAxisAlignment:
-                  //                                 CrossAxisAlignment.start,
-                  //                             mainAxisAlignment:
-                  //                                 MainAxisAlignment.center,
-                  //                             children: [
-                  //                               Text(
-                  //                                 recent['title']!,
-                  //                                 maxLines: 1,
-                  //                                 overflow:
-                  //                                     TextOverflow.ellipsis,
-                  //                                 style: GoogleFonts.poppins(
-                  //                                   fontSize: 14,
-                  //                                   fontWeight: FontWeight.bold,
-                  //                                   color: textColor,
-                  //                                 ),
-                  //                               ),
-                  //                               SizedBox(height: 8.h),
-                  //                               Row(
-                  //                                 children: [
-                  //                                   Container(
-                  //                                     padding: const EdgeInsets
-                  //                                         .symmetric(
-                  //                                         horizontal: 5,
-                  //                                         vertical: 3),
-                  //                                     decoration: BoxDecoration(
-                  //                                       color:
-                  //                                           (recent['rideType'] ==
-                  //                                                   'In-House')
-                  //                                               ? const Color
-                  //                                                   .fromRGBO(
-                  //                                                   255,
-                  //                                                   85,
-                  //                                                   0,
-                  //                                                   0.14)
-                  //                                               : const Color
-                  //                                                   .fromRGBO(
-                  //                                                   19,
-                  //                                                   59,
-                  //                                                   183,
-                  //                                                   .14),
-                  //                                       borderRadius:
-                  //                                           BorderRadius
-                  //                                               .circular(40),
-                  //                                     ),
-                  //                                     child: Text(
-                  //                                       '${recent['rideType']} Driver',
-                  //                                       style:
-                  //                                           GoogleFonts.poppins(
-                  //                                         color: (recent[
-                  //                                                     'rideType'] ==
-                  //                                                 'In-House')
-                  //                                             ? backgroundColor
-                  //                                             : const Color(
-                  //                                                 0xff133BB7),
-                  //                                         fontSize: 8,
-                  //                                         fontWeight:
-                  //                                             FontWeight.bold,
-                  //                                       ),
-                  //                                     ),
-                  //                                   ),
-                  //                                   SizedBox(width: 6.w),
-                  //                                   Container(
-                  //                                     padding: const EdgeInsets
-                  //                                         .symmetric(
-                  //                                         horizontal: 5,
-                  //                                         vertical: 3),
-                  //                                     decoration: BoxDecoration(
-                  //                                       color: getStatusColor(
-                  //                                               recent['status']!
-                  //                                                   .toLowerCase())
-                  //                                           .withOpacity(0.14),
-                  //                                       borderRadius:
-                  //                                           BorderRadius
-                  //                                               .circular(40),
-                  //                                     ),
-                  //                                     child: Text(
-                  //                                       recent['status']!,
-                  //                                       style:
-                  //                                           GoogleFonts.poppins(
-                  //                                         color: getStatusColor(
-                  //                                             recent['status']!
-                  //                                                 .toLowerCase()),
-                  //                                         fontSize: 8,
-                  //                                         fontWeight:
-                  //                                             FontWeight.bold,
-                  //                                       ),
-                  //                                     ),
-                  //                                   ),
-                  //                                 ],
-                  //                               ),
-                  //                               SizedBox(height: 8.h),
-                  //                               Text(
-                  //                                 recent['time']!,
-                  //                                 style: GoogleFonts.poppins(
-                  //                                   fontSize: 12,
-                  //                                   fontWeight: FontWeight.w500,
-                  //                                   color: textColor,
-                  //                                 ),
-                  //                               ),
-                  //                             ],
-                  //                           ),
-                  //                         ),
-                  //                       ],
-                  //                     ),
-                  //                   ),
-                  //                   const Flexible(
-                  //                     flex: 2,
-                  //                     child: Icon(
-                  //                       Icons.more_horiz,
-                  //                     ),
-                  //                   ),
-                  //                 ],
-                  //               ),
-                  //               // Add text at the bottom-right
-                  //               Positioned(
-                  //                 bottom: 5, // Adjust this value for spacing
-                  //                 right: 5, // Align to the bottom-right corner
-                  //                 child: Image.asset(
-                  //                   'assets/images/recent_rides_icon.png',
-                  //                   width: 25,
-                  //                   height: 25,
-                  //                 ),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //         SizedBox(height: 12.h),
-                  //       ],
-                  //     );
-                  //   }).toList(),
-                  // ),
-
-                  SizedBox(
-                    height: 20.h,
+                        ),
+                        SizedBox(height: 10.h),
+                        Text(
+                          ride.mainDropoffAddress,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: textColor,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
+              ),
+              SizedBox(height: 15.h),
+
+              // Footer - Trip Type, Schedule, Date
+              Row(
+                children: [
+                  _buildInfoChip(
+                    icon: Iconsax.repeat,
+                    label: ride.isReturnTrip ? 'Return' : 'One Way',
+                    color: const Color(0xff133BB7),
+                  ),
+                  SizedBox(width: 8.w),
+                  _buildInfoChip(
+                    icon: Iconsax.calendar,
+                    label: ride.scheduleType,
+                    color: backgroundColor,
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Iconsax.clock,
+                    size: 14,
+                    color: textColor.withOpacity(0.5),
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    formatDate(ride.createdAt.toString()),
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: textColor.withOpacity(0.6),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Driver Info (if assigned)
+              if (ride.hasDrivers) ...[
+                SizedBox(height: 12.h),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: backgroundColor.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Iconsax.driver,
+                        size: 14,
+                        color: backgroundColor,
+                      ),
+                      SizedBox(width: 6.w),
+                      Text(
+                        'Driver: ${ride.primaryDriver!.fullname}',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: textColor,
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: ride.primaryDriver!.isAvailable
+                              ? Colors.green.withOpacity(0.15)
+                              : Colors.grey.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          ride.primaryDriver!.status.capitalizeFirst!,
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            color: ride.primaryDriver!.isAvailable
+                                ? Colors.green
+                                : Colors.grey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip({
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 10,
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(30),
+              decoration: BoxDecoration(
+                color: backgroundColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Iconsax.car,
+                size: 80,
+                color: backgroundColor,
+              ),
+            ),
+            const SizedBox(height: 30),
+            Text(
+              'No Rides Yet',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Start by booking your first ride for your child',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: textColor.withOpacity(0.6),
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () => Get.to(() => const BookRide()),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: backgroundColor,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'Book a Ride',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Get.to(const BookRide());
-        },
-        backgroundColor: backgroundColor,
-        foregroundColor: Colors.white,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.drive_eta),
-      ),
     );
   }
 
-  double calculateHeightFactor(int childrenCount) {
-    // Minimum height factor is 0.6, increase by 0.1 for every 3 children
-    double heightFactor = 0.6 + (childrenCount / 10);
-    return heightFactor > 1.0 ? 1.0 : heightFactor; // Limit it to a max of 1.0
+  Widget _buildNoResultsState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Iconsax.search_normal,
+              size: 80,
+              color: Colors.grey.withOpacity(0.5),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'No Rides Found',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _searchQuery.isNotEmpty
+                  ? 'No rides match your search "$_searchQuery"'
+                  : 'No ${_selectedFilter != 'all' ? _selectedFilter : ''} rides found',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: textColor.withOpacity(0.6),
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _selectedFilter = 'all';
+                  _searchController.clear();
+                  _searchQuery = '';
+                });
+              },
+              child: Text(
+                'Clear Filters',
+                style: GoogleFonts.poppins(
+                  color: backgroundColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
