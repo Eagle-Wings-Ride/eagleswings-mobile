@@ -10,7 +10,7 @@ import 'package:eaglerides/domain/usecases/generate_rental_charges_usecase.dart'
 import 'package:eaglerides/domain/usecases/generate_trip_usecase.dart';
 import 'package:eaglerides/domain/usecases/ride_map_prediction_usecase.dart';
 import 'package:eaglerides/domain/usecases/vwhicle_detail_usecase.dart';
-import 'package:eaglerides/presentation/screens/home/home.dart';
+import 'package:eaglerides/navigation_page.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart';
@@ -68,7 +68,7 @@ class RideController extends GetxController {
   var req_accepted_driver_and_vehicle_data = <String, String>{};
 
   final Completer<GoogleMapController> controller = Completer();
-  late StreamSubscription subscription;
+  StreamSubscription? subscription;
 
   RideController({
     required this.mapPredictionUsecase,
@@ -170,7 +170,7 @@ class RideController extends GetxController {
         destinationLocations[0].latitude,
         destinationLocations[0].longitude,
         "destination_marker",
-           "assets/images/secondMarker.png",
+        "assets/images/secondMarker.png",
         "img",
         "Destination Location",
       );
@@ -275,6 +275,12 @@ class RideController extends GetxController {
   }
 
   getPolyLine() async {
+    // Safety check to prevent index out of bounds
+    if (uberMapDirectionData.isEmpty) {
+      print('Warning: uberMapDirectionData is empty, cannot draw polyline');
+      return;
+    }
+
     List<PointLatLng> result = polylinePoints
         .decodePolyline(uberMapDirectionData[0].enCodedPoints.toString());
     polylineCoordinates.clear();
@@ -341,7 +347,7 @@ class RideController extends GetxController {
 
   generateTrip(DriverEntity driverData, int index) async {
     cancelTripUseCase.call(prevTripId.value, true); // if canceled
-    subscription.pause();
+    subscription?.pause();
     String vehicleType = driverData.vehicle!.path.split('/').first;
     String driverId = driverData.driverId.toString();
     String riderId = 'sdfdjgkfdsjfjfdbjkvskj';
@@ -381,10 +387,11 @@ class RideController extends GetxController {
     tripSubscription = reqStatusData.listen((data) async {
       final reqStatus = data.data()['ready_for_trip'];
       if (reqStatus) {
-        subscription.cancel();
+        subscription?.cancel();
       }
       if (reqStatus && findDriverLoading.value) {
-        subscription.cancel();
+        subscription?.cancel();
+        Get.offAll(const NavigationPage());
         final req_accepted_driver_vehicle_data = await getVehicleDetailsUseCase
             .call(vehicleType, driverId); // get vehicldata if req accepted
         req_accepted_driver_and_vehicle_data["name"] =
@@ -444,7 +451,7 @@ class RideController extends GetxController {
             "driver arrived!", "Now you can track from tripHistory page!",
             snackPosition: SnackPosition.BOTTOM);
         tripSubscription.cancel();
-        Get.off(() => const HomePage());
+        Get.offAll(() => const NavigationPage());
       }
       Timer(const Duration(seconds: 60), () {
         if (reqStatus == false && findDriverLoading.value) {
@@ -454,7 +461,7 @@ class RideController extends GetxController {
           Get.snackbar(
               "Sorry !", "request denied by driver,please choose other driver",
               snackPosition: SnackPosition.BOTTOM);
-          subscription.resume();
+          subscription?.resume();
           findDriverLoading.value = false;
         }
       });
