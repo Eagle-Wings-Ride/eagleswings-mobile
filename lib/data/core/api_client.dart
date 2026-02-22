@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:eaglerides/functions/function.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -27,23 +26,10 @@ class ApiClient {
     print('New  token: $newToken');
   }
 
-  // Helper function to get headers including the token if available
-  // Map<String, String> _getHeaders() {
-  //   final headers = {
-  //     'Content-Type': 'application/json',
-  //   };
-  //   if (_bearerToken != null) {
-  //     headers['Authorization'] = 'Bearer $_bearerToken';
-  //   }
-  //   return headers;
-  // }
-
   dynamic get(String path, {Map<dynamic, dynamic>? params}) async {
     // await Future.delayed(const Duration(milliseconds: 500));
     var box = await Hive.openBox('authBox');
     final token = box.get('auth_token');
-    // print('token==============');
-    // print(token);
 
     try {
       final response = await _client
@@ -52,14 +38,6 @@ class ApiClient {
             headers: _buildHeaders(token),
           )
           .timeout(const Duration(seconds: 15)); // 10 seconds timeout
-
-      // print(response.body);
-      // print(response.statusCode);
-      // print('Response Status Code: ${response.statusCode}');
-      // print('Response Body: ${response.body}');
-      // print('Is 401: ${response.statusCode == 401}');
-
-      // Check if the response body is empty or not
       if (response.statusCode == 404) {
         return json.decode(response.body);
       }
@@ -69,22 +47,28 @@ class ApiClient {
         print('Decoding response body');
         print(json.decode(response.body));
         return json.decode(response.body);
-      } else if (response.statusCode == 401 ||
-          jsonDecode(response.body)['message']
-              .contains('Invalid or expired token')) {
+      } else if (response.statusCode == 401) {
+        // Handle unauthorized - clear auth and redirect to login
         await box.delete('auth_token');
         await box.clear();
-        // print('response.body');
-        // print(response.statusCode);
-        // final decodedBody = jsonDecode(response.body);
-
-        // print(decodedBody['message']);
-        // Log the response before redirecting
         print('Unauthorized access, redirecting to login');
         Get.offAll(const Login());
-        // throw 'Unauthorized access, redirecting to login';
-        // return;
+        throw Exception('Unauthorized access');
       } else {
+        // Try to extract error message from response
+        try {
+          final body = jsonDecode(response.body);
+          final message = body['message'];
+          if (message != null &&
+              message.toString().contains('Invalid or expired token')) {
+            await box.delete('auth_token');
+            await box.clear();
+            Get.offAll(const Login());
+            throw Exception('Session expired');
+          }
+        } catch (_) {
+          // Could not parse body, continue with generic error
+        }
         print('Error response: ${response.reasonPhrase}');
         throw Exception(
             'Error: ${response.statusCode} - ${response.reasonPhrase}');
@@ -112,16 +96,7 @@ class ApiClient {
           )
           .timeout(const Duration(seconds: 15));
 
-      // final errorResponse = json.decode(response.body);
-      // debugPrint('errorResponse');
       print('response.statusCode');
-      // print(json.decode(response.body)['message']);
-      // print('here');
-      // print(response.reasonPhrase);
-
-      // Print raw response for debugging
-      // print("Response Body: ${response.body}");
-      // print("Response Body: ${response.statusCode}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         debugPrint('response.body here');
@@ -173,28 +148,254 @@ class ApiClient {
     }
   }
 
+  // PATCH request for updates
+  dynamic patch(String path, {Map<dynamic, dynamic>? params}) async {
+    var box = await Hive.openBox('authBox');
+    final token = box.get('auth_token');
+    try {
+      print('PATCH request to: $path');
+      final response = await _client
+          .patch(
+            getPath(path, null),
+            body: jsonEncode(params),
+            headers: _buildHeaders(token),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      print('PATCH response status: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('PATCH response body: ${response.body}');
+        return json.decode(response.body);
+      } else if (response.statusCode == 401) {
+        await box.delete('auth_token');
+        await box.clear();
+        print('Unauthorized access, redirecting to login');
+        Get.offAll(const Login());
+        throw Exception('Unauthorized access');
+      } else {
+        final errorResponse = json.decode(response.body);
+        final errorMessage =
+            errorResponse['message'] ?? 'Unknown error occurred';
+        debugPrint('PATCH error: $errorMessage');
+        throw errorMessage;
+      }
+    } on UnauthorisedException {
+      throw UnauthorisedException();
+    } catch (e) {
+      if (e is TimeoutException) {
+        throw Exception("Request timed out. Please try again.");
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  // DELETE request
+  dynamic delete(String path) async {
+    var box = await Hive.openBox('authBox');
+    final token = box.get('auth_token');
+    try {
+      print('DELETE request to: $path');
+      final response = await _client
+          .delete(
+            getPath(path, null),
+            headers: _buildHeaders(token),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      print('DELETE response status: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        if (response.body.isNotEmpty) {
+          return json.decode(response.body);
+        }
+        return {'message': 'Deleted successfully'};
+      } else if (response.statusCode == 401) {
+        await box.delete('auth_token');
+        await box.clear();
+        print('Unauthorized access, redirecting to login');
+        Get.offAll(const Login());
+        throw Exception('Unauthorized access');
+      } else {
+        final errorResponse = json.decode(response.body);
+        final errorMessage =
+            errorResponse['message'] ?? 'Unknown error occurred';
+        debugPrint('DELETE error: $errorMessage');
+        throw errorMessage;
+      }
+    } on UnauthorisedException {
+      throw UnauthorisedException();
+    } catch (e) {
+      if (e is TimeoutException) {
+        throw Exception("Request timed out. Please try again.");
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  // PUT request
+  dynamic put(String path, {Map<dynamic, dynamic>? params}) async {
+    var box = await Hive.openBox('authBox');
+    final token = box.get('auth_token');
+    try {
+      print('PUT request to: $path');
+      final response = await _client
+          .put(
+            getPath(path, null),
+            body: jsonEncode(params),
+            headers: _buildHeaders(token),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      print('PUT response status: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('PUT response body: ${response.body}');
+        return json.decode(response.body);
+      } else if (response.statusCode == 401) {
+        await box.delete('auth_token');
+        await box.clear();
+        print('Unauthorized access, redirecting to login');
+        Get.offAll(const Login());
+        throw Exception('Unauthorized access');
+      } else {
+        final errorResponse = json.decode(response.body);
+        final errorMessage =
+            errorResponse['message'] ?? 'Unknown error occurred';
+        debugPrint('PUT error: $errorMessage');
+        throw errorMessage;
+      }
+    } on UnauthorisedException {
+      throw UnauthorisedException();
+    } catch (e) {
+      if (e is TimeoutException) {
+        throw Exception("Request timed out. Please try again.");
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  Future<dynamic> postMultipart(
+    String path, {
+    required Map<String, String> fields,
+    File? file,
+    String fileField = 'image',
+  }) async {
+    return _sendMultipart(
+      'POST',
+      path,
+      fields: fields,
+      file: file,
+      fileField: fileField,
+    );
+  }
+
+  Future<dynamic> patchMultipart(
+    String path, {
+    required Map<String, String> fields,
+    File? file,
+    String fileField = 'image',
+  }) async {
+    return _sendMultipart(
+      'PATCH',
+      path,
+      fields: fields,
+      file: file,
+      fileField: fileField,
+    );
+  }
+
+  Future<dynamic> _sendMultipart(
+    String method,
+    String path, {
+    required Map<String, String> fields,
+    File? file,
+    String fileField = 'image',
+  }) async {
+    var box = await Hive.openBox('authBox');
+    final token = box.get('auth_token');
+
+    try {
+      final request = https.MultipartRequest(method, getPath(path, null))
+        ..headers.addAll(_buildMultipartHeaders(token))
+        ..fields.addAll(fields);
+
+      if (file != null && await file.exists()) {
+        request.files.add(
+          await https.MultipartFile.fromPath(fileField, file.path),
+        );
+      }
+
+      final streamedResponse =
+          await _client.send(request).timeout(const Duration(seconds: 15));
+      final response = await https.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.body.trim().isEmpty) {
+          return <String, dynamic>{};
+        }
+        return json.decode(response.body);
+      } else if (response.statusCode == 401) {
+        await box.delete('auth_token');
+        await box.clear();
+        Get.offAll(const Login());
+        throw Exception('Unauthorized access');
+      } else {
+        String errorMessage = 'Unknown error occurred';
+        try {
+          final errorResponse = json.decode(response.body);
+          errorMessage = errorResponse['message'] ?? errorMessage;
+        } catch (_) {
+          errorMessage =
+              'Error: ${response.statusCode} - ${response.reasonPhrase}';
+        }
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      if (e is TimeoutException) {
+        throw Exception("Request timed out. Please try again.");
+      }
+      rethrow;
+    }
+  }
+
   Uri getPath(String path, Map<dynamic, dynamic>? params) {
-    var paramsString = '';
-    if (params?.isNotEmpty ?? false) {
-      params?.forEach((key, value) {
-        paramsString += '&$key=$value';
-      });
+    final baseUri = Uri.parse('${ApiConstants.baseUrl}$path');
+    if (params == null || params.isEmpty) {
+      return baseUri;
     }
 
-    return Uri.parse('${ApiConstants.baseUrl}$path$paramsString');
+    final mergedQueryParameters = <String, String>{
+      ...baseUri.queryParameters,
+      ...params.map(
+        (key, value) => MapEntry(key.toString(), value.toString()),
+      ),
+    };
+
+    return baseUri.replace(queryParameters: mergedQueryParameters);
   }
 
   Map<String, String> _buildHeaders(token) {
-    final headers = {
-      'Authorization': 'Bearer $token',
+    final headers = <String, String>{
       'Content-Type': 'application/json',
     };
 
-    // if (_bearerToken != null) {
-    //   headers['Authorization'] = 'Bearer $_bearerToken';
-    // }
+    if (token != null && token.toString().isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
 
-    // print('Headers: $headers');
+    return headers;
+  }
+
+  Map<String, String> _buildMultipartHeaders(token) {
+    final headers = <String, String>{};
+    if (token != null && token.toString().isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
     return headers;
   }
 }
