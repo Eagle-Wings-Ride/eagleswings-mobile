@@ -38,8 +38,10 @@ import 'data/datasource/user_current_location_data_source.dart';
 import 'data/datasource/user_current_location_data_source_impl.dart';
 import 'data/repositories/user_current_location_repository_impl.dart';
 import 'domain/repositories/user_current_location_repository.dart';
+import 'domain/usecases/fetch_all_rides_usecase.dart';
 import 'domain/usecases/fetch_rates_usecase.dart';
 import 'domain/usecases/get_user_current_location_usecase.dart';
+import 'domain/usecases/delete_user_usecase.dart';
 // import 'package:http/http.dart' as http;
 import 'presentation/controller/auth/auth_controller.dart';
 
@@ -101,24 +103,27 @@ Future<void> init() async {
 
   sl.registerFactory<AuthController>(
     () => AuthController(
-        eagleRidesAuthIsSignInUseCase: sl.call(),
-        eagleRidesLoginUserUseCase: sl.call(),
-        eagleRidesAuthCheckUserUseCase: sl.call(),
-        eagleRidesRegisterUseCase: sl.call(),
-        eagleRidesAuthOtpVerificationUseCase: sl.call(),
-        eagleRidesAuthSignOutUseCase: sl.call(),
-        getUserUsecase: sl.call(),
-        addChildUseCase: sl.call(),
-        fetchChildrenUseCase: sl.call(),
-        fetchRecentRidesUseCase: sl.call(),
-        bookRideUseCase: sl.call(),
-        fetchRatesUsecase: sl.call()
-        // eagleRidesAuthGetUserUidUseCase: sl.call(),
-        // uberAuthCheckUserStatusUseCase: sl.call(),
-        // uberAuthGetUserUidUseCase: sl.call(),
-        // uberProfileUpdateRiderUsecase: sl.call(),
-        // uberAddProfileImgUseCase: sl.call(),
-        ),
+      eagleRidesAuthIsSignInUseCase: sl.call(),
+      eagleRidesLoginUserUseCase: sl.call(),
+      eagleRidesAuthCheckUserUseCase: sl.call(),
+      eagleRidesRegisterUseCase: sl.call(),
+      eagleRidesAuthOtpVerificationUseCase: sl.call(),
+      eagleRidesAuthSignOutUseCase: sl.call(),
+      getUserUsecase: sl.call(),
+      addChildUseCase: sl.call(),
+      fetchChildrenUseCase: sl.call(),
+      fetchRecentRidesUseCase: sl.call(),
+      bookRideUseCase: sl.call(),
+      fetchRatesUsecase: sl.call(),
+      fetchAllRidesUseCase: sl(), // ⭐ ADD THIS
+      deleteUserUseCase: sl(),
+      // cancelRideUseCase: sl(),
+      // eagleRidesAuthGetUserUidUseCase: sl.call(),
+      // uberAuthCheckUserStatusUseCase: sl.call(),
+      // uberAuthGetUserUidUseCase: sl.call(),
+      // uberProfileUpdateRiderUsecase: sl.call(),
+      // uberAddProfileImgUseCase: sl.call(),
+    ),
   );
 
   // usecase
@@ -182,6 +187,9 @@ Future<void> init() async {
       eagleRidesAuthRepository: sl.call(),
     ),
   );
+  sl.registerLazySingleton(() => FetchAllRidesUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteUserUseCase(sl()));
+  // sl.registerLazySingleton(() => CancelRideUseCase(sl()));
 
   //repository
   sl.registerLazySingleton<EagleRidesAuthRepository>(
