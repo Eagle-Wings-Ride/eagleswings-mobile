@@ -1,16 +1,13 @@
 import 'dart:convert';
 
-import 'package:eaglerides/data/models/register_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:http/http.dart';
 
 import '../../injection_container.dart';
-import '../../presentation/screens/auth/login.dart';
 import '../core/api_client.dart';
-import '../models/child_model.dart';
-import '../models/user_model.dart';
+import '../models/child_upsert_request.dart';
+import '../models/payment_models.dart';
 import 'auth_remote_data_source.dart';
 
 class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
@@ -76,19 +73,27 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
   }
 
   @override
-  Future<String> bookRide(Map<String, dynamic> requestBody, childId) async {
-    final uri = '/book/$childId';
+  Future<String> bookRide(
+      Map<String, dynamic> requestBody, String childId) async {
     try {
-      final response = await _client.post(uri, params: requestBody);
+      // Use /book/$childId as per Postman collection
+      final uri = '/book/$childId';
+
+      final body = Map<String, dynamic>.from(requestBody);
+      body['childId'] = childId;
+
+      final response = await _client.post(uri, params: body);
 
       debugPrint('Response Body: $response');
-      // Assume the response is a map, not a string
+
+      // ⭐ RETURN THE ENTIRE RESPONSE AS JSON STRING
       if (response is Map<String, dynamic>) {
-        // print('error here');
-        debugPrint(response['message']);
-        return response['message'];
+        // Convert the map back to JSON string so it can be parsed later
+        return json.encode(response); // ✅ Return full JSON
+      } else if (response is String) {
+        return response; // Already a string
       } else {
-        return 'Unexpected response format';
+        return json.encode({'error': 'Unexpected response format'});
       }
     } catch (e) {
       debugPrint('Exception: $e');
@@ -97,11 +102,15 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
   }
 
   @override
-  Future<String> addChild(Map<String, dynamic> requestBody) async {
+  Future<String> addChild(ChildUpsertRequest requestBody) async {
     const uri = '/users/child';
 
     try {
-      final response = await _client.post(uri, params: requestBody);
+      final response = await _client.postMultipart(
+        uri,
+        fields: requestBody.toFormFields(),
+        file: requestBody.imageFile,
+      );
 
       debugPrint('Response Body: $response');
       // Assume the response is a map, not a string
@@ -133,23 +142,7 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
   }
 
   @override
-  Future<void> eagleridesAuthPhoneVerification(String phoneNumber) async {
-    // return await auth.verifyPhoneNumber(
-    //   phoneNumber: phoneNumber,
-    //   verificationCompleted: (PhoneAuthCredential phoneAuthCredential) async {},
-    //   verificationFailed: (FirebaseAuthException e) {
-    //     Get.snackbar('error', e.code.toString(),
-    //         snackPosition: SnackPosition.BOTTOM);
-    //   },
-    //   codeSent: (String verificationId, int? forceResendingToken) async {
-    //     verId.value = verificationId;
-    //     Get.closeAllSnackbars();
-    //     Get.snackbar('done', "otp sent to $phoneNumber");
-    //     // Get.to(() => const OtpVerificationPage());
-    //   },
-    //   codeAutoRetrievalTimeout: (String verificationId) async {},
-    // );
-  }
+  Future<void> eagleridesAuthPhoneVerification(String phoneNumber) async {}
 
   @override
   Future<String> eagleridesAuthOtpVerification(String email, String otp) async {
@@ -201,9 +194,10 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
         print('User Info: $userInfo');
         return userInfo;
       } else {
-        // Handle non-200 status codes
-        print('Error Response: ${response.body}');
-        throw Exception('Failed to load user data: $response');
+        // Handle error case - response doesn't contain 'user' key
+        final errorMessage = response['message'] ?? 'Unknown error occurred';
+        print('Error Response: $errorMessage');
+        throw Exception('Failed to load user data: $errorMessage');
       }
     } catch (e) {
       // Catch any errors such as network issues, JSON decoding errors, etc.
@@ -234,38 +228,12 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
     }
   }
 
-  // @override
-  // Future<List<Map<String, dynamic>>> fetchChildren(String userId) async {
-  //   const baseUri = '/users/children';
-  //   final uri = '$baseUri/$userId';
-
-  //   try {
-  //     print('Fetching children for userId: $userId');
-
-  //     // Ensure we are calling a function that returns decoded JSON, not Response
-  //     final data = await _client.get(uri);
-
-  //     print('Fetched data: $data');
-
-  //     if (data is List) {
-  //       return List<Map<String, dynamic>>.from(data);
-  //     } else {
-  //       throw Exception(
-  //           'Unexpected response format: Expected List, got ${data.runtimeType}');
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching children: $e');
-  //     rethrow;
-  //   }
-  // }
-
   @override
-  Future<List<Map<String, dynamic>>> fetchChildren(String userId) async {
-    const baseUri = '/users/children';
-    final uri = '$baseUri/$userId';
+  Future<List<Map<String, dynamic>>> fetchChildren() async {
+    const uri = '/users/children/me';
 
     try {
-      print('Fetching children for userId: $userId');
+      print('Fetching children for current user');
 
       final data = await _client.get(uri);
       print('Fetched data: $data');
@@ -295,29 +263,7 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
       final response = await _client.get(uri);
       print(response);
 
-      // print(response.statusCode);
-      // print(response);
-      // print(List<Map<String, dynamic>>.from(response['bookings']));
-      // var responseData =
-      //       jsonDecode(response.body);
       return List<Map<String, dynamic>>.from(response['bookings'] ?? []);
-      // if (response.statusCode == 404) {
-      //   print('No recent rides found.');
-      //   return [];
-      // }
-
-      // // Decode the response body from String to Map<String, dynamic>
-      // if (response.statusCode == 200) {
-      //   var responseData =
-      //       jsonDecode(response.body); // Decode the JSON response
-
-      //   print('Fetched data: $responseData');
-
-      //   // Assuming the response contains a 'bookings' key with the rides data
-      //   return List<Map<String, dynamic>>.from(responseData['bookings'] ?? []);
-      // } else {
-      //   throw Exception('Failed to load recent rides');
-      // }
     } catch (e) {
       print("Error fetching recent rides: $e");
       // rethrow; // Re-throw error to be handled elsewhere
@@ -354,11 +300,7 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
       await box.clear();
       await rateBox.clear();
       await childrenBox.clear();
-      // // Clear the token in GetIt
-      // sl.unregister<ApiClient>(); // Unregister ApiClient
-      // sl.registerLazySingleton<ApiClient>(() {
-      //   return ApiClient(sl<Client>(), null); // Register with null token
-      // });
+
       final token = box.get('auth_token');
       print('Token after logout: $token');
       print('Logout Response: $response');
@@ -370,15 +312,325 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
 
   @override
   Future<String> eagleridesAddProfileImg(String riderId) async {
-    // final profileImage =
-    //     await ImagePicker().pickImage(source: ImageSource.gallery);
-    // File _profileImage = File(profileImage!.path);
-    // await firebaseStorage
-    //     .ref('UserProfileImages/$riderId')
-    //     .putFile(_profileImage);
-    // return await firebaseStorage
-    //     .ref('UserProfileImages/$riderId')
-    //     .getDownloadURL();
     return '';
+  }
+
+  // ⭐ ADD THESE METHODS TO YOUR auth_remote_data_source_impl.dart
+// Based on YOUR ACTUAL API documentation
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchAllRides() async {
+    // ⭐ CORRECT ENDPOINT: GET /book/rides/
+    // This returns ALL rides for the authenticated user
+    const uri = '/book/rides/';
+
+    try {
+      print('Fetching all rides for current user');
+
+      final response = await _client.get(uri);
+      print('Fetched rides response: $response');
+
+      // Based on your API doc: response has 'rides' key
+      if (response is Map<String, dynamic> && response.containsKey('rides')) {
+        return List<Map<String, dynamic>>.from(response['rides'] ?? []);
+      }
+      // If no rides found
+      else if (response is Map<String, dynamic> &&
+          response.containsKey('message')) {
+        print('No rides found: ${response['message']}');
+        return [];
+      }
+      // If response is directly a list
+      else if (response is List) {
+        return List<Map<String, dynamic>>.from(response);
+      }
+
+      // Default to empty list if format is unexpected
+      print('Unexpected response format for rides');
+      return [];
+    } catch (e) {
+      print('Error fetching all rides: $e');
+      return []; // Return empty list on error, matching your pattern
+    }
+  }
+
+  @override
+  Future<String> cancelRide(String bookingId, String cancelReason) async {
+    try {
+      print('Cancelling ride: $bookingId with reason: $cancelReason');
+
+      final result = await updateRideStatus(bookingId, 'cancelled');
+      return result['message'] ?? 'Ride cancelled successfully';
+    } catch (e) {
+      debugPrint('Exception cancelling ride: $e');
+      rethrow;
+    }
+  }
+
+  // ============================================
+  // NEW: Payment Endpoints
+  // ============================================
+
+  @override
+  Future<PaymentResponseModel> makePayment(PaymentRequestModel request) async {
+    const uri = '/book/rides/make-payment/';
+    try {
+      print('Making payment for booking: ${request.bookingId}');
+
+      final response = await _client.post(
+        uri,
+        params: request.toJson(),
+      );
+
+      debugPrint('Payment Response: $response');
+
+      if (response is Map<String, dynamic>) {
+        return PaymentResponseModel.fromJson(response);
+      } else {
+        throw Exception('Unexpected response format');
+      }
+    } catch (e) {
+      debugPrint('Exception making payment: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<PaymentResponseModel> renewPayment(PaymentRequestModel request) async {
+    const uri = '/book/rides/renew-payment/';
+    try {
+      print('Renewing payment for booking: ${request.bookingId}');
+
+      final response = await _client.post(
+        uri,
+        params: request.toJson(),
+      );
+
+      debugPrint('Renew Payment Response: $response');
+
+      if (response is Map<String, dynamic>) {
+        return PaymentResponseModel.fromJson(response);
+      } else {
+        throw Exception('Unexpected response format');
+      }
+    } catch (e) {
+      debugPrint('Exception renewing payment: $e');
+      rethrow;
+    }
+  }
+
+  // ============================================
+  // NEW: Ride Status Endpoints
+  // ============================================
+
+  @override
+  Future<List<dynamic>> fetchRidesByStatus(
+      String childId, String status) async {
+    final uri = '/book/rides/status/$childId/$status';
+    try {
+      print('Fetching rides for child $childId with status: $status');
+
+      final response = await _client.get(uri);
+
+      debugPrint('Rides by Status Response: $response');
+
+      if (response is Map<String, dynamic> && response.containsKey('rides')) {
+        return response['rides'] as List<dynamic>;
+      } else if (response is Map<String, dynamic> &&
+          response.containsKey('bookings')) {
+        return response['bookings'] as List<dynamic>;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      debugPrint('Exception fetching rides by status: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> updateRideStatus(
+      String bookingId, String status) async {
+    final uri = '/book/rides/status/$bookingId';
+    try {
+      print('Updating ride $bookingId to status: $status');
+
+      final response = await _client.patch(
+        uri,
+        params: {'status': status},
+      );
+
+      debugPrint('Update Status Response: $response');
+
+      if (response is Map<String, dynamic>) {
+        return response;
+      } else {
+        throw Exception('Unexpected response format');
+      }
+    } catch (e) {
+      debugPrint('Exception updating ride status: $e');
+      rethrow;
+    }
+  }
+
+  // ============================================
+  // NEW: User Management Endpoints
+  // ============================================
+
+  @override
+  Future<Map<String, dynamic>> updateUserProfile(
+      String userId, Map<String, dynamic> updates) async {
+    final uri = '/users/$userId';
+    try {
+      print('Updating user profile: $userId');
+
+      final response = await _client.patch(uri, params: updates);
+
+      debugPrint('Update Profile Response: $response');
+
+      if (response is Map<String, dynamic>) {
+        // Update local storage with new user data
+        if (response.containsKey('user')) {
+          var box = await Hive.openBox('authBox');
+          await box.put('user_info', response['user']);
+        }
+        return response;
+      } else {
+        throw Exception('Unexpected response format');
+      }
+    } catch (e) {
+      debugPrint('Exception updating user profile: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> deleteUser(String userId) async {
+    final uri = '/users/$userId';
+    try {
+      print('Deleting user: $userId');
+
+      await _client.delete(uri);
+
+      // Clear local storage
+      var box = await Hive.openBox('authBox');
+      await box.clear();
+
+      debugPrint('User deleted successfully');
+    } catch (e) {
+      debugPrint('Exception deleting user: $e');
+      rethrow;
+    }
+  }
+
+  // ============================================
+  // NEW: Child Management Endpoints
+  // ============================================
+
+  @override
+  Future<Map<String, dynamic>> updateChild(
+      String childId, ChildUpsertRequest updates) async {
+    final uri = '/users/child/$childId';
+    try {
+      print('Updating child: $childId');
+
+      final response = await _client.patchMultipart(
+        uri,
+        fields: updates.toFormFields(),
+        file: updates.imageFile,
+      );
+
+      debugPrint('Update Child Response: $response');
+
+      if (response is Map<String, dynamic>) {
+        return response;
+      } else {
+        throw Exception('Unexpected response format');
+      }
+    } catch (e) {
+      debugPrint('Exception updating child: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> deleteChild(String childId) async {
+    final uri = '/users/child/$childId';
+    try {
+      print('Deleting child: $childId');
+
+      await _client.delete(uri);
+
+      debugPrint('Child deleted successfully');
+    } catch (e) {
+      debugPrint('Exception deleting child: $e');
+      rethrow;
+    }
+  }
+
+  // ============================================
+  // NEW: Password Reset Endpoints
+  // ============================================
+
+  @override
+  Future<String> forgotPassword({
+    required String email,
+    String? oldPassword,
+    String? newPassword,
+  }) async {
+    const uri = '/users/forgot-password';
+    try {
+      print('Requesting password reset for: $email');
+
+      final payload = <String, dynamic>{
+        'email': email,
+      };
+      if (oldPassword != null && oldPassword.trim().isNotEmpty) {
+        payload['oldPassword'] = oldPassword;
+      }
+      if (newPassword != null && newPassword.trim().isNotEmpty) {
+        payload['newPassword'] = newPassword;
+      }
+
+      final response = await _client.post(
+        uri,
+        params: payload,
+      );
+
+      debugPrint('Forgot Password Response: $response');
+
+      if (response is Map<String, dynamic>) {
+        return response['message'] ?? 'Password reset email sent';
+      } else {
+        return 'Password reset email sent';
+      }
+    } catch (e) {
+      debugPrint('Exception in forgot password: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> resendOtp(String email) async {
+    const uri = '/users/resend-otp';
+    try {
+      print('Resending OTP for: $email');
+
+      final response = await _client.post(
+        uri,
+        params: {'email': email},
+      );
+
+      debugPrint('Resend OTP Response: $response');
+
+      if (response is Map<String, dynamic>) {
+        return response['message'] ?? 'OTP sent successfully';
+      } else {
+        return 'OTP sent successfully';
+      }
+    } catch (e) {
+      debugPrint('Exception resending OTP: $e');
+      rethrow;
+    }
   }
 }
