@@ -1,6 +1,8 @@
 import '../datasource/auth_remote_data_source.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../models/child_model.dart';
+import '../models/child_upsert_request.dart';
+import '../models/payment_models.dart';
 
 class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
   final EagleRidesAuthDataSource eagleRidesAuthDataSource;
@@ -29,13 +31,13 @@ class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
   }
 
   @override
-  Future<String> addChild(Map<String, dynamic> requestBody) async {
+  Future<String> addChild(ChildUpsertRequest requestBody) async {
     return await eagleRidesAuthDataSource.addChild(requestBody);
   }
 
   @override
-  Future<List<dynamic>> fetchChildren(String userId) async {
-    return await eagleRidesAuthDataSource.fetchChildren(userId);
+  Future<List<dynamic>> fetchChildren() async {
+    return await eagleRidesAuthDataSource.fetchChildren();
   }
 
   @override
@@ -88,5 +90,106 @@ class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
   @override
   Future<String> eagleRidesAddProfileImg(String riderId) async {
     return await eagleRidesAuthDataSource.eagleridesAddProfileImg(riderId);
+  }
+
+  @override
+  Future<List<dynamic>> fetchAllRides() async {
+    try {
+      return await eagleRidesAuthDataSource.fetchAllRides();
+    } catch (e) {
+      throw Exception('Failed to fetch rides: $e');
+    }
+  }
+
+  @override
+  Future<String> cancelRide(String bookingId, String cancelReason) async {
+    try {
+      return await eagleRidesAuthDataSource.cancelRide(bookingId, cancelReason);
+    } catch (e) {
+      throw Exception('Failed to cancel ride: $e');
+    }
+  }
+
+  // ============================================
+  // NEW: Payment Methods
+  // ============================================
+
+  @override
+  Future<PaymentResponseModel> makePayment(PaymentRequestModel request) async {
+    return await eagleRidesAuthDataSource.makePayment(request);
+  }
+
+  @override
+  Future<PaymentResponseModel> renewPayment(
+      PaymentRequestModel request) async {
+    return await eagleRidesAuthDataSource.renewPayment(request);
+  }
+
+  // ============================================
+  // NEW: Ride Status Methods
+  // ============================================
+
+  @override
+  Future<List<dynamic>> fetchRidesByStatus(
+      String childId, String status) async {
+    return await eagleRidesAuthDataSource.fetchRidesByStatus(childId, status);
+  }
+
+  @override
+  Future<Map<String, dynamic>> updateRideStatus(
+      String bookingId, String status) async {
+    return await eagleRidesAuthDataSource.updateRideStatus(bookingId, status);
+  }
+
+  // ============================================
+  // NEW: User Management Methods
+  // ============================================
+
+  @override
+  Future<Map<String, dynamic>> updateUserProfile(
+      String userId, Map<String, dynamic> updates) async {
+    return await eagleRidesAuthDataSource.updateUserProfile(userId, updates);
+  }
+
+  @override
+  Future<void> deleteUser(String userId) async {
+    await eagleRidesAuthDataSource.deleteUser(userId);
+  }
+
+  // ============================================
+  // NEW: Child Management Methods
+  // ============================================
+
+  @override
+  Future<Map<String, dynamic>> updateChild(
+      String childId, ChildUpsertRequest updates) async {
+    return await eagleRidesAuthDataSource.updateChild(childId, updates);
+  }
+
+  @override
+  Future<void> deleteChild(String childId) async {
+    await eagleRidesAuthDataSource.deleteChild(childId);
+  }
+
+  // ============================================
+  // NEW: Password Reset Methods
+  // ============================================
+
+  @override
+  Future<String> forgotPassword({
+    required String email,
+    String? oldPassword,
+    String? newPassword,
+  }) async {
+    return await eagleRidesAuthDataSource.forgotPassword(
+      email: email,
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    );
+  }
+
+  @override
+  Future<String> resendOtp(String email) async {
+    return await eagleRidesAuthDataSource.resendOtp(email);
   }
 }
