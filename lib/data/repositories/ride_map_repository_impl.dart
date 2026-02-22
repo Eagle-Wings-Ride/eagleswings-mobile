@@ -49,10 +49,7 @@ class RideMapRepositoryImpl extends RideMapRepository {
     return rideMapDirectionEntityList;
   }
 
-  // @override
-  // Stream<List<DriverModel>> getAvailableDrivers() {
-  //   return rideMapDataSource.getAvailableDrivers();
-  // }
+ 
 
   @override
   Future<RentalChargeModel> getRentalChargeForVehicle(double kms) async {
