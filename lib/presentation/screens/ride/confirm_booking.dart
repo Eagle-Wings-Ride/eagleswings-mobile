@@ -7,15 +7,13 @@ import 'package:eaglerides/core/utils/get_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
-import '../../../injection_container.dart' as di;
 import '../../../styles/styles.dart';
 import '../../controller/auth/auth_controller.dart';
-import '../../controller/ride/ride_controller.dart';
 
 class ConfirmBooking extends StatefulWidget {
   final String pickUpLatitude,
@@ -32,23 +30,44 @@ class ConfirmBooking extends StatefulWidget {
       returnTime,
       childName,
       childId;
+  // ⭐ ADD THESE NEW PARAMETERS:
+  final List<String> pickupDays;
+  final String morningFrom,
+      morningTo,
+      morningFromAddress,
+      morningToAddress,
+      afternoonFrom,
+      afternoonTo,
+      afternoonFromAddress,
+      afternoonToAddress;
 
-  const ConfirmBooking(
-      {super.key,
-      required this.pickUpLatitude,
-      required this.pickUpLongitude,
-      required this.dropOffLatitude,
-      required this.dropOffLongitude,
-      required this.pickUpLocation,
-      required this.dropOffLocation,
-      required this.rideType,
-      required this.tripType,
-      required this.schedule,
-      required this.startDate,
-      required this.pickUpTime,
-      required this.returnTime,
-      required this.childName,
-      required this.childId});
+  const ConfirmBooking({
+    super.key,
+    required this.pickUpLatitude,
+    required this.pickUpLongitude,
+    required this.dropOffLatitude,
+    required this.dropOffLongitude,
+    required this.pickUpLocation,
+    required this.dropOffLocation,
+    required this.rideType,
+    required this.tripType,
+    required this.schedule,
+    required this.startDate,
+    required this.pickUpTime,
+    required this.returnTime,
+    required this.childName,
+    required this.childId,
+    // ⭐ ADD THESE TO CONSTRUCTOR:
+    required this.pickupDays,
+    required this.morningFrom,
+    required this.morningTo,
+    required this.morningFromAddress,
+    required this.morningToAddress,
+    required this.afternoonFrom,
+    required this.afternoonTo,
+    required this.afternoonFromAddress,
+    required this.afternoonToAddress,
+  });
 
   @override
   State<ConfirmBooking> createState() => _ConfirmBookingState();
@@ -75,11 +94,6 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
     rootBundle.loadString('assets/map_style_black.json').then((string) {
       mapStyle = string;
     });
-    // _loadMapStyle().then((style) {
-    //   setState(() {
-    //     mapStyle = style;
-    //   });
-    // });
   }
 
   bool _isPopupVisible = false;
@@ -88,12 +102,6 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
     setState(() {
       _isPopupVisible = !_isPopupVisible;
     });
-  }
-
-  // Load the map style from assets
-  Future<String> _loadMapStyle() async {
-    return await DefaultAssetBundle.of(context)
-        .loadString('assets/map_style.json'); // Load your map style JSON file
   }
 
   Future<void> _loadCustomMarkers() async {
@@ -197,7 +205,10 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                   // });
                   // controller.setMapStyle(mapStyle);
                   // controller.GoogleMap.style('assets/map_style.json');
-                  controller.showMarkerInfoWindow(const MarkerId('pickup'));
+                  // Small delay to ensure markers are ready on the map
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    controller.showMarkerInfoWindow(const MarkerId('pickup'));
+                  });
                   _controller.complete(controller);
 
                   LatLng pickupLocation = LatLng(
@@ -287,12 +298,35 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Confirm Your Booking',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Confirm Your Booking',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: backgroundColor.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        'Step 5 of 5',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: backgroundColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,107 +337,37 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
                                         children: [
-                                          const SizedBox(
-                                            height: 20,
+                                          const SizedBox(height: 24),
+                                          _buildRoutePoint(
+                                            icon: Iconsax.location,
+                                            color: Colors.green,
+                                            address: widget.pickUpLocation,
+                                            label: 'Pickup',
                                           ),
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xffF7F6F6),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          100),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.flag,
-                                                  size: 15,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 5,
-                                              ),
-                                              SizedBox(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    1.5,
-                                                child: Text(
-                                                  widget.pickUpLocation,
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: textColor,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          for (var i = 0; i < 5; i++)
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 1,
-                                                      horizontal: 20),
-                                              child: Container(
-                                                width: 2,
-                                                height: 5,
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xffF7F6F6),
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
+                                          Padding(
+                                            padding:
+                                                EdgeInsets.only(left: 17.w),
+                                            child: Container(
+                                              width: 2,
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.green,
+                                                    Colors.red
+                                                  ],
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
                                                 ),
                                               ),
                                             ),
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xffF7F6F6),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          100),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.location_on_outlined,
-                                                  size: 15,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 5,
-                                              ),
-                                              SizedBox(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    1.5,
-                                                child: Text(
-                                                  widget.dropOffLocation,
-                                                  // overflow: TextOverflow.ellipsis,
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: textColor,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+                                          ),
+                                          _buildRoutePoint(
+                                            icon: Iconsax.location_tick,
+                                            color: Colors.red,
+                                            address: widget.dropOffLocation,
+                                            label: 'Drop-off',
                                           ),
                                         ],
                                       ),
@@ -414,266 +378,211 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 14,
+                                  height: 24,
                                 ),
-                                Text(
-                                  'Other details',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
+                                _buildSectionHeader('Other details'),
                                 const SizedBox(
-                                  height: 7,
+                                  height: 12,
                                 ),
                                 Container(
                                   width: MediaQuery.of(context).size.width,
-                                  padding: const EdgeInsets.all(23),
+                                  padding: EdgeInsets.all(20.sp),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(
-                                      15,
-                                    ),
+                                    borderRadius: BorderRadius.circular(20),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.grey.withOpacity(
-                                            0.5), // Shadow color with opacity
-                                        spreadRadius:
-                                            2, // How wide the shadow spreads
-                                        blurRadius:
-                                            5, // The softness of the shadow
-                                        offset: const Offset(3,
-                                            3), // Position of shadow: x, y (right, down)
+                                        color: Colors.black.withOpacity(0.04),
+                                        blurRadius: 15,
+                                        offset: const Offset(0, 5),
                                       ),
                                     ],
+                                    border: Border.all(
+                                      color: Colors.grey[100]!,
+                                    ),
                                   ),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      // Text(
-                                      //   '${widget.pickUpLocation} To ${widget.dropOffLocation}',
-                                      //   style: GoogleFonts.poppins(
-                                      //     fontSize: 14,
-                                      //     fontWeight: FontWeight.w600,
-                                      //   ),
-                                      // ),
-                                      // const SizedBox(
-                                      //   height: 10,
-                                      // ),
                                       Row(
                                         children: [
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 8.h,
-                                              vertical: 5.h,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              color: getRideTypeColor(
-                                                      widget.rideType)
-                                                  .withOpacity(0.14),
-                                            ),
-                                            child: Text(
-                                              (widget.rideType == 'inhouse')
-                                                  ? 'In-house driver'
-                                                  : 'Freelance Driver',
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 12,
-                                                color: getRideTypeColor(
-                                                    widget.rideType),
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
+                                          _buildDetailChip(
+                                            label: widget.rideType == 'inhouse'
+                                                ? 'In-house driver'
+                                                : 'Freelance Driver',
+                                            color: getRideTypeColor(
+                                                widget.rideType),
                                           ),
-                                          SizedBox(
-                                            width: 10.w,
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 8.h,
-                                              vertical: 5.h,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              color: const Color.fromRGBO(
-                                                  19, 59, 183, .14),
-                                            ),
-                                            child: Text(
-                                              (widget.tripType == 'oneway')
-                                                  ? 'One Way Trip'
-                                                  : 'Return Trip',
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 12,
-                                                color: const Color(0xff133BB7),
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
+                                          SizedBox(width: 8.w),
+                                          _buildDetailChip(
+                                            label: widget.tripType == 'oneway'
+                                                ? 'One Way Trip'
+                                                : 'Return Trip',
+                                            color: const Color(0xff133BB7),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
+                                      const SizedBox(height: 16),
                                       Row(
                                         children: [
-                                          SvgPicture.asset(
-                                            'assets/images/duration_icon.svg',
-                                            width: 20,
-                                            height: 20,
-                                          ),
-                                          SizedBox(
-                                            width: 5.w,
-                                          ),
+                                          const Icon(Iconsax.calendar,
+                                              size: 20, color: Colors.grey),
+                                          SizedBox(width: 8.w),
                                           Text(
                                             widget.schedule,
                                             style: GoogleFonts.poppins(
-                                              fontSize: 12,
+                                              fontSize: 13,
                                               fontWeight: FontWeight.w600,
-                                              color: Colors.black,
+                                              color: textColor,
                                             ),
                                           ),
-                                          SizedBox(
-                                            width: 10.w,
-                                          ),
-                                          SvgPicture.asset(
-                                            'assets/images/child_icon.svg',
-                                            width: 20,
-                                            height: 20,
-                                          ),
-                                          SizedBox(
-                                            width: 5.w,
-                                          ),
+                                          SizedBox(width: 16.w),
+                                          const Icon(Iconsax.user,
+                                              size: 20, color: Colors.grey),
+                                          SizedBox(width: 8.w),
                                           Text(
                                             widget.childName,
                                             style: GoogleFonts.poppins(
-                                              fontSize: 12,
+                                              fontSize: 13,
                                               fontWeight: FontWeight.w600,
-                                              color: Colors.black,
+                                              color: textColor,
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Wrap(
-                                        runAlignment: WrapAlignment.center,
-                                        alignment: WrapAlignment.center,
-                                        crossAxisAlignment:
-                                            WrapCrossAlignment.center,
+                                      const SizedBox(height: 12),
+                                      Row(
                                         children: [
-                                          const Icon(
-                                            Icons.access_time,
-                                            color: Colors.black,
-                                            size: 16,
-                                          ),
-                                          SizedBox(
-                                            width: 2.w,
-                                          ),
+                                          const Icon(Iconsax.clock,
+                                              size: 20, color: Colors.grey),
+                                          SizedBox(width: 8.w),
                                           Text(
-                                            'Pick Up time: ${widget.pickUpTime}',
+                                            'Pickup: ${widget.pickUpTime}',
                                             style: GoogleFonts.poppins(
-                                              color: Colors.black,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
+                                              fontSize: 13,
+                                              color: textColor,
                                             ),
                                           ),
-                                          SizedBox(
-                                            width: 8.w,
-                                          ),
-                                          const Icon(
-                                            Icons.access_time,
-                                            color: Colors.black,
-                                            size: 16,
-                                          ),
-                                          SizedBox(
-                                            width: 2.w,
-                                          ),
-                                          Text(
-                                            'Arrival time: ${widget.returnTime}',
-                                            style: GoogleFonts.poppins(
-                                              color: Colors.black,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
+                                          if (widget.tripType == 'return') ...[
+                                            SizedBox(width: 16.w),
+                                            Text(
+                                              'Return: ${widget.returnTime}',
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 13,
+                                                color: textColor,
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ],
                                       ),
                                     ],
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 20),
-                                        child: Text(
-                                          'Cancel',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
+                                Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 20.h),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Container(
+                                            height: 56.h,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[100],
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            child: Text(
+                                              'Cancel',
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        minimumSize: Size(
-                                            MediaQuery.of(context).size.width *
-                                                .4,
-                                            50),
-                                        backgroundColor: backgroundColor,
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            50,
+                                      SizedBox(width: 16.w),
+                                      Expanded(
+                                        flex: 2,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            _authController.bookRide({
+                                              "ride_type": widget.rideType,
+                                              "trip_type": widget.tripType,
+                                              "schedule_type": widget.schedule,
+                                              "pickup_days": widget.pickupDays,
+                                              "start_date": _convertDateFormat(
+                                                  widget.startDate),
+                                              "morning_from":
+                                                  widget.morningFrom,
+                                              "morning_to": widget.morningTo,
+                                              "morning_time": widget.pickUpTime,
+                                              "morning_from_address":
+                                                  widget.morningFromAddress,
+                                              "morning_to_address":
+                                                  widget.morningToAddress,
+                                              "afternoon_from":
+                                                  widget.afternoonFrom,
+                                              "afternoon_to":
+                                                  widget.afternoonTo,
+                                              "afternoon_time":
+                                                  widget.returnTime,
+                                              "afternoon_from_address":
+                                                  widget.afternoonFromAddress,
+                                              "afternoon_to_address":
+                                                  widget.afternoonToAddress,
+                                              "start_longitude":
+                                                  widget.pickUpLongitude,
+                                              "start_latitude":
+                                                  widget.pickUpLatitude,
+                                              "end_longitude":
+                                                  widget.dropOffLongitude,
+                                              "end_latitude":
+                                                  widget.dropOffLatitude,
+                                            }, widget.childId, context);
+                                          },
+                                          child: Container(
+                                            height: 56.h,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  backgroundColor,
+                                                  backgroundColor
+                                                      .withOpacity(0.9)
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: backgroundColor
+                                                      .withOpacity(0.3),
+                                                  blurRadius: 10,
+                                                  offset: const Offset(0, 4),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Text(
+                                              'Confirm Booking',
+                                              style: GoogleFonts.poppins(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                      onPressed: () {
-                                        _authController.bookRide({
-                                          "pick_up_location":
-                                              widget.pickUpLocation,
-                                          "drop_off_location":
-                                              widget.dropOffLocation,
-                                          "ride_type": widget.rideType,
-                                          "trip_type": widget.tripType,
-                                          "schedule": widget.schedule,
-                                          "start_date": widget.startDate,
-                                          "pick_up_time": widget.pickUpTime,
-                                          "drop_off_time": widget.returnTime,
-                                          "start_longitude":
-                                              widget.pickUpLongitude,
-                                          "start_latitude":
-                                              widget.pickUpLatitude,
-                                          "end_longitude":
-                                              widget.dropOffLongitude,
-                                          "end_latitude": widget.dropOffLatitude
-                                        }, widget.childId, context);
-                                      },
-                                      child: Text(
-                                        'Confirm',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.poppins(
-                                          color: buttonText,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -749,22 +658,96 @@ class _ConfirmBookingState extends State<ConfirmBooking> {
       ),
     );
   }
+
+  Widget _buildDetailChip({required String label, required Color color}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title.toUpperCase(),
+      style: GoogleFonts.poppins(
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+        color: backgroundColor,
+        letterSpacing: 1.2,
+      ),
+    );
+  }
+
+  Widget _buildRoutePoint({
+    required IconData icon,
+    required Color color,
+    required String address,
+    required String label,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: color, size: 16),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: textColor.withOpacity(0.5),
+                ),
+              ),
+              Text(
+                address,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-String convertDateFormat(String dateStr) {
-  // Remove the day suffix (st, nd, rd, th)
-  final day = dateStr.split(',')[0].replaceAll(RegExp(r'\D'), '');
-  final monthYear = dateStr.split(',')[1].trim();
-  final month = monthYear.split(' ')[0];
-  final year = monthYear.split(' ')[1];
+String _convertDateFormat(String dateStr) {
+  try {
+    if (RegExp(r'^\d{1,2}/\d{1,2}/\d{4}$').hasMatch(dateStr)) {
+      return dateStr;
+    }
 
-  // Create the final formatted string
-  final formattedDate = '$day $month, $year';
-
-  // Parse the date and format it to the desired format
-  DateFormat inputFormat = DateFormat('d MMMM, yyyy');
-  DateFormat outputFormat = DateFormat('dd/MM/yyyy');
-  DateTime dateTime = inputFormat.parse(formattedDate);
-
-  return outputFormat.format(dateTime);
+    DateFormat inputFormat = DateFormat('d MMMM, yyyy');
+    DateTime dateTime = inputFormat.parse(dateStr);
+    DateFormat outputFormat = DateFormat('MM/dd/yyyy');
+    return outputFormat.format(dateTime);
+  } catch (e) {
+    return dateStr;
+  }
 }
