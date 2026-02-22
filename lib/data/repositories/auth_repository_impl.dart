@@ -1,6 +1,5 @@
 import '../datasource/auth_remote_data_source.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../models/child_model.dart';
 import '../models/child_upsert_request.dart';
 import '../models/payment_models.dart';
 
@@ -120,8 +119,7 @@ class EagleRidesAuthRepositoryImpl extends EagleRidesAuthRepository {
   }
 
   @override
-  Future<PaymentResponseModel> renewPayment(
-      PaymentRequestModel request) async {
+  Future<PaymentResponseModel> renewPayment(PaymentRequestModel request) async {
     return await eagleRidesAuthDataSource.renewPayment(request);
   }
 

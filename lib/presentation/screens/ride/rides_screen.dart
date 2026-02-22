@@ -31,6 +31,12 @@ class _RidesScreenState extends State<RidesScreen> {
     {'value': 'all', 'label': 'All', 'icon': Iconsax.archive},
     {'value': 'booked', 'label': 'Booked', 'icon': Iconsax.calendar},
     {'value': 'paid', 'label': 'Paid', 'icon': Iconsax.wallet},
+    {
+      'value': 'payment_failed',
+      'label': 'Payment Failed',
+      'icon': Iconsax.warning_2
+    },
+    {'value': 'expired', 'label': 'Expired', 'icon': Iconsax.timer_pause},
     {'value': 'assigned', 'label': 'Assigned', 'icon': Iconsax.user},
     {'value': 'ongoing', 'label': 'Ongoing', 'icon': Iconsax.car},
     {'value': 'completed', 'label': 'Completed', 'icon': Iconsax.tick_circle},

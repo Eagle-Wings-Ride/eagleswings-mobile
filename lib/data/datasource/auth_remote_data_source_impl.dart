@@ -278,9 +278,26 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
 
   @override
   Future<bool> eagleridesAuthCheckUserStatus(String userId) async {
-    final response =
-        await _client.get('/checkUserStatus', params: {'userId': userId});
-    return response['status'] == 'active'; // Adjust based on your API response
+    final response = await _client.get('/users/current');
+    if (response is! Map<String, dynamic>) {
+      return false;
+    }
+
+    final user = response['user'];
+    if (user is! Map<String, dynamic>) {
+      return false;
+    }
+
+    final resolvedId = (user['_id'] ?? user['id'] ?? '').toString();
+    if (resolvedId.isEmpty) {
+      return false;
+    }
+
+    if (userId.trim().isEmpty) {
+      return true;
+    }
+
+    return resolvedId == userId.trim();
   }
 
   @override
@@ -483,8 +500,14 @@ class EagleRidesAuthDataSourceImpl extends EagleRidesAuthDataSource {
     final uri = '/users/$userId';
     try {
       print('Updating user profile: $userId');
+      final sanitizedUpdates = <String, dynamic>{};
+      updates.forEach((key, value) {
+        if (value != null) {
+          sanitizedUpdates[key] = value.toString().trim();
+        }
+      });
 
-      final response = await _client.patch(uri, params: updates);
+      final response = await _client.patch(uri, params: sanitizedUpdates);
 
       debugPrint('Update Profile Response: $response');
 

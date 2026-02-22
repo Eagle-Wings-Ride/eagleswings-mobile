@@ -887,19 +887,18 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 
-import '../../../core/utils/format_date.dart';
 import '../../../core/utils/get_status.dart';
 import '../../../core/utils/string_extensions.dart'; // ⭐ ADDED THIS FIX
 import '../../../data/models/book_rides_model.dart';
 import '../../../styles/styles.dart';
 import '../../controller/auth/auth_controller.dart';
 import 'live_tracking_screen.dart' show LiveTrackingScreen;
+import 'payment_screen.dart';
 
 class SingleRideInfoScreen extends StatefulWidget {
   const SingleRideInfoScreen({super.key});
@@ -1813,10 +1812,59 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
   }
 
   Widget _buildActionButtons() {
-    if (_ride!.status.toLowerCase() == 'booked' ||
-        _ride!.status.toLowerCase() == 'paid') {
-      return Column(
-        children: [
+    final status = _ride!.status.toLowerCase();
+    final canCancel = status == 'booked' || status == 'paid';
+    final canPay =
+        status == 'booked' || status == 'payment_failed' || status == 'expired';
+
+    if (!canCancel && !canPay) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      children: [
+        if (canPay) ...[
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                final isRenewal =
+                    status == 'payment_failed' || status == 'expired';
+                Get.to(
+                  () => PaymentScreen(
+                    amount: _estimateAmountForRide(),
+                    bookingId: _ride!.id,
+                    isRenewal: isRenewal,
+                    bookingDetails: {
+                      'childName': _ride!.child.fullname,
+                      'tripType': _ride!.tripType,
+                      'schedule': _ride!.scheduleType,
+                      'startDate': _ride!.startDate,
+                    },
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: backgroundColor,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              icon: const Icon(Iconsax.wallet, color: Colors.white),
+              label: Text(
+                status == 'booked' ? 'Complete Payment' : 'Renew Payment',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        if (canCancel) ...[
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -1840,39 +1888,62 @@ class _SingleRideInfoScreenState extends State<SingleRideInfoScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {
-                Get.snackbar(
-                  'Coming Soon',
-                  'Contact support feature will be available soon',
-                  snackPosition: SnackPosition.BOTTOM,
-                );
-              },
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: backgroundColor),
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
+        ],
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () {
+              Get.snackbar(
+                'Coming Soon',
+                'Contact support feature will be available soon',
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            },
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: backgroundColor),
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
               ),
-              icon: Icon(Icons.phone, color: backgroundColor),
-              label: Text(
-                'Contact Support',
-                style: GoogleFonts.poppins(
-                  color: backgroundColor,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
+            ),
+            icon: Icon(Icons.phone, color: backgroundColor),
+            label: Text(
+              'Contact Support',
+              style: GoogleFonts.poppins(
+                color: backgroundColor,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
+
+  double _estimateAmountForRide() {
+    final rates = _authController.rates.value;
+    if (rates == null) {
+      return 0.0;
     }
 
-    return const SizedBox.shrink();
+    final driverKey = _ride!.rideType.toLowerCase() == 'inhouse'
+        ? 'in_house_drivers'
+        : 'freelance_drivers';
+    final scheduleKey = _ride!.scheduleType.toLowerCase() == '2 weeks'
+        ? 'bi_weekly'
+        : _ride!.scheduleType.toLowerCase() == '1 month'
+            ? 'monthly'
+            : 'daily';
+    final tripKey =
+        _ride!.tripType.toLowerCase() == 'return' ? 'return' : 'one_way';
+
+    final amount = rates[driverKey]?[scheduleKey]?[tripKey];
+    if (amount is num) {
+      return amount.toDouble();
+    }
+
+    return double.tryParse(amount?.toString() ?? '') ?? 0.0;
   }
 
   void _showCancelConfirmation() {

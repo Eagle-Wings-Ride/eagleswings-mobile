@@ -8,8 +8,16 @@ Color getStatusColor(String? status) {
       return const Color(0xffFF4D4D); // Red for canceled
     case 'booked':
       return const Color(0xff4D79FF); // Blue for completed
+    case 'paid':
+      return const Color(0xff0E9F6E); // Green for paid
+    case 'assigned':
+      return const Color(0xff2F80ED); // Blue for assigned
     case 'ongoing':
       return const Color(0xffFFC107); // Yellow for ongoing
+    case 'payment_failed':
+      return const Color(0xffD92D20); // Red for failed payments
+    case 'expired':
+      return const Color(0xffF79009); // Amber for expired rides
     default:
       return const Color(0xffB0BEC5); // Grey for unknown statuses
   }

@@ -17,8 +17,9 @@ class UserModel {
 
   // From JSON to UserModel (used for API response)
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    final resolvedId = (json['_id'] ?? json['id'] ?? '').toString();
     return UserModel(
-      id: json['id'] ?? '',
+      id: resolvedId,
       name: json['fullname'] ?? 'Guest',
       email: json['email'] ?? '',
       number: json['phone_number'] ?? '',
@@ -29,8 +30,9 @@ class UserModel {
 
   // From Map to UserModel (used for local storage like Hive)
   factory UserModel.fromMap(Map<String, dynamic> map) {
+    final resolvedId = (map['_id'] ?? map['id'] ?? '').toString();
     return UserModel(
-      id: map['id'] ?? '',
+      id: resolvedId,
       name: map['fullname'] ?? '',
       email: map['email'] ?? '',
       number: map['phone_number'] ?? '',
@@ -43,6 +45,7 @@ class UserModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      '_id': id,
       'fullname': name,
       'email': email,
       'phone_number': number,

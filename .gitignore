@@ -43,4 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-Eagles Wings Ride APIS.postman_collection.json
+*postman_collection.json
+/postman_collection.json
+postman_collection.json

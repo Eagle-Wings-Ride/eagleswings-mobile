@@ -210,13 +210,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 itemCount: children.length,
                 itemBuilder: (context, index) {
                   final child = children[index];
+                  final childInitial = child.fullname.trim().isNotEmpty
+                      ? child.fullname.trim()[0].toUpperCase()
+                      : '?';
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundImage: child.image != null
                           ? NetworkImage(child.image!)
                           : null,
-                      child:
-                          child.image == null ? Text(child.fullname[0]) : null,
+                      child: child.image == null ? Text(childInitial) : null,
                     ),
                     title: Text(child.fullname),
                     subtitle: Text('Age: ${child.age} | Grade: ${child.grade}'),

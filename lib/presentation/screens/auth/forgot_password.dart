@@ -134,8 +134,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                         try {
                                           final authController =
                                               Get.find<AuthController>();
-                                          await authController
-                                              .forgotPassword(email);
+                                          await authController.forgotPassword(
+                                              email: email);
 
                                           // Only navigate if API call was successful
                                           Get.to(

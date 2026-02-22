@@ -6,8 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../styles/styles.dart';
 import '../../../widgets/widgets.dart';
+import '../../controller/auth/auth_controller.dart';
 import 'set_new_password.dart';
-import 'verification_confirmation_screen.dart';
 
 class ForgotPassOtpScreen extends StatefulWidget {
   const ForgotPassOtpScreen({super.key, required this.email});
@@ -18,35 +18,14 @@ class ForgotPassOtpScreen extends StatefulWidget {
 }
 
 class _ForgotPassOtpScreenState extends State<ForgotPassOtpScreen> {
+  final AuthController _authController = Get.find<AuthController>();
   final TextEditingController _forgotPassOtpController =
       TextEditingController();
   final verifyCodeFormKey = GlobalKey<FormState>();
-
-  bool isVerifying = false;
-  bool isVerificationSuccessful = false;
   @override
   void dispose() {
     _forgotPassOtpController.clear();
     super.dispose();
-  }
-
-  verificationSuccessful() async {
-    setState(() {
-      isVerificationSuccessful = true;
-    });
-  }
-
-  confirmVerifying() {
-    setState(() {
-      isVerifying = true;
-    });
-  }
-
-  void handleClickButton() async {
-    confirmVerifying();
-    // Wait for 5 seconds
-    await Future.delayed(const Duration(seconds: 5));
-    verificationSuccessful();
   }
 
   @override
@@ -147,18 +126,33 @@ class _ForgotPassOtpScreenState extends State<ForgotPassOtpScreen> {
                                     ),
                                     onPressed: () {
                                       FocusScope.of(context).unfocus();
-                                      // handleClickButton();
-                                      Get.to(
-                                        () => VerificationConfirmationScreen(
-                                          nextScreenBuilder: () =>
-                                              SetNewPasswordScreen(
-                                                  email: widget
-                                                      .email), // Builder function for the next page
-                                        ),
-                                      );
+                                      final otp =
+                                          _forgotPassOtpController.text.trim();
+                                      if (otp.isEmpty) {
+                                        Get.snackbar(
+                                          'Invalid OTP',
+                                          'Please enter the verification code',
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor:
+                                              const Color(0xffFF5500),
+                                          colorText: Colors.white,
+                                        );
+                                        return;
+                                      }
 
-                                      // await verificationSuccessful();
-                                      // Get.offAll(NavigationPage());
+                                      _authController
+                                          .verifyPasswordResetOtp(
+                                        email: widget.email,
+                                        otp: otp,
+                                      )
+                                          .then((_) {
+                                        Get.to(
+                                          () => SetNewPasswordScreen(
+                                            email: widget.email,
+                                            otp: otp,
+                                          ),
+                                        );
+                                      });
                                     },
                                     child: Text(
                                       'Continue',
@@ -168,6 +162,21 @@ class _ForgotPassOtpScreenState extends State<ForgotPassOtpScreen> {
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
                                       ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 12.h),
+                                TextButton(
+                                  onPressed: () async {
+                                    await _authController
+                                        .resendOtp(widget.email);
+                                  },
+                                  child: Text(
+                                    'Resend OTP',
+                                    style: GoogleFonts.poppins(
+                                      color: backgroundColor,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
                                     ),
                                   ),
                                 ),

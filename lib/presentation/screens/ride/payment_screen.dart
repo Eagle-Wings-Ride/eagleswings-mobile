@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../injection_container.dart' as di;
 import '../../../navigation_page.dart';
 import '../../../styles/styles.dart';
 import '../../controller/auth/auth_controller.dart';
@@ -70,6 +68,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildAmountCard() {
+    final shortBookingId = widget.bookingId.length > 10
+        ? '${widget.bookingId.substring(0, 10)}...'
+        : widget.bookingId;
+
     return Container(
       padding: EdgeInsets.all(20.sp),
       decoration: BoxDecoration(
@@ -105,7 +107,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
           SizedBox(height: 5.h),
           Text(
-            'Booking ID: ${widget.bookingId.substring(0, 10)}...',
+            'Booking ID: $shortBookingId',
             style: GoogleFonts.poppins(
               fontSize: 12,
               color: Colors.white.withOpacity(0.8),
@@ -156,9 +158,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildDetailRow(String label, dynamic value) {
-    final displayValue = value?.toString().trim().isNotEmpty == true
-        ? value.toString()
-        : 'N/A';
+    final displayValue =
+        value?.toString().trim().isNotEmpty == true ? value.toString() : 'N/A';
 
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
@@ -247,9 +248,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    widget.isRenewal
-                        ? 'Renew Payment'
-                        : 'Proceed to Payment',
+                    widget.isRenewal ? 'Renew Payment' : 'Proceed to Payment',
                     style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: 16,

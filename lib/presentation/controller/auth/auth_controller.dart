@@ -14,7 +14,6 @@ import 'package:eaglerides/domain/usecases/getUserUseCase.dart';
 import 'package:eaglerides/domain/usecases/register.dart';
 import 'package:eaglerides/presentation/screens/auth/login.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -105,7 +104,7 @@ class AuthController extends GetxController {
 
       // Token exists, try to fetch user data to validate it
       final userResponse = await getUserUsecase.call();
-      if (userResponse != null) {
+      if (userResponse.isNotEmpty) {
         // User data fetched successfully, token is valid
         final userInfo = UserModel.fromMap(userResponse);
         user.value = userInfo;
@@ -132,7 +131,6 @@ class AuthController extends GetxController {
 
   loginUser(String email, String password, context) async {
     final box = await Hive.openBox('authBox');
-    final token = box.get('auth_token');
     // Clear token and navigate to login
     await box.delete('auth_token'); // Explicitly delete the auth token
     await box.clear();
@@ -235,7 +233,8 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> addChild(ChildUpsertRequest requestBody, BuildContext context) async {
+  Future<void> addChild(
+      ChildUpsertRequest requestBody, BuildContext context) async {
     print('requestBody');
     print(requestBody);
     try {
@@ -892,7 +891,8 @@ class AuthController extends GetxController {
       GlobalLoader().show();
       final dataSource = GetIt.instance<EagleRidesAuthDataSource>();
       final userId = _resolveUserIdOrThrow();
-      final result = await dataSource.updateUserProfile(userId, updates);
+      final payload = _buildUserProfileUpdatePayload(updates);
+      final result = await dataSource.updateUserProfile(userId, payload);
 
       // Refresh user data
       await loadUser();
@@ -1043,5 +1043,70 @@ class AuthController extends GetxController {
       );
     }
     return userId;
+  }
+
+  Map<String, dynamic> _buildUserProfileUpdatePayload(
+      Map<String, dynamic> updates) {
+    final currentUser = user.value;
+
+    final fullname = _firstNonEmptyString([
+      updates['fullname'],
+      updates['fullName'],
+      currentUser?.name,
+    ]);
+    final email = _firstNonEmptyString([
+      updates['email'],
+      currentUser?.email,
+    ]);
+    final phoneNumber = _firstNonEmptyString([
+      updates['phone_number'],
+      updates['phoneNumber'],
+      currentUser?.number,
+    ]);
+    final address = _firstNonEmptyString([
+      updates['address'],
+      updates['home_address'],
+      currentUser?.address,
+    ]);
+
+    if (fullname.isEmpty ||
+        email.isEmpty ||
+        phoneNumber.isEmpty ||
+        address.isEmpty) {
+      throw Exception(
+        'Full name, email, phone number and address are required.',
+      );
+    }
+
+    final nameParts = fullname
+        .split(RegExp(r'\s+'))
+        .where((part) => part.trim().isNotEmpty)
+        .toList();
+    final firstName = nameParts.isNotEmpty ? nameParts.first : fullname;
+    final lastName = nameParts.length > 1
+        ? nameParts.sublist(1).join(' ')
+        : (nameParts.isNotEmpty ? nameParts.first : fullname);
+
+    return {
+      'fullname': fullname,
+      'fullName': fullname,
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'phone_number': phoneNumber,
+      'phoneNumber': phoneNumber,
+      'address': address,
+      'home_address': address,
+    };
+  }
+
+  String _firstNonEmptyString(Iterable<dynamic> values) {
+    for (final value in values) {
+      final text = value?.toString().trim() ?? '';
+      if (text.isNotEmpty) {
+        return text;
+      }
+    }
+    return '';
   }
 }

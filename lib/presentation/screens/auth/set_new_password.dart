@@ -6,18 +6,20 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../styles/styles.dart';
 import '../../../widgets/widgets.dart';
+import '../../controller/auth/auth_controller.dart';
 import 'login.dart';
-import 'verification_confirmation_screen.dart';
 
 class SetNewPasswordScreen extends StatefulWidget {
-  const SetNewPasswordScreen({super.key, required this.email});
+  const SetNewPasswordScreen({super.key, required this.email, this.otp});
   final String email;
+  final String? otp;
 
   @override
   State<SetNewPasswordScreen> createState() => _SetNewPasswordScreenState();
 }
 
 class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
+  final AuthController _authController = Get.find<AuthController>();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
@@ -189,31 +191,22 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                                           ),
                                         ),
                                       ),
-                                      onPressed: () {
-                                        Get.to(
-                                          () => VerificationConfirmationScreen(
-                                            path: 'login',
-                                            nextScreenBuilder: () =>
-                                                const Login(), // Builder function for the next page
-                                          ),
-                                        );
-                                        // Navigator.pushReplacement(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //     builder: (context) => const Login(),
-                                        //   ),
-                                        // );
-                                        // if (setNewPasswordFormKey.currentState!
-                                        //     .validate()) {
-                                        //   // _authController.register({
-                                        //   //   'fullname': widget.fullName,
-                                        //   //   'email': widget.email,
-                                        //   //   'password':
-                                        //   //       _passwordController.text,
-                                        //   //   'phone_number': widget.phoneNumber,
-                                        //   //   'address': widget.address,
-                                        //   // });
-                                        // }
+                                      onPressed: () async {
+                                        FocusScope.of(context).unfocus();
+                                        if (!setNewPasswordFormKey.currentState!
+                                            .validate()) {
+                                          return;
+                                        }
+
+                                        try {
+                                          await _authController
+                                              .setForgotPassword(
+                                            email: widget.email,
+                                            newPassword:
+                                                _passwordController.text.trim(),
+                                          );
+                                          Get.offAll(() => const Login());
+                                        } catch (_) {}
                                       },
                                       child: Text(
                                         'Continue',

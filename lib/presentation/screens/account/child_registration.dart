@@ -40,8 +40,6 @@ class _ChildRegistrationState extends State<ChildRegistration> {
   final TextEditingController _schoolController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   bool _showDropdown = false;
-  final GlobalKey _textFieldKey = GlobalKey();
-  double _textFieldOffset = 0; // Position of the TextField
   final registerChildFormKey = GlobalKey<FormState>();
   // bool _isLoading = true;
   List<String> genderList = ['Male', 'Female'];
@@ -111,16 +109,6 @@ class _ChildRegistrationState extends State<ChildRegistration> {
     } else {
       print("Error fetching suggestions");
     }
-  }
-
-  // Get the position of the TextField
-  void getTextFieldPosition() {
-    final RenderBox renderBox =
-        _textFieldKey.currentContext!.findRenderObject() as RenderBox;
-    final Offset position = renderBox.localToGlobal(Offset.zero);
-    setState(() {
-      _textFieldOffset = position.dy + renderBox.size.height;
-    });
   }
 
   Future<void> _pickImage() async {
@@ -503,14 +491,12 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                               height: 10.h,
                             ),
                             CustomTextFieldWidget(
-                              key: _textFieldKey,
                               controller: _homeAddressController,
                               keyboardType: TextInputType.streetAddress,
                               obscureText: false,
                               filled: false,
                               readOnly: false,
                               onChanged: (value) {
-                                getTextFieldPosition(); // Update position dynamically
                                 getSuggestions(value); // Fetch suggestions
                               },
                               prefixIcon: Icon(
@@ -736,16 +722,16 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                         age: _ageController.text.trim(),
                                         grade: _gradeController.text.trim(),
                                         school: _schoolController.text.trim(),
-                                        relationship: _relationshipController
-                                            .text
-                                            .trim(),
+                                        relationship:
+                                            _relationshipController.text.trim(),
                                         homeAddress:
                                             _homeAddressController.text.trim(),
-                                        schoolAddress:
-                                            _schoolAddressController.text.trim(),
-                                        daycareAddress: _daycareAddressController
+                                        schoolAddress: _schoolAddressController
                                             .text
                                             .trim(),
+                                        daycareAddress:
+                                            _daycareAddressController.text
+                                                .trim(),
                                         imageFile: _selectedImage,
                                       );
 
