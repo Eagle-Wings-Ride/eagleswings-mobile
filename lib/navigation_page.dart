@@ -1,22 +1,21 @@
-// import 'package:eaglerides/pages/onTripPage/invoice.dart';
-// import 'package:eaglerides/pages/onTripPage/map_page.dart';
 import 'package:eaglerides/presentation/controller/auth/auth_controller.dart';
 import 'package:eaglerides/presentation/screens/account/account.dart';
 import 'package:eaglerides/presentation/screens/home/home.dart';
 import 'package:eaglerides/presentation/screens/ride/rides_screen.dart';
-// import 'package:eaglerides/presentation/screens/ride/map_with_source_destination_field.dart';
+import 'package:eaglerides/presentation/screens/ride/trip_history_screen.dart'; // ⭐ ADD THIS
 import 'package:eaglerides/styles/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../injection_container.dart' as di;
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 
 import 'data/core/api_client.dart';
 
 class NavigationPage extends StatefulWidget {
-  const NavigationPage({super.key});
+  final int initialTab;
+
+  const NavigationPage({super.key, this.initialTab = 0});
 
   @override
   State<NavigationPage> createState() => _NavigationPageState();
@@ -24,41 +23,34 @@ class NavigationPage extends StatefulWidget {
 
 class _NavigationPageState extends State<NavigationPage> {
   final AuthController _authController = Get.put(di.sl<AuthController>());
-  // static const CameraPosition _defaultLocation = CameraPosition(
-  //   target: LatLng(23.030357, 72.517845),
-  //   zoom: 14.4746,
-  // );
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    currentIndex = widget.initialTab;
     _loadUserAndSetToken();
   }
 
   Future<void> _loadUserAndSetToken() async {
     try {
-      // Ensure that the token is set before any navigation or further actions
       await _authController.loadUser();
       await _authController.fetchChildren();
       await _authController.fetchRatesData();
 
-      // Get the latest token (in case the AuthController modifies or fetches it)
-      // Get the token from the AuthController (await it since getToken() is asynchronous)
       final token = await _authController.getToken();
 
       if (token != null) {
         final apiClient = di.sl<ApiClient>();
-        apiClient.setToken(token); // Now passing the resolved token (String)
+        apiClient.setToken(token);
         print('Token set: $token');
       }
     } catch (e) {
-      // Handle any error that occurs while loading user data or setting the token
       print('Error loading user or setting token: $e');
     }
   }
 
   var currentIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,7 +74,8 @@ class _NavigationPageState extends State<NavigationPage> {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(3, (index) {
+          children: List.generate(4, (index) {
+            // ⭐ CHANGED FROM 3 TO 4
             return InkWell(
               onTap: () {
                 setState(() {
@@ -123,7 +116,6 @@ class _NavigationPageState extends State<NavigationPage> {
                           : FontWeight.w500,
                     ),
                   ),
-                  // SizedBox(height: MediaQuery.of(context).size.width * .06),
                 ],
               ),
             );
@@ -133,18 +125,23 @@ class _NavigationPageState extends State<NavigationPage> {
     );
   }
 
+  // ⭐ UPDATED: Added "History" tab
   List<String> navText = [
     'Home',
     'Ride',
+    'History', // ⭐ NEW
     'Account',
   ];
 
+  // ⭐ UPDATED: Added history icon
   List<IconData> listOfIcons = [
     Iconsax.home,
     Iconsax.car,
+    Iconsax.clock, // ⭐ NEW - or use Iconsax.document
     Iconsax.profile_circle,
   ];
 
+  // ⭐ UPDATED: Added trip history case
   Widget _buildPage(int index) {
     switch (index) {
       case 0:
@@ -152,6 +149,8 @@ class _NavigationPageState extends State<NavigationPage> {
       case 1:
         return const RidesScreen();
       case 2:
+        return const TripHistoryScreen(); // ⭐ NEW
+      case 3:
         return const AccountScreen();
       default:
         return const HomePage();

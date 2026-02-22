@@ -31,15 +31,15 @@ class _LoadingPageState extends State<LoadingPage> {
     _authController.checkIsSignIn();
     Timer(const Duration(seconds: 2), () async {
       if (_authController.isSignIn.value) {
-        // print(_authController.isSignIn.value);
+        // User is signed in, check their status
         if (await _authController.checkUserStatus()) {
-          // await _authController.loadUser();
           Get.off(() => const NavigationPage());
         } else {
+          // User status check failed, redirect to login
           Get.off(() => const Login());
         }
-        Get.off(() => const NavigationPage());
       } else {
+        // User is not signed in
         Get.off(() => const Login());
       }
     });
